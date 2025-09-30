@@ -113,9 +113,6 @@ namespace xfl
     QStringList findFiles(const QString &startDir, const QStringList &filters, bool bRecursive);
     bool findFile(QString const &filename, QString const &startDir, const QStringList &filters, bool bRecursive, QString &filePathName);
 
-    void printDouble(QString msg, double d0, double d1=-2.0e50, double d2=-2.0e50, double d3=-2.0e50, double d4=-2.0e50, double d5=-2.0e50, double d6=-2.0e50, double d7=-2.0e50, double d8=-2.0e50, double d9=-2.0e50);
-    void printDouble(double d0, double d1=-2.0e50, double d2=-2.0e50, double d3=-2.0e50, double d4=-2.0e50, double d5=-2.0e50, double d6=-2.0e50, double d7=-2.0e50, double d8=-2.0e50, double d9=-2.0e50);
-
     void writeCString(QDataStream &ar, QString const &strong);
     void readCString(QDataStream &ar, QString &strong);
 

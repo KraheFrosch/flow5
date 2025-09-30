@@ -381,126 +381,10 @@ bool xfl::findFile(QString const &filename, QString const &startDir, QStringList
 }
 
 
-
-void xfl::printDouble(QString msg, double d0, double d1, double d2, double d3, double d4, double d5, double d6, double d7, double d8, double d9)
-{
-    QString strong, str;
-    strong = msg;
-    str = QString::asprintf("  %13.7g", d0);
-    strong += str;
-    if(d1>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d1);
-        strong += str;
-    }
-    if(d2>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d2);
-        strong += str;
-    }
-    if(d3>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d3);
-        strong += str;
-    }
-    if(d4>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d4);
-        strong += str;
-    }
-    if(d5>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d5);
-        strong += str;
-    }
-    if(d6>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d6);
-        strong += str;
-    }
-    if(d7>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d7);
-        strong += str;
-    }
-    if(d8>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d8);
-        strong += str;
-    }
-    if(d9>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d9);
-        strong += str;
-    }
-
-    qDebug("%s", strong.toStdString().c_str());
-}
-
-
-void xfl::printDouble(double d0, double d1, double d2, double d3, double d4, double d5, double d6, double d7, double d8, double d9)
-{
-    QString strong, str;
-    strong = QString::asprintf("  %13.7g", d0);
-    if(d1>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d1);
-        strong += str;
-    }
-    if(d2>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d2);
-        strong += str;
-    }
-    if(d3>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d3);
-        strong += str;
-    }
-    if(d4>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d4);
-        strong += str;
-    }
-    if(d5>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d5);
-        strong += str;
-    }
-    if(d6>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d6);
-        strong += str;
-    }
-    if(d7>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d7);
-        strong += str;
-    }
-    if(d8>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d8);
-        strong += str;
-    }
-    if(d9>-1.0e50)
-    {
-        str = QString::asprintf("  %13.7g", d9);
-        strong += str;
-    }
-
-    qDebug("%s", strong.toStdString().c_str());
-}
-
-
-/**
-* Reads a sequence of characters from a binary stream and returns a QString. Inherited from the MFC versions of XFLR5.
-*@param ar the binary datastream
-*@param strong the QString read from the stream
-*/
 void xfl::readString(QDataStream &ar, QString &strong)
 {
-    qint8 qi, ch;
-    char c;
+    qint8 qi(0), ch(0);
+    char c(0);
 
     ar >> qi;
     strong.clear();
@@ -514,11 +398,6 @@ void xfl::readString(QDataStream &ar, QString &strong)
 }
 
 
-/**
-* Writes a sequence of characters from a QStrinf to a binary stream. Inherited from the MFC versions of XFLR5.
-*@param ar the binary datastream
-*@param strong the QString to output to the stream
-*/
 void xfl::writeString(QDataStream &ar, QString const &strong)
 {
     qint8 qi = qint8(strong.length());
@@ -532,16 +411,10 @@ void xfl::writeString(QDataStream &ar, QString const &strong)
 }
 
 
-
-/**
-* Reads a sequence of characters from a binary stream and returns a QString. Inherited from the MFC versions of XFLR5.
-*@param ar the binary datastream
-*@param strong the QString read from the stream
-*/
 void xfl::readCString(QDataStream &ar, QString &strong)
 {
-    qint8 qi, ch;
-    char c;
+    qint8 qi(0), ch(0);
+    char c(0);
 
     ar >> qi;
     strong.clear();
@@ -555,11 +428,6 @@ void xfl::readCString(QDataStream &ar, QString &strong)
 }
 
 
-/**
-* Writes a sequence of characters from a QString to a binary stream. Inherited from the MFC versions of XFLR5.
-*@param ar the binary datastream
-*@param strong the QString to output to the stream
-*/
 void xfl::writeCString(QDataStream &ar, QString const &strong)
 {
     qint8 qi = qint8(strong.length());
