@@ -13,7 +13,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 TEMPLATE = app
 TARGET = flow5
 
-VERSION = 7.51
+VERSION = 7.53
 
 QT += opengl widgets xml
 
@@ -116,12 +116,6 @@ linux-g++ {
     # .../build/debug> gprof -pb flow5 gmon.out > ./analysis_flat.txt
     # .../build/debug> gprof -q flow5 gmon.out > ./analysis_callgraph.txt
 
-
-    #------------- QLM -------------------
-    #------ Open SSL libs are required by QLM -----
-    INCLUDEPATH += /usr/include/openssl/
-    LIBS += -lcrypto  -lssl
-
 # issues with OpenCascade
 QMAKE_CXXFLAGS_WARN_ON += -Wno-deprecated-declarations
 
@@ -159,13 +153,10 @@ win32-msvc {
 #------------ OPEN CASCADE --------------------------
     INCLUDEPATH += D:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc
     LIBS += -LD:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib
-    LIBS += -LD:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\bin
+    LIBS += -LprintD:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\bin
 
 
 
-#------------------------ QLM -------------------
-    INCLUDEPATH += "C:\Program Files\OpenSSL-Win64\include"
-    LIBS += -L"C:\Program Files\OpenSSL-Win64\lib" -llibcrypto  -llibssl
 
 #---------------- OTHER WIN LIBS -------------------
     DEFINES += _UNICODE WIN64 QT_DLL QT_WIDGETS_LIB
@@ -208,13 +199,6 @@ macx {
     DEFINES += ACCELERATE
     #    QMAKE_LFLAGS += -framework Accelerate
     LIBS += -llapack -lcblas
-
-    #-------------QLM--------------------------
-    #    LIBS += -L/usr/local/mac-dev-env/openssl-1.1.1g/lib -lcrypto -lssl
-    #    LIBS += -L/Users/techwinder/bin/openssl-1.1.1g/lib -lcrypto -lssl
-    LIBS += -L/Users/techwinder/bin/openssl-mac
-    LIBS +=  -lssl -lcrypto
-    INCLUDEPATH += /Users/techwinder/bin/openssl-3.2.0-arm64/include/
 }
 
 
