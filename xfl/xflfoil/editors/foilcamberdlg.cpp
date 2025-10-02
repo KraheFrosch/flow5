@@ -391,16 +391,16 @@ void FoilCamberDlg::onApproxFoil()
 
     onTakePicture();
 
-    Q_ASSERT(pRefFoil->m_BaseCbLine.size()==pRefFoil->m_Thickness.size());
-    int size = pRefFoil->m_BaseCbLine.size();
-    s_CSpline.approximate(degree, nCtrlPoints, pRefFoil->m_BaseCbLine);
+    Q_ASSERT(pRefFoil->baseCbLine().size()==pRefFoil->thickness().size());
+    int size = pRefFoil->baseCbLine().size();
+    s_CSpline.approximate(degree, nCtrlPoints, pRefFoil->baseCbLine());
 
-    QVector<Vector2d> points(size);
+    QVector<Node2d> points(size);
 
     for(int i=0; i<size; i++)
     {
-        points[i].x = pRefFoil->m_BaseCbLine.at(i).x;
-        points[i].y = pRefFoil->m_BaseCbLine.at(i).y + pRefFoil->m_Thickness.at(i)/2.0;
+        points[i].x = pRefFoil->baseCbLine().at(i).x;
+        points[i].y = pRefFoil->baseCbLine().at(i).y + pRefFoil->thickness().at(i)/2.0;
     }
     s_TSpline.approximate(degree, nCtrlPoints, points);
 

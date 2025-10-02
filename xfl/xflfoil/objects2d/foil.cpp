@@ -104,48 +104,11 @@ void Foil::setDefaultMidLinePointDistribution(int nMidPoints)
 }
 
 
-bool Foil::initGeometry(bool bFast)
-{
-    if(nBaseNodes()<=0) return false;
-
-
-    setTE();
-
-    if(!makeTopBotSurfaces()) return false;
-
-    applyBase();
-
-
-    if(bFast) // to speed up foil modification routines
-        makeCubicSpline(nNodes()/3);
-    else
-        makeCubicSpline();
-
-    makeNormalsFromCubic(true);
-
-    setLEFromCubicSpline();
-    makeBaseMidLine();
-
-    setFlaps();
-
-    if(bFast) // to speed up foil modification routines
-        makeCubicSpline(nNodes()/3);
-    else
-        makeCubicSpline();
-
-    makeNormalsFromCubic(false);
-
-    m_BaseCbLine.front() = m_LE;
-
-    return true;
-}
-
-
 void Foil::makeBaseMidLine()
 {
     Vector2d U = (m_TE-m_LE).normalized();
     Vector2d N(-U.y, U.x);
-    Vector2d TOP, BOT;
+    Vector2d Top, Bot;
 
     setDefaultMidLinePointDistribution(MIDPOINTCOUNT);
 
@@ -156,15 +119,14 @@ void Foil::makeBaseMidLine()
     {
         Vector2d pt = m_LE + U *m_BaseCbLine.at(l).x;
 
-        m_CubicSpline.getPoint(true,  m_CSfracLE, pt, pt+N, TOP);
-        m_CubicSpline.getPoint(false, m_CSfracLE, pt, pt-N, BOT);
+        m_CubicSpline.getPoint(true,  m_CSfracLE, pt, pt+N, Top);
+        m_CubicSpline.getPoint(false, m_CSfracLE, pt, pt-N, Bot);
 
         // update values
-        m_BaseCbLine[l] = (TOP+BOT)/2.0;
-        m_Thickness[l] = (TOP-BOT).norm();
+        m_BaseCbLine[l] = (Top+Bot)/2.0;
+        m_Thickness[l] = (Top-Bot).norm();
     }
 
-    m_CbLine = m_BaseCbLine;
 }
 
 
@@ -335,13 +297,12 @@ void Foil::setThickness(double xthick, double thick)
     }
 
     m_Thickness = newth;
-    makeBaseFromCamberAndThickness();
 }
 
 
 void Foil::setCamber(double xcamb, double camb)
 {
-    QVector<Vector2d> newc = m_BaseCbLine; // the new camber line
+    QVector<Node2d> newc = m_BaseCbLine; // the new camber line
     double c0 = maxCamber();
     double xc0 = xCamber();
     double cr = camb/c0;
@@ -378,23 +339,28 @@ void Foil::setCamber(double xcamb, double camb)
     }
 
     m_BaseCbLine = newc;
-    makeBaseFromCamberAndThickness();
 }
 
 
 void Foil::makeBaseFromCamberAndThickness()
 {
     double c{0},t{0};
-    for(int i=0; i<m_BaseTop.size(); i++)
+
+    m_BaseTop.resize(m_BaseCbLine.size());
+    m_BaseBot.resize(m_BaseCbLine.size());
+
+    for(int i=0; i<m_BaseCbLine.size(); i++)
     {
-        c = camber(m_BaseTop.at(i).x);
-        t = thickness(m_BaseTop.at(i).x);
+        c = camber(m_BaseCbLine.at(i).x);
+        t = thickness(m_BaseCbLine.at(i).x);
+        m_BaseTop[i].x = m_BaseCbLine.at(i).x;
         m_BaseTop[i].y = c + 0.5*t;
     }
-    for(int i=0; i<m_BaseBot.size(); i++)
+    for(int i=0; i<m_BaseCbLine.size(); i++)
     {
-        c = camber(m_BaseBot.at(i).x);
-        t = thickness(m_BaseBot.at(i).x);
+        c = camber(m_BaseCbLine.at(i).x);
+        t = thickness(m_BaseCbLine.at(i).x);
+        m_BaseBot[i].x = m_BaseCbLine.at(i).x;
         m_BaseBot[i].y = c - 0.5*t;
     }
 }
@@ -420,8 +386,6 @@ void Foil::rebuildPointSequenceFromBase()
         m_BaseNode[topsize+i-1].x = m_BaseBot.at(i).x;
         m_BaseNode[topsize+i-1].y = m_BaseBot.at(i).y;
     }
-
-    applyBase();
 }
 
 
@@ -540,7 +504,6 @@ void Foil::copy(Foil const &SrcFoil, bool bMeta, bool bForceDeepCopy)
 
     m_bCamberLine = SrcFoil.m_bCamberLine;
 
-    m_BSpline     = SrcFoil.m_BSpline;
     m_CubicSpline = SrcFoil.m_CubicSpline;
     m_BSfracLE    = SrcFoil.m_BSfracLE;
     m_CSfracLE    = SrcFoil.m_CSfracLE;
@@ -921,45 +884,41 @@ void Foil::getY(QVector<Vector2d> const &vec, double x, double &y) const
 }
 
 
-void Foil::setTE()
-{
-    m_TE.x = (m_BaseNode.front().x+m_BaseNode.back().x)/2.0;
-    m_TE.y = (m_BaseNode.front().y+m_BaseNode.back().y)/2.0;
-}
-
-
 /** XFoil method: LE is the point such that the local tangent is
  *  perpendicular to the line linking LE to TE */
 void Foil::setLEFromCubicSpline()
 {
     // find the LE by dichotomy
     double dx{0}, dy{0}, tx{0}, ty{0}, nt{0}, nd{0}, sc{0}, s0{0}, s1{0};
-    double xs{0}, ys{0};
+
+    const double precision = 1.0e-5;
+
+    Vector2d ps;
 
     double t0 = 0.;
     int iter{0};
     do
     {
         t0+=0.05;
-        m_CubicSpline.splinePoint(t0, xs, ys);
+        ps = m_CubicSpline.splinePoint(t0);
         iter++;
     }
-    while(xs>0.15 && iter<10);
+    while(ps.x>0.15 && iter<10);
 
     iter=0;
     double t1 = 1.0;
     do
     {
         t1 -=0.05;
-        m_CubicSpline.splinePoint(t1, xs, ys);
+        ps = m_CubicSpline.splinePoint(t1);
         iter++;
     }
-    while(xs>0.15 && iter<10);
+    while(ps.x>0.15 && iter<10);
 
-    m_CubicSpline.splinePoint(t0, xs, ys);
+    ps = m_CubicSpline.splinePoint(t0);
     //make normalized vector from TE to point
-    tx = m_TE.x - xs;
-    ty = m_TE.y - ys;
+    tx = m_TE.x - ps.x;
+    ty = m_TE.y - ps.y;
     nt = sqrt(tx*tx+ty*ty);
     tx *= 1.0/nt;
     ty *= 1.0/nt;
@@ -969,10 +928,10 @@ void Foil::setLEFromCubicSpline()
     dy *= 1.0/nd;
     s0 = tx*dx + ty*dy;
 
-    m_CubicSpline.splinePoint(t1, xs, ys);
+    ps = m_CubicSpline.splinePoint(t1);
     //make normalized vector from TE to point
-    tx = m_TE.x - xs;
-    ty = m_TE.y - ys;
+    tx = m_TE.x - ps.x;
+    ty = m_TE.y - ps.y;
     nt = sqrt(tx*tx+ty*ty);
     tx *= 1.0/nt;
     ty *= 1.0/nt;
@@ -989,10 +948,10 @@ void Foil::setLEFromCubicSpline()
     do
     {
         t=(t0+t1)/2.0;
-        m_CubicSpline.splinePoint(t, xs, ys);
+        ps = m_CubicSpline.splinePoint(t);
         //make normalized vector from TE to point
-        tx = m_TE.x - xs;
-        ty = m_TE.y - ys;
+        tx = m_TE.x - ps.x;
+        ty = m_TE.y - ps.y;
         nt = sqrt(tx*tx+ty*ty);
         tx *= 1.0/nt;
         ty *= 1.0/nt;
@@ -1005,16 +964,15 @@ void Foil::setLEFromCubicSpline()
         if(sc<0.0) t0=t;
         else       t1=t;
 
-        if(fabs(t1-t0)<1.e-5)
-            break;
+        if(fabs(t1-t0)<precision)  break;
         iter++;
     }while(iter<100);
 
     if(iter<100)
     {
         m_CSfracLE = (t0+t1)/2.0;
-        m_CubicSpline.splinePoint(m_CSfracLE, m_LE.x, m_LE.y);
-        if(fabs(m_LE.y)<1.0e-5) m_LE.y = 0;
+        m_LE = m_CubicSpline.splinePoint(m_CSfracLE);
+        if(fabs(m_LE.y)<1.0e-4) m_LE.y = 0;
     }
     else
     {
@@ -1028,14 +986,14 @@ bool Foil::makeApproxBSpline(BSpline &bs, int deg, int nCtrlPts, int nOutputPts)
 {
     bs.setOutputSize(nOutputPts);
 
-    QVector<Vector2d> points(nBaseNodes());
+/*    QVector<Node2d> points(nBaseNodes());
     for(int i=0; i<nBaseNodes(); i++)
     {
         points[i].x = xb(i);
         points[i].y = yb(i);
-    }
+    }*/
 
-    return bs.approximate(deg, nCtrlPts, points);
+    return bs.approximate(deg, nCtrlPts, m_BaseNode);
 }
 
 
@@ -1075,9 +1033,6 @@ bool Foil::makeTopBotSurfaces()
     {
         m_BaseBot[i-m_iLE].set(xb(i), yb(i));
     }
-
-    m_Top = m_BaseTop;
-    m_Bot = m_BaseBot;
 
     return true;
 }
@@ -1134,13 +1089,15 @@ double Foil::normalizeGeometry()
 }
 
 
-/**
- * Sets the properties for the trailing edge flap.
- * @param bFlap true if a flap is applied to the trailing edge
-  * @param xhinge the relative x-position of the flap's hinge
- * @param yhinge the relative y-position of the flap's hinge
- * @param angle the flap angle in degrees
- */
+void Foil::scaleHingeLocations()
+{
+    m_LEXHinge /= 100.0;
+    m_LEYHinge /= 100.0;
+    m_TEXHinge /= 100.0;
+    m_TEYHinge /= 100.0;
+}
+
+
 void Foil::setTEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 {
     m_bTEFlap     = bFlap;
@@ -1150,13 +1107,6 @@ void Foil::setTEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 }
 
 
-/**
- * Sets the properties for the leading edge flap.
- * @param bFlap true if a flap is applied to the leading edge
- * @param xhinge the relative x-position of the flap's hinge
- * @param yhinge the relative y-position of the flap's hinge
- * @param angle the flap angle in degrees
- */
 void Foil::setLEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 {
     m_bLEFlap     = bFlap;
@@ -1166,11 +1116,6 @@ void Foil::setLEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 }
 
 
-/**
- * Modifies the geometry of the current foil by setting the leading edge flap.
- * The specification for the flap is assumed to have been set previously
- * Modifies the current geometry defined in the arrays rpTpo and rpBot, not the base geometry
- */
 void Foil::setLEFlap()
 {
     bool bIntersect{false};
@@ -1706,14 +1651,13 @@ Vector2d Foil::TEbisector() const
 void Foil::makeNormalsFromCubic(bool bBase)
 {
     double dx{0}, dy{0};
-    for(int t=0; t<nNodes(); t++)
+    for(int t=0; t<nBaseNodes(); t++)
     {
         m_CubicSpline.splineDerivative(double(t)/double(nNodes()-1), dx, dy);
         double norm = sqrt(dx*dx+dy*dy);
         if(bBase)
             m_BaseNode[t].setNormal(dy/norm, -dx/norm);
-        else
-            m_Node[t].setNormal(dy/norm, -dx/norm);
+//        else            m_Node[t].setNormal(dy/norm, -dx/norm);
 
     }
 }
@@ -1727,11 +1671,7 @@ void Foil::makeCubicSpline(int nCtrlPts)
 
 void Foil::makeCubicSpline(CubicSpline &cs, int nCtrlPts) const
 {
-    QVector<Vector2d> points(nNodes());
-    for(int i=0; i<nNodes(); i++)
-        points[i] = m_Node.at(i);
-
-    cs.approximate(nCtrlPts, points);
+    cs.approximate(nCtrlPts, m_BaseNode);
 }
 
 
@@ -1989,8 +1929,8 @@ Node2d const &Foil::node(int index) const
 
 void Foil::interpolate(Foil const *pFoil1, Foil const *pFoil2, double frac)
 {
-    QVector<Vector2d> const &cline1 = pFoil1->m_BaseCbLine;
-    QVector<Vector2d> const &cline2 = pFoil2->m_BaseCbLine;
+    QVector<Node2d> const &cline1 = pFoil1->m_BaseCbLine;
+    QVector<Node2d> const &cline2 = pFoil2->m_BaseCbLine;
 
     QVector<double> const &th1 = pFoil1->m_Thickness;
     QVector<double> const &th2 = pFoil2->m_Thickness;
@@ -2007,91 +1947,53 @@ void Foil::interpolate(Foil const *pFoil1, Foil const *pFoil2, double frac)
 }
 
 
-bool Foil::bIsInside(float x, float y) const
+
+/**
+ * "Base arrays" = raw airfoil as imported or constructed, with coarse panelling and no flap
+ * "Active arrays" = Base + repanelling and flaps
+ *
+ * Use the BaseNodes + re-panelling data to
+ *   - find the LE and TE
+ *   - build the camber line and thickness array
+ *   - build the top and bot base arrays, including the normals
+ *
+ * Procedure:
+ *   0. Make the cubic spline C3S using BaseNodes
+ *   1. repanel using the C3S and the bunch parameters and store in Nodes
+ *   2. set LE and midline from Nodes
+ *   3. Create top and bot surfaces base + current
+ *   4. set the flaps
+ */
+bool Foil::initGeometry(bool bFast)
 {
-    if(x<0.0f || x>1.0f)
-        return false;
-    if(fabs(y)>maxThickness()) return false;
+    if(nBaseNodes()<=0) return false;
 
-    Vector2d N;
+    // set the Trailing edge
+    m_TE.x = (m_BaseNode.front().x+m_BaseNode.back().x)/2.0;
+    m_TE.y = (m_BaseNode.front().y+m_BaseNode.back().y)/2.0;
 
-    if(y>=0 && y<=upperYRel(x,N).y)
-        return true;
-    if(y<=0 && y>=lowerYRel(x, N).y)
-        return true;
+    // use the base nodes to build the cubic
+    if(bFast) // to speed up foil modification routines
+        makeCubicSpline(nNodes()/3);
+    else
+        makeCubicSpline();
 
-    return false;
-}
+    makeNormalsFromCubic(true);
 
+    setLEFromCubicSpline();
+    makeBaseMidLine();
+    m_BaseCbLine.front() = m_LE;
 
-bool Foil::isInside(float xp, float yp) const
-{
-    double xmin = LARGEVALUE;
-    double xmax = -LARGEVALUE;
-    double ymin = LARGEVALUE;
-    double ymax = -LARGEVALUE;
+    if(!makeTopBotSurfaces()) return false;
 
-    for (int i=0; i<nNodes(); i++)
-    {
-        xmin = std::min(xmin, m_Node.at(i).x);
-        xmax = std::max(xmax, m_Node.at(i).x);
-        ymin = std::min(ymin, m_Node.at(i).y);
-        ymax = std::max(ymax, m_Node.at(i).y);
-    }
-
-    if (xp<xmin || xp>xmax)   return false;
-    if (yp<ymin || yp>ymax)   return false;
+    applyBase();
 
 
-    int i(0), j(0);
-    bool bInside = false;
-    for (i=0, j=nNodes()-1; i<nNodes(); j=i++)
-    {
-        if ( ((m_Node.at(i).y>yp)!=(m_Node.at(j).y>yp)) &&
-             (xp<(m_Node.at(j).x-m_Node.at(i).x) * (yp-m_Node.at(i).y) / (m_Node.at(j).x-m_Node.at(i).x) + m_Node.at(i).x))
-            bInside = !bInside;
-    }
-    return bInside;
-}
+    setFlaps();
 
-
-bool Foil::intersectFoil(const Vector2d &A, const Vector2d &B, Vector2d &I) const
-{
-    for(int i=1; i<nNodes(); i++)
-    {
-        if(intersect(A, B, {m_Node.at(i-1).x, m_Node.at(i-1).y}, {m_Node.at(i).x, m_Node.at(i).y}, I)) return true;
-    }
-    return false;
-}
-
-
-void Foil::getNodeOnCubic(double tau, Node2d &n2d) const
-{
-    double dx(0), dy(0);
-
-    m_CubicSpline.splinePoint(     tau, n2d.x, n2d.y);
-    m_CubicSpline.splineDerivative(tau, dx,    dy);
-    double norm = sqrt(dx*dx+dy*dy);
-    n2d.setNormal(dy/norm, -dx/norm);
-    n2d.setTau(tau);
-}
-
-
-/** Projects point A normally onto the airfoil's surface and returns a node2d */
-bool Foil::project(Vector2d const &pt, Node2d &node) const
-{
-    double t = m_CubicSpline.closest(pt.x, pt.y, 1.0e-5f);
-    m_CubicSpline.splinePoint(t, node.x, node.y);
-    double dx(0), dy(0);
-
-    if(m_CubicSpline.isSingular()) return false;
-
-    m_CubicSpline.splineDerivative(t, dx, dy);
-    double norm = sqrt(dx*dx+dy*dy);
-    node.setNormal(dy/norm, -dx/norm);
-    node.setTau(t);
     return true;
 }
+
 
 
 

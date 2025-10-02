@@ -24,6 +24,6 @@ void s7Spline::makeCurve()
     for(int i=0; i<m_Output.size(); i++)
     {
         double di = double(i)/double(m_Output.size()-1);
-        splinePoint(di, m_Output[i].x, m_Output[i].y);
+        m_Output[i] = splinePoint(di);
     }
 }

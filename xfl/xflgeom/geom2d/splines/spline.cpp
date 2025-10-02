@@ -439,10 +439,10 @@ bool Spline::serializeFl5(QDataStream &ar, bool bIsStoring)
         n=0;
         switch(m_BunchType)
         {
-            case Spline::NOBUNCH:    n=0;        break;
-            case Spline::UNIFORM:    n=1;        break;
-            case Spline::SIGMOID:    n=2;        break;
-            case Spline::DOUBLESIG:  n=3;        break;
+            case NOBUNCH:    n=0;        break;
+            case UNIFORM:    n=1;        break;
+            case SIGMOID:    n=2;        break;
+            case DOUBLESIG:  n=3;        break;
         }
         ar << n << k; // ar << m_BunchDistrib;
 
@@ -523,9 +523,10 @@ double Spline::closest(double xin, double yin, float precision) const
     int nsplit = 300; // need to refine to differentiate top and bottom surfaces near the TE
     // find the two adjacent points
     double dist(0);
-    double x(0), y(0);
     double u(0);
     double dmax=1.e10;
+
+    Vector2d pt;
 
     float umin=0.0;
     float umax=1.0;
@@ -541,8 +542,8 @@ double Spline::closest(double xin, double yin, float precision) const
         bImproved = false;
         for(int i=0; i<nsplit; i++)
         {
-            splinePoint(u, x, y);
-            dist = sqrt((xin-x)*(xin-x)+(yin-y)*(yin-y));
+            pt = splinePoint(u);
+            dist = sqrt((xin-pt.x)*(xin-pt.x)+(yin-pt.y)*(yin-pt.y));
             if(dist<dmax)
             {
                 uc=u;
@@ -611,14 +612,13 @@ double Spline::length(double t0, double t1) const
     double l=0;
     double u0=t0;
     double u1=0.0;
-    double x0=0, y0=0;
-    double x1=0, y1=0;
-    splinePoint(u0, x0, y0);
+    Vector2d p0, p1;
+    p0 = splinePoint(u0);
     for(int it=1; it<RES; it++)
     {
         u1 = t0 + double(it)/double(RES-1)*(t1-t0);
-        splinePoint(u1, x1, y1);
-        l += sqrt((x1-x0)*(x1-x0)+(y1-y0)*(y1-y0));
+        p1 = splinePoint(u1);
+        l += p0.distanceTo(p1);
 //        u0 = u1;
     }
     return l;
@@ -647,7 +647,7 @@ void Spline::makeSplit(int m_nSegs, xfl::enumDistribution distrib, QVector<doubl
     double tl=0;
     double eps = 0.0001;
     double seglength=0;
-    double x0=0, y0=0, x1=0, y1=0;
+    Vector2d p0, p1;
 
     int iter=0;
     for(int i=1; i<m_nSegs; i++)
@@ -656,8 +656,8 @@ void Spline::makeSplit(int m_nSegs, xfl::enumDistribution distrib, QVector<doubl
         v0 = u0;
         v1 = u1;
 
-        splinePoint(v0, x0, y0);
-        splinePoint(v1, x1, y1);
+//        p0 = splinePoint(v0);
+//        p1 = splinePoint(v1);
         iter = 0;
         do
         {
@@ -685,15 +685,6 @@ void Spline::scale(double ratio)
     }
     updateSpline();
     makeCurve();
-}
-
-
-
-Vector2d Spline::splinePt(double u) const
-{
-    Vector2d pt;
-    splinePoint(u, pt.x, pt.y);
-    return pt;
 }
 
 

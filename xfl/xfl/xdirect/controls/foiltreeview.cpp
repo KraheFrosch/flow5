@@ -24,6 +24,7 @@
 #include <xflfoil/objects2d/objects2d.h>
 #include <xflfoil/objects2d/oppoint.h>
 #include <xflfoil/objects2d/polar.h>
+#include <xflgeom/geom_globals/geom_params.h>
 #include <xflwidgets/customwts/plaintextoutput.h>
 #include <xflwidgets/line/linebtn.h>
 #include <xflwidgets/line/linemenu.h>

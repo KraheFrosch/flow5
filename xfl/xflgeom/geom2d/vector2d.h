@@ -11,8 +11,6 @@
 
 #include <cmath>
 
-#include <QString>
-
 
 class Vector2d
 {
@@ -196,7 +194,7 @@ class Vector2d
         virtual void rotateZ(Vector2d const &O, double ZTilt);
         virtual void rotateZ(double beta);
 
-        void displayCoords(QString msg = QString()) const;
+        void displayCoords() const;
 };
 
 

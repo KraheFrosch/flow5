@@ -165,7 +165,7 @@ XPlane::XPlane(MainFrame *pMainFrame) : QObject()
     m_pPanelResultTest = nullptr;
 
     //the instance of the analysis dlg
-    m_pPanelAnalysisDlg = new PlaneAnalysisDlg;
+    m_pPanelAnalysisDlg = new PlaneAnalysisDlg(s_pMainFrame);
     PlaneAnalysisDlg::setXPlane(this);
     connect(m_pPanelAnalysisDlg, SIGNAL(analysisFinished(WPolar*)), SLOT(onFinishAnalysis(WPolar*)));
 
@@ -255,7 +255,7 @@ XPlane::XPlane(MainFrame *pMainFrame) : QObject()
     m_WPlrGraph[1]->setVariables(1,4);
     m_WPlrGraph[2]->setVariables(1,9);
     m_WPlrGraph[3]->setVariables(1,5);
-    m_WPlrGraph[4]->setVariables(1,17);
+    m_WPlrGraph[4]->setVariables(1,16);
 
 
     //set the default settings for the time response graphs
@@ -1585,7 +1585,7 @@ bool XPlane::loadSettings(QSettings &settings)
         m_WPlrGraph.at(ig)->setXVariableList(WPolar::variableNames());
         m_WPlrGraph.at(ig)->setYVariableList(WPolar::variableNames());
     }
-    s_pMainFrame->m_pWPolarTiles->loadSettings(settings, "WPolarTileWt");
+    s_pMainFrame->m_pWPolarTiles->loadSettings(settings, "WPolarTiles");
     if(s_pMainFrame->m_pWPolarTiles->variableSetCount()>0)
     {
         GraphTileVariableSet const & variableset = s_pMainFrame->m_pWPolarTiles->variableSet(0);
@@ -1675,11 +1675,12 @@ bool XPlane::saveSettings(QSettings &settings)
     m_StabPlrGraph.at(0)->saveSettings(settings);
     m_StabPlrGraph.at(1)->saveSettings(settings);
 
-    for(int ig=0; ig<m_WPlrGraph.count(); ig++) m_WPlrGraph[ig]->saveSettings(settings);
+    for(int ig=0; ig<m_WPlrGraph.count(); ig++)
+        m_WPlrGraph[ig]->saveSettings(settings);
     for(int ig=0; ig<m_WingGraph.count(); ig++) m_WingGraph[ig]->saveSettings(settings);
     for(int ig=0; ig<m_TimeGraph.count(); ig++) m_TimeGraph[ig]->saveSettings(settings);
 
-    s_pMainFrame->m_pWPolarTiles->saveSettings(   settings, "WPolarTileWt");
+    s_pMainFrame->m_pWPolarTiles->saveSettings(   settings, "WPolarTiles");
     s_pMainFrame->m_pPOppTiles->saveSettings(     settings, "POppGraphTiles");
     s_pMainFrame->m_pStabPolarTiles->saveSettings(settings, "StabPolarTiles");
     s_pMainFrame->m_pStabTimeTiles->saveSettings( settings, "StabTimeTiles");

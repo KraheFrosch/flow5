@@ -67,7 +67,8 @@ void XPlaneActions::makeActions()
     connect(m_pCpViewAct, SIGNAL(triggered()), m_pXPlane, SLOT(onCpView()));
 
     m_p3dLightAct = new QAction(QIcon(":/icons/light.png"), "Light settings", m_pXPlane);
-    m_p3dLightAct->setStatusTip("Define the light options in the 3d view");
+    m_p3dLightAct->setStatusTip("<p>Define the light options in 3d views</p>");
+    m_p3dLightAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
     connect(m_p3dLightAct, SIGNAL(triggered()), m_pXPlane->m_pgl3dXPlaneView, SLOT(onSetupLight()));
 
     m_pBackImageLoad = new QAction("Load", this);

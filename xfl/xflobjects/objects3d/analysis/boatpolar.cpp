@@ -793,7 +793,7 @@ double BoatPolar::windForce(double z) const
     if(z>m_WindSpline.lastCtrlPoint().y) return 1.0;
     if(z<0.0) return 0.0;
 
-    QVector<Vector2d> pts = m_WindSpline.outputPts();
+    QVector<Node2d> const &pts = m_WindSpline.outputPts();
 
     for (int k=0; k<pts.size()-1; k++)
     {
@@ -817,7 +817,7 @@ void BoatPolar::trueWindSpeed(double ctrl, double z, Vector3d &VT) const
     double tws_inf = m_TWSMin*(1-ctrl) + m_TWSMax*ctrl;
     double twa = m_TWAMin*(1-ctrl) + m_TWAMax*ctrl;;// true wind angle at high altitude in degrees
 
-    QVector<Vector2d> const &pts = m_WindSpline.outputPts();
+    QVector<Node2d> const &pts = m_WindSpline.outputPts();
 
     for (int k=0; k<pts.size()-1; k++)
     {
@@ -876,7 +876,7 @@ void BoatPolar::apparentWind(double ctrl, double z, Vector3d &AWS) const
 
     Vector3d TWS(tws_inf*cos(twa_inf*PI/180.0), tws_inf*sin(twa_inf*PI/180.0), 0.0); // true wind speed
 
-    QVector<Vector2d> pts = m_WindSpline.outputPts();
+    QVector<Node2d> const &pts = m_WindSpline.outputPts();
 
     for (int k=0; k<pts.size()-1; k++)
     {

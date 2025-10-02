@@ -287,7 +287,7 @@ void testPanel2d()
     Vector2d ptGlobal(1.6,1.0);
 
     Vector2d ptLocal = t2d.frame().globalToLocalPosition(ptGlobal);
-    ptLocal.displayCoords("ptlocal");
+    ptLocal.displayCoords();
 
 //    int iVertex=-1;
     int iEdge=-1;

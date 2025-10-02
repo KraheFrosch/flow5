@@ -27,8 +27,6 @@
 #include <xflcore/linestyle.h>
 #include <xflcore/xflobject.h>
 
-#include <xflgeom/geom2d/splines/bspline.h>
-
 
 /**
 *@class Foil
@@ -42,6 +40,9 @@ The class stores two geometries:
 @todo One of the very early classes in this project. Would need a general revision.
 Also it mixes the construction methods and the GUI; would be better to move the GUI to a derived child class for polymorphism.
 */
+
+class BSpline;
+
 class Foil : public XflObject
 {
     public:
@@ -83,6 +84,7 @@ class Foil : public XflObject
 
         void setCamber(double xcamb, double camb);
         void setThickness(double xthick, double thick);
+        void setThickness(QVector<double> const &thicknesses) {m_Thickness=thicknesses;}
 
         void makeBaseFromCamberAndThickness();
         void rebuildPointSequenceFromBase();
@@ -104,6 +106,8 @@ class Foil : public XflObject
         Vector2d TEbisector() const;
         Vector2d const &TE() const {return m_TE;}
         Vector2d const &LE() const {return m_LE;}
+        void setLE(Vector2d const &le) {m_LE=le;}
+        void setTE(Vector2d const &te) {m_TE=te;}
 
         bool exportFoilToDat(QTextStream &out) const;
         bool initGeometry(bool bFast=false);
@@ -117,6 +121,24 @@ class Foil : public XflObject
         void setLEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
         void setTEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
         void setTEFlapAngle(double angle){m_TEFlapAngle=angle;}
+
+
+        bool hasTEFlap() const {return m_bTEFlap;}
+        bool hasLEFlap() const {return m_bLEFlap;}
+        void setTEFlap(bool b) {m_bTEFlap=b;}
+        void setLEFlap(bool b) {m_bLEFlap=b;}
+
+        double TEFlapAngle() const {return m_TEFlapAngle;}
+        double LEFlapAngle() const {return m_LEFlapAngle;}
+        double TEXHinge() const {return m_TEXHinge;}
+        double TEYHinge() const {return m_TEYHinge;}
+        Vector2d TEHinge() const;
+
+        double LEXHinge() const {return m_LEXHinge;}
+        double LEYHinge() const {return m_LEYHinge;}
+        Vector2d LEHinge() const;
+
+        void scaleHingeLocations(); // cleaning old files
 
         bool serializeXfl(QDataStream &ar, bool bIsStoring);
         bool serializeFl5(QDataStream &ar, bool bIsStoring);
@@ -144,18 +166,6 @@ class Foil : public XflObject
 
         void applyBase();
 
-        bool hasTEFlap() const {return m_bTEFlap;}
-        bool hasLEFlap() const {return m_bLEFlap;}
-        double TEFlapAngle() const {return m_TEFlapAngle;}
-        double LEFlapAngle() const {return m_LEFlapAngle;}
-        double TEXHinge() const {return m_TEXHinge;}
-        double TEYHinge() const {return m_TEYHinge;}
-        Vector2d TEHinge() const;
-
-        double LEXHinge() const {return m_LEXHinge;}
-        double LEYHinge() const {return m_LEYHinge;}
-        Vector2d LEHinge() const;
-
         int iSelectedPt() const {return m_iSelectedPt;}
         void setSelectedPt(int iH) {m_iSelectedPt = iH;}
 
@@ -165,33 +175,43 @@ class Foil : public XflObject
         void listCoords(bool bBaseCoords=false);
         void listSurface(bool bBase);
 
-        void setBaseCamberLine(QVector<Vector2d> const &cb) {m_BaseCbLine=cb;}
+        QVector<Node2d> const & baseCbLine() const {return m_BaseCbLine;}
+        QVector<Node2d> const & CbLine() const {return m_CbLine;}
+
+        QVector<double> const &thickness() const {return m_Thickness;}
+
+        void setBaseCamberLine(QVector<Node2d> const &cb) {m_BaseCbLine=cb;}
         void setThicknessLine(QVector<double> const &th) {m_Thickness=th;}
 
         void resizeBaseArrays(int size) {m_BaseTop.resize(size); m_BaseBot.resize(size);}
 
-        void setBaseTop(QVector<Vector2d> const &points) {m_BaseTop=points;}
-        void setBaseBot(QVector<Vector2d> const &points) {m_BaseBot=points;}
+        void setBaseNodes(QVector<Node2d> const &Nodes) {m_BaseNode=Nodes;}
+        void setBaseNode(int i, double x, double y) {if(i>=0&&i<m_BaseNode.size()) m_BaseNode[i].set(x,y);}
+
+        void setBaseTop(QVector<Node2d> const &points) {m_BaseTop=points;}
+        void setBaseBot(QVector<Node2d> const &points) {m_BaseBot=points;}
 
         int LEindex() const {return m_iLE;}
 
-        bool bIsInside(float x, float y) const;
-        bool isInside(float x, float y) const;
-        bool intersectFoil(const Vector2d &A, const Vector2d &B, Vector2d &I) const;
+        CubicSpline const & cubicSpline() const {return m_CubicSpline;}
 
         void makeModPermanent();
+
+        double CSfracLE() const {return m_CSfracLE;}
+
+
+        Node2d const &frontNode() const {return m_Node.front();}
+        Node2d const &backNode() const {return m_Node.back();}
+
 
     private:
         void resetFoil();
 
         void setLEFromCubicSpline();
-        void setTE();
 
         void setTEFlap();
         void setLEFlap();
 
-        bool project(Vector2d const &pt, Node2d &node) const;
-        void getNodeOnCubic(double tau, Node2d &n2d) const;
 
     private:
 
@@ -200,43 +220,45 @@ class Foil : public XflObject
         int m_iSelectedPt;                    /**< the index of the point to highlight in the display */
         bool m_bFill;                        /**< true if the inside of the foil should be displayed with a solid color */
 
-    public:
-
-        QVector<Node2d> m_BaseNode;          /**< the array of base foil points, i.e. non-flapped */
-        QVector<Node2d> m_Node;              /**< the array of coordinates of the flapped foil*/
-
-        QVector<Vector2d> m_BaseCbLine;      /**< the mid camber line points for the base unflapped foil */
-        QVector<Vector2d> m_CbLine;          /**< the mid camber line points for the flapped foil */
-        QVector<double> m_Thickness;         /**< the local thicknesses at each mid point*/
-
-        QVector<Vector2d> m_BaseTop;	     /**< the upper surface points of the base geometry, i.e. non-flapped */
-        QVector<Vector2d> m_BaseBot;         /**< the lower surface points of the base geometry, i.e. non-flapped */
-
-        QVector<Vector2d> m_Top;	         /**< the upper surface points = base + flapped */
-        QVector<Vector2d> m_Bot;	         /**< the lower surface points = base + flapped  */
-
         bool m_bCamberLine;                  /**< true if the foil mid camber line is to be displayed */
 
+        CubicSpline m_CubicSpline;
+
+        // depending on how the foil was constructed, base Top and Bot arrays can be created first
+        // and then base Nodes are constructed, or the other way round
+        QVector<Node2d> m_BaseNode;          /**< the array of base foil points, i.e. non-flapped */
+        QVector<Node2d> m_BaseTop;	     /**< the upper surface points of the base geometry, i.e. non-flapped */
+        QVector<Node2d> m_BaseBot;         /**< the lower surface points of the base geometry, i.e. non-flapped */
+
+        QVector<Node2d> m_Node;              /**< the array of coordinates of the flapped foil*/
+
+        QVector<Node2d> m_Top;	         /**< the upper surface points = base + flapped */
+        QVector<Node2d> m_Bot;	         /**< the lower surface points = base + flapped  */
+
+        int m_iLE;                           /**< the index of the leading edge point - defined as the point of min x. */
 
         Vector2d m_TE;                       /**< the trailing edge point */
         Vector2d m_LE;                       /**< the leading edge point. Note: NOT a foil point*/
-        int m_iLE;                           /**< the index of the leading edge point - defined as the point of min x. */
+
+        double m_BSfracLE;         /**< the B-spline parameter such that m_BSpline(frac)=LE */
+        double m_CSfracLE;         /**< the cubic spline parameter such that m_CSpline(frac)=LE */
+
+        QVector<Node2d> m_CbLine;          /**< the mid camber line points for the flapped foil */
+
 
         bool m_bTEFlap;          /**< true if the foil has a trailing edge flap */
+        bool m_bLEFlap;          /**< true if the foil has a leading edge flap */
         double m_TEFlapAngle;    /**< the trailing edge flap angle, in degrees*/
         double m_TEXHinge;       /**< the x-position of the trailing edge flap, in chord % */
         double m_TEYHinge;       /**< the y-position of the trailng edge flap, in chord %*/
 
-        bool m_bLEFlap;          /**< true if the foil has a leading edge flap */
         double m_LEFlapAngle;    /**< the leading edge flap angle, in degrees */
         double m_LEXHinge;       /**< the x-position of the leading edge flap, in chord % */
         double m_LEYHinge;       /**< the y-position of the leading edge flap, in chord %*/
 
-        CubicSpline m_CubicSpline;
-        BSpline m_BSpline;
+        QVector<Node2d> m_BaseCbLine;      /**< the mid camber line points for the base unflapped foil */
+        QVector<double> m_Thickness;         /**< the local thicknesses at each mid point*/
 
-        double m_BSfracLE;         /**< the B-spline parameter such that m_BSpline(frac)=LE */
-        double m_CSfracLE;         /**< the cubic spline parameter such that m_CSpline(frac)=LE */
 
 };
 

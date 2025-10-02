@@ -22,7 +22,7 @@
 
 #include <xflmath/mathelem.h>
 #include <xflgeom/geom2d/vector2d.h>
-#include <xflgeom/geom3d/vector3d.h>
+#include <xflgeom/geom2d/node2d.h>
 #include <xflcore/linestyle.h>
 
 
@@ -56,9 +56,8 @@ class Spline
 
         virtual bool updateSpline() = 0;
         virtual void makeCurve() = 0;
-        virtual void splinePoint(double u, double &x, double &y) const = 0;
+        virtual Vector2d splinePoint(double u) const = 0;
         virtual void splineDerivative(double u, double &dx, double &dy) const = 0;
-        Vector2d splinePt(double u) const; // name changed to avoid hiding splinePoint in sub classes
         Vector2d splineNormal(double u) const;
 
         virtual double length(double t0, double t1) const;
@@ -154,7 +153,7 @@ class Spline
 
         int outputSize() const {return m_Output.size();}
         void setOutputSize(int n) {m_Output.resize(n);}
-        QVector<Vector2d> const &outputPts() const {return m_Output;}
+        QVector<Node2d> const &outputPts() const {return m_Output;}
         Vector2d outputPt(int i) const {if(i<m_Output.size()) return m_Output.at(i); else return Vector2d();}
 
         int selectedPoint() const {return m_iSelect;}
@@ -194,7 +193,7 @@ class Spline
 
         QVector<Vector2d> m_CtrlPt;      /**< the array of the positions of the spline's control points */
         QVector<double> m_Weight;   /**< the array of weight of control points. Used for B-Splines only. Default is 1. The higher the value, the more the curve will be pulled towards the control points. */
-        QVector<Vector2d> m_Output;      /**< the array of output points, size of which is m_iRes @todo use a QVarLengthArray or a QList*/
+        QVector<Node2d> m_Output;      /**< the array of output points */
 
         LineStyle m_theStyle;
 

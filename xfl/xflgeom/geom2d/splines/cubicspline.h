@@ -33,7 +33,7 @@ class CubicSpline : public Spline
         bool updateSpline() override;
 
         bool serializeFl5(QDataStream &ar, bool bIsStoring) override;
-        void splinePoint(double u, double &x, double &y) const override;
+        Vector2d splinePoint(double u) const override;
         void splineDerivative(double u, double &dx, double &dy) const override;
 
         void buildMatrix(int size, int coordinate, double *aij, double *RHS);
@@ -50,7 +50,7 @@ class CubicSpline : public Spline
 
         bool getPoint(bool bBefore, double sfrac, Vector2d const &A, Vector2d const &B, Vector2d &I) const;
 
-        bool approximate(int nPts, const QVector<Vector2d> &node);
+        bool approximate(int nPts, const QVector<Node2d> &node);
 
     private:
 

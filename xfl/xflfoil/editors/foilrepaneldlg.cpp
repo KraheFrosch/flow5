@@ -37,7 +37,7 @@ FoilRepanelDlg::FoilRepanelDlg(QWidget *pParent) : FoilDlg(pParent)
 
 FoilRepanelDlg::~FoilRepanelDlg()
 {
-    delete m_pCS;
+    if(m_pCS) delete m_pCS;
 }
 
 
@@ -172,7 +172,7 @@ void FoilRepanelDlg::initDialog(Foil *pFoil)
 
 void FoilRepanelDlg::onReset()
 {
-    m_pCS->duplicate(m_pRefFoil->m_CubicSpline);
+    m_pCS->duplicate(m_pRefFoil->cubicSpline());
     m_pCS->setPointStyle(Line::BIGCIRCLE);
     m_pCS->showCtrlPts(false);
     m_pCS->updateSpline();
@@ -203,12 +203,7 @@ void FoilRepanelDlg::onApply()
 
     m_pCS->rePanel(nPanels);
 
-    int npts = m_pCS->outputSize();
-    m_pBufferFoil->m_BaseNode.resize(npts);
-    for(int i=0; i<npts; i++)
-    {
-        m_pBufferFoil->m_BaseNode[i] = m_pCS->outputPt(i);
-    }
+    m_pBufferFoil->setBaseNodes(m_pCS->outputPts());
 
     m_pBufferFoil->initGeometry(true);
 

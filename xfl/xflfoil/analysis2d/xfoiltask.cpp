@@ -11,17 +11,17 @@
 #include <QCoreApplication>
 
 
-#include <xflfoil/analysis2d/xfoiltask.h>
-#include <xflcore/xflcore.h>
+
 #include <xflcore/flow5events.h>
-#include <xflmath/constants.h>
+#include <xflcore/xflcore.h>
+#include <xflfoil/analysis2d/xfoiltask.h>
 #include <xflfoil/objects2d/foil.h>
-#include <xflfoil/objects2d/polar.h>
-
 #include <xflfoil/objects2d/objects2d.h>
-#include <xflfoil/objects2d/polar.h>
 #include <xflfoil/objects2d/oppoint.h>
-
+#include <xflfoil/objects2d/polar.h>
+#include <xflfoil/objects2d/polar.h>
+#include <xflgeom/geom_globals/geom_params.h>
+#include <xflmath/constants.h>
 
 
 

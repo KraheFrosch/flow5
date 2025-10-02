@@ -31,8 +31,7 @@ HEADERS += \
 
 
 SOURCES += \
-    $$PWD/geom2d/node2d.cpp \
-    xflgeom/geom_globals/ruppertmesher.cpp \
+    xflgeom/geom2d/node2d.cpp \
     xflgeom/geom2d/pslg2d.cpp \
     xflgeom/geom2d/quad2d.cpp \
     xflgeom/geom2d/segment2d.cpp \
@@ -55,3 +54,4 @@ SOURCES += \
     xflgeom/geom3d/triangulation.cpp \
     xflgeom/geom3d/vector3d.cpp \
     xflgeom/geom_globals/geom_global.cpp \
+    xflgeom/geom_globals/ruppertmesher.cpp \

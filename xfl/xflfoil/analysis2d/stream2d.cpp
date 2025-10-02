@@ -105,7 +105,7 @@ void Stream2d::makeFoilPanels(Foil *pFoil)
         m_Panel[p].B.setIndex(p+1);
         m_Panel[p].setIndex(p);
     }
-    Node2d A(pFoil->m_Node.back());
+    Node2d A(pFoil->backNode());
     A.setNormal(pFoil->normal(pFoil->nNodes()-1));
     m_Node.push_back(A);
     m_Node.last().setIndex(pFoil->nNodes()-1);
@@ -712,8 +712,8 @@ void Stream2d::makeWakePanels(double alpha, double qinf, float xmax)
     // calculate a streamline from the TE
 
     Node2d firstwakenode;
-    firstwakenode.x = (m_Foil.m_Node.front().x + m_Foil.m_Node.back().x)/2.0;
-    firstwakenode.y = (m_Foil.m_Node.front().y + m_Foil.m_Node.back().y)/2.0;
+    firstwakenode.x = (m_Foil.frontNode().x + m_Foil.backNode().x)/2.0;
+    firstwakenode.y = (m_Foil.frontNode().y + m_Foil.backNode().y)/2.0;
 
     Vector2d bis = m_Foil.TEbisector();
     firstwakenode.setNormal(-bis.y, +bis.x); // wake node normals point upwards

@@ -29,7 +29,7 @@ class Naca4Spline : public s7Spline
         void duplicate(Spline const &n4spline) override;
         bool updateSpline() override;
         void makeCurve() override;
-        void splinePoint(double u, double &x, double &y) const override;
+        Vector2d splinePoint(double u) const override;
         void splineDerivative(double u, double &dx, double &dy) const override;
 
 

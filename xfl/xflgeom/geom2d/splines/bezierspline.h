@@ -26,7 +26,7 @@ class BezierSpline : public Spline
         void makeCurve() override;
         bool updateSpline() override {return true;}
 
-        void splinePoint(double u, double &x, double &y) const override;
+        Vector2d splinePoint(double u) const override;
         void splineDerivative(double u, double &dx, double &dy) const override;
         bool serializeFl5(QDataStream &ar, bool bIsStoring) override;
 

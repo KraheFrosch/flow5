@@ -817,25 +817,25 @@ void Surface::setFlap()
     Foil const *pFoilA = foilA();
     Foil const *pFoilB = foilB();
     Vector3d N;
-    if(pFoilA && pFoilA->m_bTEFlap)
+    if(pFoilA && pFoilA->hasTEFlap())
     {
-        m_posATE = pFoilA->m_TEXHinge;
+        m_posATE = pFoilA->TEXHinge();
         if(m_posATE>1.0) m_posATE = 1.0; else if(m_posATE<0.0) m_posATE = 0.0;
     }
     else m_posATE = 1.0;
 
-    if(pFoilB && pFoilB->m_bTEFlap)
+    if(pFoilB && pFoilB->hasTEFlap())
     {
-        m_posBTE = pFoilB->m_TEXHinge;
+        m_posBTE = pFoilB->TEXHinge();
         if(m_posBTE>1.0) m_posBTE = 1.0; else if(m_posBTE<0.0) m_posBTE = 0.0;
     }
     else m_posBTE = 1.0;
 
-    if(pFoilA && pFoilB) m_bTEFlap = pFoilA->m_bTEFlap && pFoilB->m_bTEFlap;
+    if(pFoilA && pFoilB) m_bTEFlap = pFoilA->hasTEFlap() && pFoilB->hasTEFlap();
     else                 m_bTEFlap = false;
 
 
-    if(pFoilA && pFoilB && pFoilA->m_bTEFlap && pFoilB->m_bTEFlap)
+    if(pFoilA && pFoilB && pFoilA->hasTEFlap() && pFoilB->hasTEFlap())
     {
         Vector3d HB;
         //create a hinge unit vector and initialize hinge moment
@@ -1114,9 +1114,9 @@ void Surface::createXPoints()
     Foil const *pFoilA = foilA();
     Foil const *pFoilB = foilB();
 
-    if(pFoilA && pFoilA->hasTEFlap()) xHingeA=pFoilA->m_TEXHinge;
+    if(pFoilA && pFoilA->hasTEFlap()) xHingeA=pFoilA->TEXHinge();
     else                              xHingeA=1.0;
-    if(pFoilB && pFoilB->hasTEFlap()) xHingeB=pFoilB->m_TEXHinge;
+    if(pFoilB && pFoilB->hasTEFlap()) xHingeB=pFoilB->TEXHinge();
     else                              xHingeB=1.0;
 
     NXFlapA = int((1.0-xHingeA) * double(m_NXPanels)*(1.000+LENGTHPRECISION));// to avoid numerical errors if exact division

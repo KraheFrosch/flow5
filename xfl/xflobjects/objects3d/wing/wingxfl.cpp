@@ -187,13 +187,13 @@ void WingXfl::computeGeometry()
         pFoilB = Objects2d::foil(rightFoilName(is));
         if(pFoilA && pFoilB && m_bTwoSided)
         {
-            if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(yPosition(is)-yPosition(is-1))>MinPanelSize)    m_nFlaps++;
+            if(pFoilA->hasTEFlap() && pFoilB->hasTEFlap() && fabs(yPosition(is)-yPosition(is-1))>MinPanelSize)    m_nFlaps++;
         }
         pFoilA = Objects2d::foil(leftFoilName(is-1));
         pFoilB = Objects2d::foil(leftFoilName(is));
         if(pFoilA && pFoilB)
         {
-            if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(yPosition(is)-yPosition(is-1))>MinPanelSize)    m_nFlaps++;
+            if(pFoilA->hasTEFlap() && pFoilB->hasTEFlap() && fabs(yPosition(is)-yPosition(is-1))>MinPanelSize)    m_nFlaps++;
         }
     }
 }
@@ -2595,7 +2595,7 @@ void WingXfl::exportAVLWing(QTextStream &out, int index, double y, double Thetay
         if(aSurface.m_bTEFlap)
         {
             if(aSurface.foilA() && aSurface.foilB())
-                mean_angle = (aSurface.foilA()->m_TEFlapAngle + aSurface.foilB()->m_TEFlapAngle)/2.0;
+                mean_angle = (aSurface.foilA()->TEFlapAngle() + aSurface.foilB()->TEFlapAngle())/2.0;
         }
 
         out << ("#______________\nSECTION                                                     |  (keyword)\n");
@@ -2627,7 +2627,7 @@ void WingXfl::exportAVLWing(QTextStream &out, int index, double y, double Thetay
 
             Q_ASSERT(aSurface.foilA());
             str = QString("%1  %2  %3  %4  -1.0  ")
-                    .arg(aSurface.foilA()->m_TEXHinge,5,'f',3)
+                    .arg(aSurface.foilA()->TEXHinge(),5,'f',3)
                     .arg(aSurface.hingeVector().x,10,'f',4)
                     .arg(aSurface.hingeVector().y,10,'f',4)
                     .arg(aSurface.hingeVector().z,10,'f',4);
@@ -2666,7 +2666,7 @@ void WingXfl::exportAVLWing(QTextStream &out, int index, double y, double Thetay
 
             Q_ASSERT(aSurface.foilB());
             str = QString("%1  %2  %3  %4  -1.0  ")
-                    .arg(aSurface.foilB()->m_TEXHinge,5,'f',3)
+                    .arg(aSurface.foilB()->TEXHinge(),5,'f',3)
                     .arg(aSurface.hingeVector().x,10,'f',4)
                     .arg(aSurface.hingeVector().y,10,'f',4)
                     .arg(aSurface.hingeVector().z,10,'f',4);
@@ -2963,7 +2963,7 @@ void WingXfl::makeTriangulation(Fuse const *pFuse, int CHORDPANELS) const
         Foil const *pFoilA = surfaceAt(j).foilA();
         Foil const *pFoilB = surfaceAt(j).foilB();
 
-        if(pFoilA && pFoilB && pFoilA->m_bLEFlap && pFoilB->m_bLEFlap)
+        if(pFoilA && pFoilB && pFoilA->hasLEFlap() && pFoilB->hasLEFlap())
         {
             nOutlineSegments += 2;//two vertices for the top line and two for the bottom line
         }
@@ -3191,12 +3191,12 @@ void WingXfl::makeTriangulation(Fuse const *pFuse, int CHORDPANELS) const
         //LE flap outline....
         if(pFoilA && pFoilB && pFoilA->hasLEFlap() && pFoilB->hasLEFlap())
         {
-            surf.getSurfacePoint(surf.foilA()->m_LEXHinge, surf.foilA()->m_LEXHinge,  0.0, xfl::TOPSURFACE, PtA, N);
-            surf.getSurfacePoint(surf.foilB()->m_LEXHinge, surf.foilB()->m_LEXHinge, 1.0, xfl::TOPSURFACE, PtB, N);
+            surf.getSurfacePoint(surf.foilA()->LEXHinge(), surf.foilA()->LEXHinge(), 0.0, xfl::TOPSURFACE, PtA, N);
+            surf.getSurfacePoint(surf.foilB()->LEXHinge(), surf.foilB()->LEXHinge(), 1.0, xfl::TOPSURFACE, PtB, N);
             m_Outline[ivo++].setNodes(PtA, PtB);
 
-            surf.getSurfacePoint(surf.foilA()->m_LEXHinge, surf.foilA()->m_LEXHinge, 0.0, xfl::BOTSURFACE, PtA, N);
-            surf.getSurfacePoint(surf.foilB()->m_LEXHinge, surf.foilB()->m_LEXHinge, 1.0, xfl::BOTSURFACE, PtB, N);
+            surf.getSurfacePoint(surf.foilA()->LEXHinge(), surf.foilA()->LEXHinge(), 0.0, xfl::BOTSURFACE, PtA, N);
+            surf.getSurfacePoint(surf.foilB()->LEXHinge(), surf.foilB()->LEXHinge(), 1.0, xfl::BOTSURFACE, PtB, N);
             m_Outline[ivo++].setNodes(PtA, PtB);
          }
     }

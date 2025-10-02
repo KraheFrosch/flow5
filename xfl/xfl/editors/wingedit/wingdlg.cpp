@@ -269,7 +269,7 @@ bool WingDlg::checkWing()
         Foil const*pRightFoil = Objects2d::foil(m_pWing->m_Section.at(k).m_RightFoilName);
         if(pLeftFoil)
         {
-            if((pLeftFoil->TEXHinge()>=0.99&& pLeftFoil->hasTEFlap()) ||(pLeftFoil->m_LEXHinge<0.01&&pLeftFoil->m_bLEFlap))
+            if((pLeftFoil->TEXHinge()>=0.99&& pLeftFoil->hasTEFlap()) ||(pLeftFoil->LEXHinge()<0.01&&pLeftFoil->hasLEFlap()))
             {
                 QMessageBox::warning(this, "Warning", pLeftFoil->name()+": Zero length flaps will cause a division by zero and should be avoided.");
                 return false;
@@ -277,7 +277,7 @@ bool WingDlg::checkWing()
         }
         if(pRightFoil)
         {
-            if((pRightFoil->TEXHinge()>=0.99&& pRightFoil->hasTEFlap()) ||(pRightFoil->m_LEXHinge<0.01&&pRightFoil->m_bLEFlap))
+            if((pRightFoil->TEXHinge()>=0.99&& pRightFoil->hasTEFlap()) ||(pRightFoil->LEXHinge()<0.01&&pRightFoil->hasLEFlap()))
             {
                 QMessageBox::warning(this, "Warning", pRightFoil->name()+": Zero length flaps will cause a division by zero and should be avoided.");
                 return false;

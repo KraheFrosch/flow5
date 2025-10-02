@@ -153,8 +153,8 @@ void FoilLEDlg::onApply()
     s_LErfac = m_pfeLEfactor->value();
     s_BlendLength  = m_pfeBlend->value()/100;
 
-    QVector<double> newthick = m_pBufferFoil->m_Thickness;
-    QVector<Vector2d> const& cbl = m_pBufferFoil->m_BaseCbLine;
+    QVector<double> newthick = m_pBufferFoil->thickness();
+    QVector<Node2d> const& cbl = m_pBufferFoil->baseCbLine();
 
     for(int i=0; i<cbl.size(); i++)
     {
@@ -163,7 +163,7 @@ void FoilLEDlg::onApply()
         double dcf = exp(-arg/s_BlendLength);
         newthick[i] += newthick[i] * dcf * (s_LErfac-1.0);
     }
-    m_pBufferFoil->m_Thickness = newthick;
+    m_pBufferFoil->setThickness(newthick);
     m_pBufferFoil->makeBaseFromCamberAndThickness();
     m_pBufferFoil->rebuildPointSequenceFromBase();
     m_pBufferFoil->initGeometry();

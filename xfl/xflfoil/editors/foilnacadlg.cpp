@@ -137,18 +137,18 @@ void NacaFoilDlg::onApply()
     QVector<double> frac;
     int npts = s_nPanels/2;
     xfl::getPointDistribution(frac, npts-1, xfl::COSINE);
-    m_pBufferFoil->m_BaseTop.resize(npts);
-    m_pBufferFoil->m_BaseBot.resize(npts);
+
+/*    m_pBufferFoil->resizeBaseArrays(npts);
     for(int i=0; i<npts; i++)
     {
         m_pBufferFoil->m_BaseTop[i].x = frac[i];
         m_pBufferFoil->m_BaseBot[i].x = frac[i];
-    }
+    }*/
 
     m_pBufferFoil->setDefaultMidLinePointDistribution(npts);
 
-    m_pBufferFoil->m_LE.set(0.0,0.0);
-    m_pBufferFoil->m_TE.set(1.0,0.0);
+    m_pBufferFoil->setLE(Vector2d(0.0,0.0));
+    m_pBufferFoil->setTE(Vector2d(1.0,0.0));
 
     bool bSuccess(false);
 
@@ -187,7 +187,7 @@ bool NacaFoilDlg::makeNaca4(int digits)
 
     makeThickness(t);
 
-    QVector<Vector2d> &cbl = m_pBufferFoil->m_BaseCbLine;
+    QVector<Node2d> cbl = m_pBufferFoil->baseCbLine();
     if(n1==0 || n2==0)
     {
         // no camber, or camber max pos is undefined
@@ -214,6 +214,7 @@ bool NacaFoilDlg::makeNaca4(int digits)
         }
     }
 
+    m_pBufferFoil->setBaseCamberLine(cbl);
     m_pBufferFoil->makeBaseFromCamberAndThickness();
     m_pBufferFoil->rebuildPointSequenceFromBase();
 
@@ -263,7 +264,7 @@ bool NacaFoilDlg::makeNaca5(int digits)
     }
 
 
-    QVector<Vector2d> &cbl = m_pBufferFoil->m_BaseCbLine;
+    QVector<Node2d> cbl = m_pBufferFoil->baseCbLine();
     for(int i=0; i<cbl.size(); i++)
     {
         double x = cbl[i].x;
@@ -283,6 +284,7 @@ bool NacaFoilDlg::makeNaca5(int digits)
         }
     }
 
+    m_pBufferFoil->setBaseCamberLine(cbl);
     makeThickness(t);
     m_pBufferFoil->makeBaseFromCamberAndThickness();
     m_pBufferFoil->rebuildPointSequenceFromBase();
@@ -293,14 +295,16 @@ bool NacaFoilDlg::makeNaca5(int digits)
 
 void NacaFoilDlg::makeThickness(double t)
 {
-    QVector<double> &th    = m_pBufferFoil->m_Thickness;
-    QVector<Vector2d> &cbl = m_pBufferFoil->m_BaseCbLine;
+    QVector<double> th    = m_pBufferFoil->thickness();
+    QVector<Node2d> const &cbl = m_pBufferFoil->baseCbLine();
     for(int i=0; i<th.size(); i++)
     {
         double x = cbl[i].x;
         th[i] = 0.2969*sqrt(x) - 0.1260*x -0.3516*x*x + 0.2843*x*x*x -0.1015*x*x*x*x;
         th[i] *= 5.0*t *2.0;
     }
+
+    m_pBufferFoil->setThickness(th);
 }
 
 

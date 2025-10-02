@@ -463,6 +463,7 @@ void gl::makeSplineSailOutline(SplineSail const *pSSail, Vector3d const &pos, QO
 {
     if(!pSSail) return;
 
+    Vector2d p0, p1;
     Vector3d Pt, Pt1, pt3d, pt3d1;
     double v(0), v1(0);
 
@@ -496,8 +497,12 @@ void gl::makeSplineSailOutline(SplineSail const *pSSail, Vector3d const &pos, QO
             v1 = fraclist.at(j+1);
 //            if(v>=1.0) v=0.999999; /** @todo do something */
 //            if(v<=0.0) v=0.000001;
-            pSpline->splinePoint(v,  Pt.x,  Pt.y);
-            pSpline->splinePoint(v1, Pt1.x, Pt1.y);
+            p0 = pSpline->splinePoint(v);
+            p1 = pSpline->splinePoint(v1);
+            Pt.x  = p0.x;
+            Pt.y  = p0.y;
+            Pt1.x = p1.x;
+            Pt1.y = p1.y;
             pt3d.set( Pt.x,  Pt.y,  pSSail->sectionPosition(iFr).z);
             pt3d1.set(Pt1.x, Pt1.y, pSSail->sectionPosition(iFr).z);
 
@@ -690,7 +695,7 @@ void gl::makeSectionHighlight(SplineSail const *pSSail, Vector3d pos, QOpenGLBuf
         double v = double(j)*hinc;
         if(v>=1.0) v=0.999999; /** @todo do something */
         if(v<=0.0) v=0.000001;
-        pSpline->splinePoint(v, Point.x, Point.y);
+        Point = pSpline->splinePoint(v);
         Vector3d pt3d(Point.x, Point.y, pSSail->sectionPosition(iFr).z);
         Vector3d O(pSpline->firstCtrlPoint().x, pSpline->firstCtrlPoint().y, pSSail->sectionPosition(iFr).z);
         pt3d.rotateY(O, pSSail->sectionAngle(iFr));

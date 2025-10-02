@@ -148,16 +148,16 @@ void FoilTableView::fillFoilTable()
             ind = m_pFoilModel->index(row, 5, QModelIndex());
             m_pFoilModel->setData(ind, pFoil->nNodes());
 
-            if(pFoil->m_bTEFlap)
+            if(pFoil->hasTEFlap())
             {
                 ind = m_pFoilModel->index(row, 6, QModelIndex());
-                m_pFoilModel->setData(ind, pFoil->m_TEFlapAngle);
+                m_pFoilModel->setData(ind, pFoil->TEFlapAngle());
 
                 ind = m_pFoilModel->index(row, 7, QModelIndex());
-                m_pFoilModel->setData(ind, pFoil->m_TEXHinge*100.0);
+                m_pFoilModel->setData(ind, pFoil->TEXHinge()*100.0);
 
                 ind = m_pFoilModel->index(row, 8, QModelIndex());
-                m_pFoilModel->setData(ind, pFoil->m_TEYHinge*100.0);
+                m_pFoilModel->setData(ind, pFoil->TEYHinge()*100.0);
             }
         }
     }
@@ -181,6 +181,22 @@ void FoilTableView::resizeColumns()
     setColumnWidth(8,w12);   //TE YHinge
     setColumnWidth(9,w12);   //Show
     setColumnWidth(10,w12);  //Camberline
+}
+
+
+void FoilTableView::keyPressEvent(QKeyEvent *pEvent)
+{
+    switch (pEvent->key())
+    {
+        case Qt::Key_Delete:
+        {
+            s_pXDirect->onDeleteCurFoil();
+            break;
+        }
+        default:
+            pEvent->ignore();
+    }
+
 }
 
 

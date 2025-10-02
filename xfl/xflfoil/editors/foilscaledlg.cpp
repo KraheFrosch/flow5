@@ -26,10 +26,10 @@ FoilScaleDlg::FoilScaleDlg(QWidget *pParent) : FoilDlg(pParent)
 
     setupLayout();
 
-    connect(m_pdeCamber,       SIGNAL(floatChanged(float)), SLOT(onCamber()));
-    connect(m_pdeXCamber,      SIGNAL(floatChanged(float)), SLOT(onXCamber()));
-    connect(m_pdeThickness,    SIGNAL(floatChanged(float)), SLOT(onThickness()));
-    connect(m_pdeXThickness,   SIGNAL(floatChanged(float)), SLOT(onXThickness()));
+    connect(m_pfeCamber,       SIGNAL(floatChanged(float)), SLOT(onCamber()));
+    connect(m_pfeXCamber,      SIGNAL(floatChanged(float)), SLOT(onXCamber()));
+    connect(m_pfeThickness,    SIGNAL(floatChanged(float)), SLOT(onThickness()));
+    connect(m_pfeXThickness,   SIGNAL(floatChanged(float)), SLOT(onXThickness()));
 
     connect(m_pslCamberSlide,  SIGNAL(sliderMoved(int)),    SLOT(onCamberSlide(int)));
     connect(m_pslXCamberSlide, SIGNAL(sliderMoved(int)),    SLOT(onXCamberSlide(int)));
@@ -60,14 +60,14 @@ void FoilScaleDlg::setupLayout()
                     m_pslCamberSlide->setOrientation(Qt::Horizontal);
                     m_pslCamberSlide->setTickPosition(QSlider::TicksBelow);
                     m_pslCamberSlide->setMinimumWidth(DisplayOptions::tableFontStruct().averageCharWidth()*50);
-                    m_pdeCamber =new FloatEdit;
+                    m_pfeCamber =new FloatEdit;
                     m_pslXCamberSlide = new QSlider;
                     m_pslXCamberSlide->setAutoFillBackground(true);
                     m_pslXCamberSlide->setOrientation(Qt::Horizontal);
                     m_pslXCamberSlide->setTickPosition(QSlider::TicksBelow);
                     m_pslXCamberSlide->setMinimumWidth(DisplayOptions::tableFontStruct().averageCharWidth()*50);
                     m_pslXCamberSlide->setPalette(m_SliderPalette);
-                    m_pdeXCamber = new FloatEdit;
+                    m_pfeXCamber = new FloatEdit;
                     QLabel *lab1 = new QLabel("Value");
                     QLabel *lab2 = new QLabel("%");
                     QLabel *lab3 = new QLabel("0%");
@@ -91,14 +91,14 @@ void FoilScaleDlg::setupLayout()
 
 
                     pCamberLayout->addWidget(lab1,                1,1);
-                    pCamberLayout->addWidget(m_pdeCamber,         1,2);
+                    pCamberLayout->addWidget(m_pfeCamber,         1,2);
                     pCamberLayout->addWidget(lab2,                1,3);
                     pCamberLayout->addWidget(lab3,                1,5);
                     pCamberLayout->addWidget(m_pslCamberSlide,    1,6);
                     pCamberLayout->addWidget(lab4,                1,7);
 
                     pCamberLayout->addWidget(lab5,                2,1);
-                    pCamberLayout->addWidget(m_pdeXCamber,        2,2);
+                    pCamberLayout->addWidget(m_pfeXCamber,        2,2);
                     pCamberLayout->addWidget(lab6,                2,3);
                     pCamberLayout->addWidget(lab7,                2,5);
                     pCamberLayout->addWidget(m_pslXCamberSlide,   2,6);
@@ -122,14 +122,14 @@ void FoilScaleDlg::setupLayout()
                     m_pslThickSlide->setOrientation(Qt::Horizontal);
                     m_pslThickSlide->setTickPosition(QSlider::TicksBelow);
                     m_pslThickSlide->setMinimumWidth(DisplayOptions::tableFontStruct().averageCharWidth()*50);
-                    m_pdeThickness =new FloatEdit;
+                    m_pfeThickness =new FloatEdit;
                     m_pslXThickSlide = new QSlider;
                     m_pslXThickSlide->setAutoFillBackground(true);
                     m_pslXThickSlide->setPalette(m_SliderPalette);
                     m_pslXThickSlide->setOrientation(Qt::Horizontal);
                     m_pslXThickSlide->setTickPosition(QSlider::TicksBelow);
                     m_pslXThickSlide->setMinimumWidth(DisplayOptions::tableFontStruct().averageCharWidth()*50);
-                    m_pdeXThickness = new FloatEdit;
+                    m_pfeXThickness = new FloatEdit;
                     QLabel *lab11 = new QLabel("Value");
                     QLabel *lab12 = new QLabel("%");
                     QLabel *lab13 = new QLabel("0%");
@@ -153,14 +153,14 @@ void FoilScaleDlg::setupLayout()
                     lab17->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
                     pThicknessLayout->addWidget(lab11,              1,1);
-                    pThicknessLayout->addWidget(m_pdeThickness,   1,2);
+                    pThicknessLayout->addWidget(m_pfeThickness,   1,2);
                     pThicknessLayout->addWidget(lab12,              1,3);
                     pThicknessLayout->addWidget(lab13,              1,5);
                     pThicknessLayout->addWidget(m_pslThickSlide,  1,6);
                     pThicknessLayout->addWidget(lab14,              1,7);
 
                     pThicknessLayout->addWidget(lab15,              2,1);
-                    pThicknessLayout->addWidget(m_pdeXThickness,  2,2);
+                    pThicknessLayout->addWidget(m_pfeXThickness,  2,2);
                     pThicknessLayout->addWidget(lab16,              2,3);
                     pThicknessLayout->addWidget(lab17,              2,5);
                     pThicknessLayout->addWidget(m_pslXThickSlide, 2,6);
@@ -187,10 +187,10 @@ void FoilScaleDlg::setupLayout()
         setLayout(pMainLayout);
     }
 
-    m_pdeCamber->setDigits(2);
-    m_pdeXCamber->setDigits(2);
-    m_pdeThickness->setDigits(2);
-    m_pdeXThickness->setDigits(2);
+    m_pfeCamber->setDigits(2);
+    m_pfeXCamber->setDigits(2);
+    m_pfeThickness->setDigits(2);
+    m_pfeXThickness->setDigits(2);
 
     m_pslCamberSlide->setRange(0,100);
     m_pslCamberSlide->setTickInterval(5);
@@ -241,13 +241,13 @@ void FoilScaleDlg::initDialog(Foil *pFoil)
     if(fabs(Camber) <0.0001)
     {
         m_pslCamberSlide->setEnabled(false);
-        m_pdeCamber->setEnabled(false);
+        m_pfeCamber->setEnabled(false);
     }
 
-    m_pdeCamber->setValue(Camber*100.0);
-    m_pdeThickness->setValue(Thickness*100.0);
-    m_pdeXCamber->setValue(XCamber*100.0);
-    m_pdeXThickness->setValue(XThickness*100.0);
+    m_pfeCamber->setValue(Camber*100.0);
+    m_pfeThickness->setValue(Thickness*100.0);
+    m_pfeXCamber->setValue(XCamber*100.0);
+    m_pfeXThickness->setValue(XThickness*100.0);
 
     m_pslCamberSlide->setSliderPosition(int(Camber*1000.0));
     m_pslThickSlide->setSliderPosition(int(Thickness*1000.0));
@@ -267,13 +267,13 @@ void FoilScaleDlg::onReset()
     double XCamber     = m_pBufferFoil->xCamber();
     double XThickness  = m_pBufferFoil->xThickness();
 
-    m_pdeThickness->setValue(Thickness*100.0);
-    m_pdeCamber->setValue(Camber*100.0);
+    m_pfeThickness->setValue(Thickness*100.0);
+    m_pfeCamber->setValue(Camber*100.0);
     m_pslThickSlide->setSliderPosition(int(Thickness*1000.0));
     m_pslCamberSlide->setSliderPosition(int(Camber*1000.0));
 
-    m_pdeXThickness->setValue(XThickness*100.0);
-    m_pdeXCamber->setValue(XCamber*100.0);
+    m_pfeXThickness->setValue(XThickness*100.0);
+    m_pfeXCamber->setValue(XCamber*100.0);
     m_pslXThickSlide->setSliderPosition(int(XThickness*1000.0));
     m_pslXCamberSlide->setSliderPosition(int(XCamber*1000.0));
 
@@ -285,7 +285,7 @@ void FoilScaleDlg::onReset()
 
 void FoilScaleDlg::onCamber()
 {
-    double fCamber = m_pdeCamber->value();
+    double fCamber = m_pfeCamber->value();
     m_pslCamberSlide->setValue(int(fCamber*10.0));
     onApply();
 }
@@ -293,7 +293,7 @@ void FoilScaleDlg::onCamber()
 
 void FoilScaleDlg::onThickness()
 {
-    double Thickness = m_pdeThickness->value();
+    double Thickness = m_pfeThickness->value();
     m_pslThickSlide->setValue(int(Thickness*10.0));
     onApply();
 }
@@ -302,7 +302,7 @@ void FoilScaleDlg::onThickness()
 void FoilScaleDlg::onThickSlide(int pos)
 {
     double Thickness = double(pos)/10.0;
-    m_pdeThickness->setValue(Thickness);
+    m_pfeThickness->setValue(Thickness);
     onApply();
 }
 
@@ -310,7 +310,7 @@ void FoilScaleDlg::onThickSlide(int pos)
 void FoilScaleDlg::onCamberSlide(int pos)
 {
     double fCamber = double(pos)/10.0;
-    m_pdeCamber->setValue(fCamber);
+    m_pfeCamber->setValue(fCamber);
     onApply();
 }
 
@@ -318,14 +318,14 @@ void FoilScaleDlg::onCamberSlide(int pos)
 void FoilScaleDlg::onXCamberSlide(int pos)
 {
     double XCamber = double(pos)/10.0;
-    m_pdeXCamber->setValue(XCamber);
+    m_pfeXCamber->setValue(XCamber);
     onApply();
 }
 
 
 void FoilScaleDlg::onXCamber()
 {
-    double XCamber = m_pdeXCamber->value();
+    double XCamber = m_pfeXCamber->value();
     m_pslXCamberSlide->setValue(int(XCamber*10.0));
     onApply();
 }
@@ -334,14 +334,14 @@ void FoilScaleDlg::onXCamber()
 void FoilScaleDlg::onXThickSlide(int pos)
 {
     double XThickness = double(pos)/10.0;
-    m_pdeXThickness->setValue(XThickness);
+    m_pfeXThickness->setValue(XThickness);
     onApply();
 }
 
 
 void FoilScaleDlg::onXThickness()
 {
-    double XThickness = m_pdeXThickness->value();
+    double XThickness = m_pfeXThickness->value();
     m_pslXThickSlide->setValue(int(XThickness*10.0));
     onApply();
 }
@@ -349,37 +349,43 @@ void FoilScaleDlg::onXThickness()
 
 void FoilScaleDlg::onApply()
 {
+/*    auto t0 = std::chrono::high_resolution_clock::now();
+    int duration(0);*/
+
     //reset everything and retry
     resetFoil();
 
     m_pBufferFoil->applyBase();
-
     m_pBufferFoil->showCamberLine(true);
 
-    double thickness  = m_pdeThickness->value() /100.0;
-    double camber     = m_pdeCamber->value()    /100.0;
-    double Xthickness = m_pdeXThickness->value()/100.0;
-    double Xcamber    = m_pdeXCamber->value()   /100.0;
+    double thickness  = m_pfeThickness->value() /100.0;
+    double camber     = m_pfeCamber->value()    /100.0;
+    double Xthickness = m_pfeXThickness->value()/100.0;
+    double Xcamber    = m_pfeXCamber->value()   /100.0;
     m_pslCamberSlide->setSliderPosition( int(camber    *100.0*10.0));
     m_pslThickSlide->setSliderPosition(  int(thickness *100.0*10.0));
     m_pslXCamberSlide->setSliderPosition(int(Xcamber   *100.0*10.0));
     m_pslXThickSlide->setSliderPosition( int(Xthickness*100.0*10.0));
 
-    Xcamber    = m_pBufferFoil->m_BaseCbLine.front().x + (m_pBufferFoil->m_BaseCbLine.back().x-m_pBufferFoil->m_BaseCbLine.front().x) * Xcamber;
-    Xthickness = m_pBufferFoil->m_BaseCbLine.front().x + (m_pBufferFoil->m_BaseCbLine.back().x-m_pBufferFoil->m_BaseCbLine.front().x) * Xthickness;
+    Xcamber    = m_pBufferFoil->baseCbLine().front().x + (m_pBufferFoil->baseCbLine().back().x-m_pBufferFoil->baseCbLine().front().x) * Xcamber;
+    Xthickness = m_pBufferFoil->baseCbLine().front().x + (m_pBufferFoil->baseCbLine().back().x-m_pBufferFoil->baseCbLine().front().x) * Xthickness;
 
     m_pBufferFoil->setThickness(Xthickness, thickness);
 
     m_pBufferFoil->setCamber(Xcamber, camber);
 
+    m_pBufferFoil->makeBaseFromCamberAndThickness();
     m_pBufferFoil->rebuildPointSequenceFromBase();
-    m_pBufferFoil->makeBaseMidLine();
+    m_pBufferFoil->applyBase();
 
-    m_pBufferFoil->initGeometry(true);
+/*    auto t6 = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(t6 - t0).count();
+    qDebug("FoilScaleDlg::onApply(t6: %7d µs", duration);*/
 
     m_bModified = true;
 
     update();
+qDebug();
 }
 
 

@@ -27,7 +27,7 @@ class ArcSpline : public s7Spline
 
         void duplicate(const Spline &arcspline) override;
         bool updateSpline() override;
-        void splinePoint(double u, double &x, double &y) const override;
+        Vector2d splinePoint(double u) const override;
         void splineDerivative(double u, double &dx, double &dy) const override;
 
 

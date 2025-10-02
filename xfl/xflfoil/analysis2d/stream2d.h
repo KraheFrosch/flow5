@@ -12,9 +12,9 @@
 #include <QVector>
 
 #include <xflfoil/objects2d/foil.h>
-#include <xflgeom/geom2d/vector2d.h>
 #include <xflfoil/panels2d/panel2d.h>
-
+#include <xflgeom/geom2d/vector2d.h>
+#include <xflmath/constants.h>
 
 
 /**

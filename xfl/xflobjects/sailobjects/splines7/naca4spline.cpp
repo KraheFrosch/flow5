@@ -97,17 +97,20 @@ void Naca4Spline::makeCurve()
     for(int i=0; i<m_Output.size(); i++)
     {
         double di = double(i)/double(m_Output.size()-1);
-        splinePoint(di, m_Output[i].x, m_Output[i].y);
+        m_Output[i] = splinePoint(di);
     }
 }
 
 
-void Naca4Spline::splinePoint(double u, double &x, double &y) const
+Vector2d Naca4Spline::splinePoint(double u) const
 {
+    double x(0), y(0);
     x = u;
 
     if(x<p) y = m/p/p* (2.0*p*x - x*x);
     else    y = m/(1.0-p)/(1.0-p) * (1.0-2.0*p + 2.0*p*x-x*x);
+
+    return Vector2d(x,y);
 }
 
 

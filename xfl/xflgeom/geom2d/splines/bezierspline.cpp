@@ -20,9 +20,9 @@ BezierSpline::BezierSpline() : Spline()
 }
 
 
-void BezierSpline::splinePoint(double u, double &x, double &y) const
+Vector2d BezierSpline::splinePoint(double u) const
 {
-    x=y=0.0;
+    double x(0), y(0);
     int N = m_CtrlPt.size();
     for(int ic=0; ic<N; ic++)
     {
@@ -30,6 +30,7 @@ void BezierSpline::splinePoint(double u, double &x, double &y) const
         x +=  b * m_CtrlPt.at(ic).x;
         y +=  b * m_CtrlPt.at(ic).y;
     }
+    return Vector2d(x,y);
 }
 
 

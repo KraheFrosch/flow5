@@ -2465,8 +2465,8 @@ void PlaneTask::makeControlBC(PlaneXfl const*pPlaneXfl, WPolar const*pWPolar,
                 if (fabs(deltaangle)>ANGLEPRECISION)
                 {
                     //Add delta rotations to initial control setting and to wing or flap delta rotation
-                    if(fabs(surf.foilA()->m_TEFlapAngle)>0.0 && fabs(surf.foilB()->m_TEFlapAngle)>0.0)
-                        totalangle = deltaangle + (surf.foilA()->m_TEFlapAngle + surf.foilB()->m_TEFlapAngle)/2.0;
+                    if(fabs(surf.foilA()->TEFlapAngle())>0.0 && fabs(surf.foilB()->TEFlapAngle())>0.0)
+                        totalangle = deltaangle + (surf.foilA()->TEFlapAngle() + surf.foilB()->TEFlapAngle())/2.0;
                     else
                         totalangle = deltaangle;
 

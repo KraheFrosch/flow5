@@ -454,13 +454,13 @@ Vector3d SplineSail::point(double xrel, double zrel, xfl::enumSurfacePosition ) 
     Spline const *spl0 = m_Spline.at(isec);
     Spline const *spl1 = m_Spline.at(isec+1);
 
-    double x0=0,y0=0,x1=0,y1=0;
-    spl0->splinePoint(xrel, x0, y0);
-    spl1->splinePoint(xrel, x1, y1);
+    Vector2d p0, p1;
+    p0 = spl0->splinePoint(xrel);
+    p1 = spl1->splinePoint(xrel);
 
     Vector3d pt0, pt1;
-    pt0.set(x0,y0,m_SectionPosition.at(isec).z);
-    pt1.set(x1,y1,m_SectionPosition.at(isec+1).z);
+    pt0.set(p0.x, p0.y, m_SectionPosition.at(isec).z);
+    pt1.set(p1.x, p1.y, m_SectionPosition.at(isec+1).z);
     pt0.rotateY(m_SectionPosition.at(isec), m_Ry.at(isec));
     pt1.rotateY(m_SectionPosition.at(isec+1), m_Ry.at(isec+1));
     return Vector3d(pt0.x*(1.0-tau)+pt1.x*tau, pt0.y*(1.0-tau)+pt1.y*tau, pt0.z*(1.0-tau)+pt1.z*tau);

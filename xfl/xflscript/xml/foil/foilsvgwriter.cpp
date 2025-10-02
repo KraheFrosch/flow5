@@ -62,8 +62,8 @@ void FoilSVGWriter::writeFoil(Foil const *pFoil)
 
         QString strange, str;
 
-        double y =-pFoil->m_Node.front().y;
-        strange = QString::asprintf("M%g %g ", pFoil->m_Node.first().x*s_SVGScaleFactor + margin, ymax + y*s_SVGScaleFactor + margin);
+        double y =-pFoil->frontNode().y;
+        strange = QString::asprintf("M%g %g ", pFoil->frontNode().x*s_SVGScaleFactor + margin, ymax + y*s_SVGScaleFactor + margin);
 
         for(int i=1; i<pFoil->nNodes(); i++)
         {

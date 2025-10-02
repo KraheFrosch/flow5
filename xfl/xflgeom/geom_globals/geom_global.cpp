@@ -383,7 +383,8 @@ void drawNormals(Spline const *pSpline, QPainter &painter, double scalex, double
     if(!pSpline->isSingular() && pSpline->ctrlPointCount()>0)
     {
         QPointF From, To;
-        double x=0,y=0,dx=0,dy=0;
+        Vector2d pt;
+        double dx=0,dy=0;
         for(int it=0; it<=10; it++)
         {
             double t = double(it)/10.0;
@@ -394,14 +395,14 @@ void drawNormals(Spline const *pSpline, QPainter &painter, double scalex, double
                 if(t>=1.0) tt= 0.99999;
             }
 
-            pSpline->splinePoint(t,x,y);
+            pt = pSpline->splinePoint(t);
             pSpline->splineDerivative(tt, dx, dy);
             double norm = sqrt(dx*dx+dy*dy)*10.0;
-            From.rx() =  x * scalex + Offset.x();
-            From.ry() = -y * scalex*scaley + Offset.y();
+            From.rx() =  pt.x * scalex + Offset.x();
+            From.ry() = -pt.y * scalex*scaley + Offset.y();
 
-            To.rx() =  (x+dy/norm) * scalex         + Offset.x();
-            To.ry() = -(y-dx/norm) * scalex* scaley + Offset.y();
+            To.rx() =  (pt.x+dy/norm) * scalex         + Offset.x();
+            To.ry() = -(pt.y-dx/norm) * scalex* scaley + Offset.y();
 
             painter.drawLine(From, To);
         }

@@ -720,6 +720,8 @@ bool readVSPFoilFile(QString const &FoilFileName, Foil *pFoil)
     FoilName.truncate(pos);
     pFoil->setName(FoilName);
 
+    QVector<Node2d> basenodes;
+
     bRead = true;
     xp=-9999.0;
     yp=-9999.0;
@@ -735,7 +737,7 @@ bool readVSPFoilFile(QString const &FoilFileName, Foil *pFoil)
             double dist = sqrt((x-xp)*(x-xp) + (y-yp)*(y-yp));
             if(dist>0.000001)
             {
-                pFoil->m_BaseNode.push_back({x,y});
+                basenodes.push_back({x,y});
 
                 xp = x;
                 yp = y;
@@ -747,12 +749,15 @@ bool readVSPFoilFile(QString const &FoilFileName, Foil *pFoil)
 
     xFoilFile.close();
 
-    pFoil->m_Node.resize(pFoil->nBaseNodes());
+/*    pFoil->m_Node.resize(pFoil->nBaseNodes());
     for(int i=0; i<pFoil->nBaseNodes(); i++)
     {
         pFoil->m_Node[i].x = pFoil->xb(i);
         pFoil->m_Node[i].y = pFoil->yb(i);
-    }
+    }*/
+
+    pFoil->setBaseNodes(basenodes);
+
     pFoil->initGeometry();
     return true;
 }

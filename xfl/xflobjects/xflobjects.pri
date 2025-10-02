@@ -1,6 +1,5 @@
 
 HEADERS += \
-    $$PWD/objects_globals/anglecontrol.h \
     xflobjects/analysis3d/boattask.h \
     xflobjects/analysis3d/llttask.h \
     xflobjects/analysis3d/p3analysis.h \
@@ -46,6 +45,7 @@ HEADERS += \
     xflobjects/objects3d/wing/surface.h \
     xflobjects/objects3d/wing/wingsection.h \
     xflobjects/objects3d/wing/wingxfl.h \
+    xflobjects/objects_globals/anglecontrol.h \
     xflobjects/objects_globals/ctrlrange.h \
     xflobjects/objects_globals/fl5object.h \
     xflobjects/objects_globals/objects_global.h \

@@ -1,11 +1,11 @@
 
 
 HEADERS += \
-    $$PWD/hermiteinterpolation.h \
     xflmath/constants.h \
     xflmath/cubicinterpolation.h \
     xflmath/gaussquadrature.h \
     xflmath/hanning.h \
+    xflmath/hermiteinterpolation.h \
     xflmath/mathelem.h \
     xflmath/matrix.h \
     xflmath/qrleastsquares.h \
@@ -14,10 +14,10 @@ HEADERS += \
     xflmath/testmatrix.h \
 
 SOURCES += \
-    $$PWD/hermiteinterpolation.cpp \
     xflmath/cubicinterpolation.cpp \
     xflmath/gaussquadrature.cpp \
     xflmath/hanning.cpp \
+    xflmath/hermiteinterpolation.cpp \
     xflmath/mathelem.cpp \
     xflmath/matrix.cpp \
     xflmath/qrleastsquares.cpp \

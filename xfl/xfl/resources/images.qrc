@@ -37,5 +37,6 @@
         <file>images/HH.png</file>
         <file>images/HH_inv.png</file>
         <file>images/sizegrip.png</file>
+        <file>images/handle.png</file>
     </qresource>
 </RCC>

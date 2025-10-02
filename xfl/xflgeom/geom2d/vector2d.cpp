@@ -49,12 +49,10 @@ double Vector2d::angle(Vector2d const &v) const
 }
 
 
-void Vector2d::displayCoords(QString msg) const
+void Vector2d::displayCoords() const
 {
-    QString strong, str;
-    str = QString::asprintf("  %17.9g  %17.9g", x,y);
-    strong = msg+ " " +str;
-    qDebug()<<strong.toStdString().c_str();
+    QString str = QString::asprintf("  %17.9g  %17.9g", x,y);
+    qDebug()<<str.toStdString().c_str();
 }
 
 

@@ -132,24 +132,24 @@ void FoilTEGapDlg::onApply()
     double dg = (gap-m_pRefFoil->TEGap());
     double length = m_pRefFoil->length();
 
-    CubicSpline CS = m_pRefFoil->m_CubicSpline; //  make it non-const
+    CubicSpline CS = m_pRefFoil->cubicSpline(); //  make it non-const
 
     for(int i=0; i<CS.ctrlPointCount(); i++)
     {
-        double arg = m_pRefFoil->m_TE.x - CS.controlPoint(i).x;
+        double arg = m_pRefFoil->TE().x - CS.controlPoint(i).x;
         //decay exponentially
         double dth = exp(-arg/(1.0-s_BlendLength)*length);
 //        double u = CS.tmin() + CS.t(i)/(CS.tmax()-CS.tmin());
         double u = double(i) / double(CS.ctrlPointCount()-1);
-        if(u<m_pRefFoil->m_CSfracLE)
+        if(u<m_pRefFoil->CSfracLE())
         {
             // top surface
-            m_pBufferFoil->m_BaseNode[i].y =  m_pBufferFoil->yb(i) + dth * dg/2.0;
+            m_pBufferFoil->setBaseNode(i, m_pBufferFoil->xb(i), m_pBufferFoil->yb(i) + dth * dg/2.0);
         }
         else
         {
             // bot surface
-            m_pBufferFoil->m_BaseNode[i].y = m_pBufferFoil->yb(i) - dth * dg/2.0;
+            m_pBufferFoil->setBaseNode(i, m_pBufferFoil->xb(i), m_pBufferFoil->yb(i) - dth * dg/2.0);
         }
     }
 

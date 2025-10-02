@@ -18,6 +18,7 @@
 #include <xflwidgets/customwts/plaintextoutput.h>
 #include <xflfoil/objects2d/foil.h>
 #include <xflfoil/editors/foilwt.h>
+#include <xflmath/constants.h>
 
 
 FoilNormalizeDlg::FoilNormalizeDlg(QWidget *pParent) : FoilDlg(pParent)

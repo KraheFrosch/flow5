@@ -884,9 +884,9 @@ void PlanePolarDlg::enableControls()
 
     m_prbViscInterpolated->setEnabled(m_pchViscAnalysis->isChecked());
 
-    s_WPolar.setViscInterpolated(true);
-    m_prbViscOnTheFly->setEnabled(false);
-    m_prbViscInterpolated->setChecked(true);
+//    s_WPolar.setViscInterpolated(true);
+//    m_prbViscOnTheFly->setEnabled(false);
+//    m_prbViscInterpolated->setChecked(true);
 
     m_pchViscousLoop->setEnabled(s_WPolar.isType6() && m_pchViscAnalysis->isChecked() && m_prbViscInterpolated->isChecked());
 

@@ -22,6 +22,7 @@
 #include <xflfoil/objects2d/foil.h>
 #include <xflfoil/objects2d/polar.h>
 #include <xflfoil/objects2d/polarnamemaker.h>
+#include <xflgeom/geom_globals/geom_params.h>
 #include <xflwidgets/customwts/floatedit.h>
 
 

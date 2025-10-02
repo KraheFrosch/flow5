@@ -123,7 +123,7 @@ QString PolarNameMaker::makeName(Polar const*pPolar)
 
     if(!pPolar->isType6() && fabs(pPolar->TEFlapAngle())>ANGLEPRECISION)
     {
-        plrname += "-" + THETACHAR + QString::asprintf("%g", pPolar->TEFlapAngle()) + DEGCHAR;
+        plrname += "-" + THETACHAR + QString::asprintf("%.2f", pPolar->TEFlapAngle()) + DEGCHAR;
     }
 
     plrname.remove(0,1); //remove first '-' character

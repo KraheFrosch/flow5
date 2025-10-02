@@ -27,14 +27,14 @@ class BSpline : public Spline
         void setDegree(int iDegree) override {m_degree = iDegree;}
         bool serializeFl5(QDataStream &ar, bool bIsStoring) override;
 
-        void splinePoint(double u, double &x, double &y) const override;
+        Vector2d splinePoint(double u) const override;
         void splineDerivative(double u, double &dx, double &dy) const override;
 
         bool splineKnots();
         void copySymmetric(const BSpline &bspline);
         void fromInterpolation(int N, const Vector2d *pt);
 
-        bool approximate(int degree, int nPts, const QVector<Vector2d> &node);
+        bool approximate(int degree, int nPts, const QVector<Node2d> &node);
 
         QVector<double> const &knots() const {return m_knot;}
 

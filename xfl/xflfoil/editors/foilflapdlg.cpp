@@ -14,9 +14,11 @@
 #include <QMessageBox>
 
 #include "foilflapdlg.h"
-#include <xflfoil/objects2d/foil.h>
-#include <xflwidgets/customwts/floatedit.h>
+
 #include <xflfoil/editors/foilwt.h>
+#include <xflfoil/objects2d/foil.h>
+#include <xflgeom/geom_globals/geom_params.h>
+#include <xflwidgets/customwts/floatedit.h>
 
 
 FoilFlapDlg::FoilFlapDlg(QWidget *pParent) : FoilDlg(pParent)

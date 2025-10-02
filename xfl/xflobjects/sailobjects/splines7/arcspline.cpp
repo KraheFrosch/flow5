@@ -75,15 +75,15 @@ Vector2d ArcSpline::normal(double const &)
 }
 
 
-void ArcSpline::splinePoint(double u, double &x, double &y) const
+Vector2d ArcSpline::splinePoint(double u) const
 {
     if(u<0.5)
     {
-        m_BSpline1.splinePoint(2.0*u,x,y);
+        return m_BSpline1.splinePoint(2.0*u);
     }
     else
     {
-        m_BSpline2.splinePoint((u-0.5)*2.0,x,y);
+        return m_BSpline2.splinePoint((u-0.5)*2.0);
     }
 }
 

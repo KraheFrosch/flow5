@@ -1304,16 +1304,11 @@ void XDirect::onEditCurPolar()
 }
 
 
-
-/**
- * The user has requested the deletion of the current Foil.
- * Deletes the Foil, and selects the next one in the array, if any.
- */
 void XDirect::onDeleteCurFoil()
 {
     QString strong;
     strong = "Are you sure you want to delete\n"+ curFoil()->name() +"\n";
-    strong+= "and all associated operatin points and olars?";
+    strong+= "and all associated operating points and polars?";
 
     int resp = QMessageBox::question(s_pMainFrame, "Question", strong,  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
     if(resp != QMessageBox::Yes) return;

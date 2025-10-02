@@ -53,7 +53,7 @@ class FoilScaleDlg : public FoilDlg
 
     private:
         QSlider	*m_pslCamberSlide, *m_pslThickSlide, *m_pslXThickSlide, *m_pslXCamberSlide;
-        FloatEdit *m_pdeXCamber, *m_pdeXThickness, *m_pdeThickness, *m_pdeCamber;
+        FloatEdit *m_pfeXCamber, *m_pfeXThickness, *m_pfeThickness, *m_pfeCamber;
 
 
     private:

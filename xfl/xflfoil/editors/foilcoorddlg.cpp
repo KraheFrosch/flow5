@@ -120,13 +120,15 @@ void FoilCoordDlg::readCoordinates()
     coords = str.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
 #endif
 
+    QVector<Node2d> basenodes;
+
     double x(0), y(0), z(0);
     m_pBufferFoil->clearPointArrays();
     for(int i=0; i<coords.size(); i++)
     {
         if(xfl::readValues(coords[i], x, y, z)>=2)
         {
-            m_pBufferFoil->m_BaseNode.push_back({x,y});
+            basenodes.push_back({x,y});
         }
     }
 
@@ -136,7 +138,7 @@ void FoilCoordDlg::readCoordinates()
     for (int i=0; i<m_pBufferFoil->nBaseNodes(); i++)
     {
         if(i==m_pBufferFoil->nBaseNodes()-1) ip = 0;
-        else                         ip = i+1;
+        else                                 ip = i+1;
         area += 0.5*(m_pBufferFoil->yb(i)+m_pBufferFoil->yb(ip))*(m_pBufferFoil->xb(i)-m_pBufferFoil->xb(ip));
     }
 
@@ -147,20 +149,21 @@ void FoilCoordDlg::readCoordinates()
         {
             double xtmp         = m_pBufferFoil->xb(i);
             double ytmp         = m_pBufferFoil->yb(i);
-            m_pBufferFoil->m_BaseNode[i].x = m_pBufferFoil->xb(m_pBufferFoil->nBaseNodes()-i-1);
-            m_pBufferFoil->m_BaseNode[i].y = m_pBufferFoil->yb(m_pBufferFoil->nBaseNodes()-i-1);
-            m_pBufferFoil->m_BaseNode[m_pBufferFoil->nBaseNodes()-i-1].x = xtmp;
-            m_pBufferFoil->m_BaseNode[m_pBufferFoil->nBaseNodes()-i-1].y = ytmp;
+            basenodes[i].x = m_pBufferFoil->xb(m_pBufferFoil->nBaseNodes()-i-1);
+            basenodes[i].y = m_pBufferFoil->yb(m_pBufferFoil->nBaseNodes()-i-1);
+            basenodes[m_pBufferFoil->nBaseNodes()-i-1].x = xtmp;
+            basenodes[m_pBufferFoil->nBaseNodes()-i-1].y = ytmp;
         }
     }
 
-    m_pBufferFoil->m_Node.resize(m_pBufferFoil->nBaseNodes());
+/*    m_pBufferFoil->m_Node.resize(m_pBufferFoil->nBaseNodes());
     for(int i=0; i<m_pBufferFoil->nBaseNodes(); i++)
     {
         m_pBufferFoil->m_Node[i].x = m_pBufferFoil->xb(i);
         m_pBufferFoil->m_Node[i].y = m_pBufferFoil->yb(i);
-    }
+    }*/
 
+    m_pBufferFoil->setBaseNodes(basenodes);
     m_pBufferFoil->initGeometry();
 }
 

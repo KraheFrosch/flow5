@@ -50,7 +50,7 @@ void BSpline::makeCurve()
                     break;
             }
 
-            splinePoint(u, m_Output[j].x, m_Output[j].y);
+            m_Output[j] = splinePoint(u);
             t += increment;
         }
         m_Output.back() = m_CtrlPt.back();
@@ -63,8 +63,9 @@ void BSpline::makeCurve()
 }
 
 
-void BSpline::splinePoint(double t, double &x, double &y) const
+Vector2d BSpline::splinePoint(double t) const
 {
+    double x(0), y(0);
     double w(0);
     x=y=0.0;
     t=std::min(t, 0.99999);
@@ -80,6 +81,7 @@ void BSpline::splinePoint(double t, double &x, double &y) const
         x *= 1.0/w;
         y *= 1.0/w;
     }
+    return Vector2d(x,y);
 }
 
 
@@ -275,7 +277,7 @@ void BSpline::fromInterpolation(int N, Vector2d const *pt)
  *   1. The curve contains the first and last data points
  *   2. The curve approximates the data polygon in the sense of least square.
 */
-bool BSpline::approximate(int degree, int nPts, QVector<Vector2d> const& node)
+bool BSpline::approximate(int degree, int nPts, QVector<Node2d> const& node)
 {
     // p=degree
     // h=number of control points to build
@@ -365,7 +367,7 @@ void BSpline::testApproximation()
 {
     BSpline bs;
 
-    QVector<Vector2d> node = {{0.0, 0.0}, {1.0, 1.0}, {2.0, 3.0}, {3.0,4.5}, {4.0,3.2}, {5.0,2.0}, {6.0,1.0}};
+    QVector<Node2d> node = {{0.0, 0.0}, {1.0, 1.0}, {2.0, 3.0}, {3.0,4.5}, {4.0,3.2}, {5.0,2.0}, {6.0,1.0}};
 
     for(int i=0; i<node.size(); i++)
         qDebug(" in  %11.5g  %11.5g", node[i].x, node[i].y);
@@ -400,7 +402,7 @@ bool BSpline::smoothFunction(int deg, int npts, QVector<double> const& x0, QVect
     if(x0.size()!=y0.size())    return false;
     if(nInput<5)                return false;
 
-    QVector<Vector2d> node(x0.size());
+    QVector<Node2d> node(x0.size());
     for(int i=1; i<x0.size(); i++)
     {
         if(x0[i-1]>x0[i])       return false;
@@ -421,14 +423,14 @@ bool BSpline::smoothFunction(int deg, int npts, QVector<double> const& x0, QVect
         double x = x0[i];
         double t0=0.0;
         double t1=1.0;
-        bs.splinePoint(t0, pt0.x, pt0.y);
-        bs.splinePoint(t1, pt1.x, pt1.y);
+        pt0 = bs.splinePoint(t0);
+        pt1 = bs.splinePoint(t1);
         double t=0.5;
         int iter=0;
         do
         {
             t=(t0+t1)/2.0;
-            bs.splinePoint(t, pt.x, pt.y);
+            pt = bs.splinePoint(t);
             if(pt.x<x) {t0=t;  pt0=pt;}
             else       {t1=t;  pt1=pt;}
             if(fabs(t1-t0)<1.e-5)

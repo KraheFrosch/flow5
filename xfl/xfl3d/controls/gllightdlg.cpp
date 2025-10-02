@@ -315,7 +315,7 @@ void GLLightDlg::setupLayout()
 
 void GLLightDlg::onButton(QAbstractButton *pButton)
 {
-    if (m_pButtonBox->button(QDialogButtonBox::Close) == pButton)                 accept();
+    if (m_pButtonBox->button(QDialogButtonBox::Close) == pButton)                 close();
     else if (m_pButtonBox->button(QDialogButtonBox::RestoreDefaults) == pButton)  onDefaults();
 }
 
@@ -517,7 +517,7 @@ void GLLightDlg::keyPressEvent(QKeyEvent *pEvent)
         }
         case Qt::Key_Escape:
         {
-            reject();
+            close();
             return;
         }
         default:
@@ -528,7 +528,7 @@ void GLLightDlg::keyPressEvent(QKeyEvent *pEvent)
 
 void GLLightDlg::showEvent(QShowEvent *pEvent)
 {
-    QDialog::showEvent(pEvent);
+    QWidget::showEvent(pEvent);
     restoreGeometry(s_Geometry);
     m_pglView->setLightVisible(gl3dView::isLightOn());
     setParams();
@@ -538,7 +538,7 @@ void GLLightDlg::showEvent(QShowEvent *pEvent)
 
 void GLLightDlg::hideEvent(QHideEvent *pEvent)
 {
-    QDialog::hideEvent(pEvent);
+    QWidget::hideEvent(pEvent);
     m_pglView->setLightVisible(false);
     s_Geometry = saveGeometry();
 }

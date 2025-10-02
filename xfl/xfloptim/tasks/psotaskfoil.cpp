@@ -167,8 +167,8 @@ void PSOTaskFoil::makeFoil(Particle const &particle, Foil *pFoil) const
             double Xthickness = particle.pos(2);
             double Xcamber    = particle.pos(3);
 
-            Xcamber    = pFoil->m_BaseCbLine.front().x + (pFoil->m_BaseCbLine.back().x-pFoil->m_BaseCbLine.front().x) * Xcamber;
-            Xthickness = pFoil->m_BaseCbLine.front().x + (pFoil->m_BaseCbLine.back().x-pFoil->m_BaseCbLine.front().x) * Xthickness;
+            Xcamber    = pFoil->baseCbLine().front().x + (pFoil->baseCbLine().back().x-pFoil->baseCbLine().front().x) * Xcamber;
+            Xthickness = pFoil->baseCbLine().front().x + (pFoil->baseCbLine().back().x-pFoil->baseCbLine().front().x) * Xthickness;
 
             pFoil->setThickness(Xthickness, thickness);
             pFoil->setCamber(Xcamber, camber);

@@ -436,8 +436,8 @@ bool CubicSpline::getPoint(bool bBefore, double sfrac, Vector2d const &A, Vector
     
     Vector2d C, D;
 
-    splinePoint(smin, C.x, C.y);
-    splinePoint(smax, D.x, D.y);
+    C = splinePoint(smin);
+    D = splinePoint(smax);
 
     double s(0);
 
@@ -445,7 +445,7 @@ bool CubicSpline::getPoint(bool bBefore, double sfrac, Vector2d const &A, Vector
     do
     {
         s = (smin+smax)/2.0;
-        splinePoint(s, I.x, I.y);
+        I = splinePoint(s);
 
         double dot = (I.x-A.x)*dir.x + (I.y-A.y)*dir.y;      // Dot product between [x1, y1] and [x2, y2]
         double det = (I.x-A.x)*dir.y - (I.y-A.y)*dir.x;      // Determinant
@@ -465,13 +465,13 @@ bool CubicSpline::getPoint(bool bBefore, double sfrac, Vector2d const &A, Vector
 }
 
 
-bool CubicSpline::approximate(int nCtrlPts, QVector<Vector2d> const& node)
+bool CubicSpline::approximate(int nCtrlPts, QVector<Node2d> const& node)
 {
     if(nCtrlPts<0)
     {
         //use them all
-//        for(int i=0; i<node.size(); i++)   appendControlPoint(node.at(i).x, node.at(i).y);
-        setCtrlPoints(node, 1.0);
+        m_CtrlPt.resize(node.size());
+        for(int i=0; i<node.size(); i++) m_CtrlPt[i] = node.at(i);
     }
     else
     {
@@ -497,11 +497,11 @@ bool CubicSpline::approximate(int nCtrlPts, QVector<Vector2d> const& node)
 }
 
 
-void CubicSpline::splinePoint(double u, double &x, double &y) const
+Vector2d CubicSpline::splinePoint(double u) const
 {
-    x=0.0;
-    y=0.0;
-    if(m_CtrlPt.size()<2) return;
+    double x(0), y(0);
+
+    if(m_CtrlPt.size()<2) return Vector2d();
 
     for(int i=0; i<m_segVal.size()-1; i++)
     {
@@ -509,14 +509,14 @@ void CubicSpline::splinePoint(double u, double &x, double &y) const
         {
             x = m_cx.at(i*4)*u*u*u + m_cx.at(i*4+1)*u*u + m_cx.at(i*4+2)*u + m_cx.at(i*4+3);
             y = m_cy.at(i*4)*u*u*u + m_cy.at(i*4+1)*u*u + m_cy.at(i*4+2)*u + m_cy.at(i*4+3);
-            return;
+            return Vector2d(x,y);
         }
     }
 
 //  return the last control point;
     x = m_CtrlPt.constLast().x;
     y = m_CtrlPt.constLast().y;
-
+    return Vector2d(x,y);
 }
 
 

@@ -188,6 +188,8 @@ void SailDlg::makeCommonWts()
 
                         m_pSailInfoLayout->addWidget(m_pleSailName);
                         m_pSailInfoLayout->addWidget(m_pcbColor);
+                        m_pSailInfoLayout->setStretchFactor(m_pleSailName, 5);
+                        m_pSailInfoLayout->setStretchFactor(m_pcbColor, 1);
                     }
                     m_pteSailDescription = new QTextEdit;
                     m_pteSailDescription->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
@@ -546,7 +548,7 @@ void SailDlg::makeCommonWts()
             m_pglSailView->showPartFrame(false);
             m_pglSailControls = new gl3dGeomControls(m_pglSailView, SailLayout, false);
 
-            m_p3dLightAct        = new  QAction(QIcon(":/icons/light.png"), "Light settings", this);
+            m_p3dLightAct        = new  QAction(QIcon(":/icons/light.png"), "Light settings\t(Alt+L)", this);
 
             m_pBackImageLoad     = new QAction("Load", this);
             m_pBackImageClear    = new QAction("Clear", this);

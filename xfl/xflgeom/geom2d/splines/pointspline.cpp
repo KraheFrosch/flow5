@@ -11,9 +11,11 @@
 
 #include <QDataStream>
 
-#include <xflmath/constants.h>
-
 #include "pointspline.h"
+
+#include <xflmath/constants.h>
+#include <xflgeom/geom_globals/geom_params.h>
+
 
 
 PointSpline::PointSpline() : Spline()
@@ -29,7 +31,7 @@ void PointSpline::makeCurve()
     for(int i=0; i<m_Output.size(); i++)
     {
         double di = double(i)/double(m_Output.size()-1);
-        splinePoint(di, m_Output[i].x, m_Output[i].y);
+        m_Output[i] = splinePoint(di);
     }
 }
 
@@ -76,8 +78,9 @@ void PointSpline::getSlopes(double &s0, double &s1)
 }
 
 
-void PointSpline::splinePoint(double u, double &x, double &y) const
+Vector2d PointSpline::splinePoint(double u) const
 {
+    double x(0), y(0);
     if(u<=0.0 || fabs(m_Length)<LENGTHPRECISION)
     {
         if(m_CtrlPt.size())
@@ -86,13 +89,13 @@ void PointSpline::splinePoint(double u, double &x, double &y) const
             y = m_CtrlPt.first().y;
         }
         else x = y = 0.0;
-        return;
+        return Vector2d(x,y);
     }
     if(u>=1.0)
     {
         x = m_CtrlPt.last().x;
         y = m_CtrlPt.last().y;
-        return;
+        return Vector2d(x,y);;
     }
 
     double l0 = 0;
@@ -106,10 +109,12 @@ void PointSpline::splinePoint(double u, double &x, double &y) const
             double tau = (u - l0/m_Length) / (deltaL/m_Length);
             x = (1.0-tau) * m_CtrlPt[i-1].x + tau *m_CtrlPt[i].x;
             y = (1.0-tau) * m_CtrlPt[i-1].y + tau *m_CtrlPt[i].y;
-            return;
+            return Vector2d(x,y);
         }
         l0 = l1;
     }
+
+    return Vector2d(x,y);
 }
 
 

@@ -14,6 +14,7 @@
 #include <xflcore/xflcore.h>
 #include <xflfoil/objects2d/foil.h>
 #include <xflfoil/objects2d/polar.h>
+#include <xflmath/constants.h>
 
 
 void drawFoil(QPainter &painter, Foil const*pFoil, double alpha, double twist, double scalex, double scaley,
@@ -96,12 +97,12 @@ void drawFoilMidLine(QPainter &painter, Foil const*pFoil, double scalex, double 
     painter.translate(Offset);
     painter.scale(scalex, scaley);
 
-    if(pFoil->m_CbLine.size()>0)
+    if(pFoil->CbLine().size()>0)
     {
         QPolygonF camberline;
-        for (int k=0; k<pFoil->m_CbLine.size(); k++)
+        for (int k=0; k<pFoil->CbLine().size(); k++)
         {
-            camberline.append({  pFoil->m_CbLine.at(k).x, -pFoil->m_CbLine.at(k).y});
+            camberline.append({  pFoil->CbLine().at(k).x, -pFoil->CbLine().at(k).y});
         }
         painter.drawPolyline(camberline);
     }
@@ -165,6 +166,8 @@ void readFoilFile(QFile &xFoilFile, Foil *pFoil)
     double xp(0), yp(0);
     bool bRead(false);
 
+    QVector<Node2d> basenodes;
+
     QTextStream inStream(&xFoilFile);
 
     QFileInfo fileInfo(xFoilFile);
@@ -193,7 +196,7 @@ void readFoilFile(QFile &xFoilFile, Foil *pFoil)
             //there isn't a name on the first line, use the file's name
             FoilName = fileName;
             {
-                pFoil->m_BaseNode.push_back({x,y});
+                basenodes.push_back({x,y});
 //                pFoil->nb=1;
 //                xp = x;
 //                yp = y;
@@ -223,7 +226,7 @@ void readFoilFile(QFile &xFoilFile, Foil *pFoil)
                 double dist = sqrt((x-xp)*(x-xp) + (y-yp)*(y-yp));
                 if(dist>0.000001)
                 {
-                    pFoil->m_BaseNode.push_back({x,y});
+                    basenodes.push_back({x,y});
 //                    pFoil->nb++;
 
                     xp = x;
@@ -254,13 +257,14 @@ void readFoilFile(QFile &xFoilFile, Foil *pFoil)
         {
             xtmp         = pFoil->xb(i);
             ytmp         = pFoil->yb(i);
-            pFoil->m_BaseNode[i].x = pFoil->xb(pFoil->nBaseNodes()-i-1);
-            pFoil->m_BaseNode[i].y = pFoil->yb(pFoil->nBaseNodes()-i-1);
-            pFoil->m_BaseNode[pFoil->nBaseNodes()-i-1].x = xtmp;
-            pFoil->m_BaseNode[pFoil->nBaseNodes()-i-1].y = ytmp;
+            basenodes[i].x = pFoil->xb(pFoil->nBaseNodes()-i-1);
+            basenodes[i].y = pFoil->yb(pFoil->nBaseNodes()-i-1);
+            basenodes[pFoil->nBaseNodes()-i-1].x = xtmp;
+            basenodes[pFoil->nBaseNodes()-i-1].y = ytmp;
         }
     }
 
+    pFoil->setBaseNodes(basenodes);
     pFoil->initGeometry();
 }
 
@@ -748,8 +752,10 @@ bool serializeFoil(Foil *pFoil, QDataStream &ar, bool bIsStoring)
     // 1003 : added Visible property
     // 1002 : added color and style save
     // 1001 : initial format
-    int p=0, j=0;
-    float f=0, ff=0;
+    int p(0), j(0);
+    float f(0), ff(0);
+
+    float xh(0), yh(0), angle(0);
 
     if(bIsStoring)
     {
@@ -759,13 +765,13 @@ bool serializeFoil(Foil *pFoil, QDataStream &ar, bool bIsStoring)
         ar << pFoil->theStyle().m_Stipple << pFoil->theStyle().m_Width;
         xfl::writeColor(ar, pFoil->lineColor().red(), pFoil->lineColor().green(), pFoil->lineColor().blue());
 
-        if (pFoil->theStyle().m_bIsVisible) ar << 1; else ar << 0;
-        if (pFoil->theStyle().m_Symbol>0)   ar << 1; else ar << 0;//1004
-        if (pFoil->m_bCamberLine)    ar << 1; else ar << 0;//1004
-        if (pFoil->m_bLEFlap)        ar << 1; else ar << 0;
-        ar << float(pFoil->m_LEFlapAngle) << float(pFoil->m_LEXHinge) << float(pFoil->m_LEYHinge);
-        if (pFoil->m_bTEFlap)        ar << 1; else ar << 0;
-        ar << float(pFoil->m_TEFlapAngle) << float(pFoil->m_TEXHinge) << float(pFoil->m_TEYHinge);
+        if (pFoil->theStyle().m_bIsVisible)  ar << 1; else ar << 0;
+        if (pFoil->theStyle().m_Symbol>0)    ar << 1; else ar << 0;//1004
+        if (pFoil->isCamberLineVisible())    ar << 1; else ar << 0;//1004
+        if (pFoil->hasLEFlap())        ar << 1; else ar << 0;
+        ar << float(pFoil->LEFlapAngle()) << float(pFoil->LEXHinge()) << float(pFoil->LEYHinge());
+        if (pFoil->hasTEFlap())        ar << 1; else ar << 0;
+        ar << float(pFoil->TEFlapAngle()) << float(pFoil->TEXHinge()) << float(pFoil->TEYHinge());
 
         ar << 1.f << 1.f << 9.f;//formerly transition parameters
         ar << pFoil->nBaseNodes();
@@ -813,43 +819,43 @@ bool serializeFoil(Foil *pFoil, QDataStream &ar, bool bIsStoring)
             ar >> p;
             pFoil->setPointStyle(LineStyle::convertSymbol(p));
             ar >> p;
-            if(p) pFoil->m_bCamberLine = true; else pFoil->m_bCamberLine = false;
+            pFoil->showCamberLine(p);
+//            if(p) pFoil->m_bCamberLine = true; else pFoil->m_bCamberLine = false;
         }
 
         if(ArchiveFormat>=1005)
         {
             ar >> p;
-            if (p) pFoil->m_bLEFlap = true; else pFoil->m_bLEFlap = false;
-            ar >> f; pFoil->m_LEFlapAngle = double(f);
-            ar >> f; pFoil->m_LEXHinge = double(f);
-            ar >> f; pFoil->m_LEYHinge = double(f);
+            ar >> angle;
+            ar >> xh;
+            ar >> yh;
+            pFoil->setLEFlapData(p, xh, yh, angle);
         }
         ar >> p;
-        if (p) pFoil->m_bTEFlap = true; else pFoil->m_bTEFlap = false;
-        ar >> f; pFoil->m_TEFlapAngle =double(f);
-        ar >> f; pFoil->m_TEXHinge = double(f);
-        ar >> f; pFoil->m_TEYHinge = double(f);
+        ar >> angle;
+        ar >> xh;
+        ar >> yh;
+        pFoil->setTEFlapData(p, xh, yh, angle);
 
         if(ArchiveFormat<1007)
         {
-            pFoil->m_LEXHinge /= 100.0;
-            pFoil->m_LEYHinge /= 100.0;
-            pFoil->m_TEXHinge /= 100.0;
-            pFoil->m_TEYHinge /= 100.0;
+            pFoil->scaleHingeLocations();
         }
 
         ar >> f >> f >> f; //formerly transition parameters
         ar >> p;
 //        if(pFoil->nb()>IBX) return false;
 
-        pFoil->resizePointArrays(p);
+        QVector<Node2d> basenodes(p);
+//        pFoil->resizePointArrays(p);
         for (j=0; j<p; j++)
         {
             ar >> f >> ff;
-            pFoil->m_BaseNode[j].x = double(f);
-            pFoil->m_BaseNode[j].y = double(ff);
+            basenodes[j].x = double(f);
+            basenodes[j].y = double(ff);
         }
-//for(int i=0; i<pFoil->xb.size(); i++)    qDebug("  %2d  %13.7f  %13.7f", i, pFoil->xb[i], pFoil->yb[i]);
+
+        pFoil->setBaseNodes(basenodes);
 
         /** @todo remove. We don't need to save/load the current foil geom
          *  since we recreate it using base geometry and flap data */
@@ -860,7 +866,7 @@ bool serializeFoil(Foil *pFoil, QDataStream &ar, bool bIsStoring)
 
             if(p>pFoil->nNodes())
             {
-                pFoil->m_Node.resize(p);
+//                pFoil->m_Node.resize(p);
 //                pFoil->resizeArrays(p);
             }
             for (j=0; j<p; j++)

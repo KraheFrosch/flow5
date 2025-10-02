@@ -14,12 +14,11 @@
 #include <xflmath/constants.h>
 #include <xflcore/trace.h>
 #include <xflcore/xflcore.h>
-#include <xflcore/flow5events.h>
 #include <xflfoil/objects2d/foil.h>
 #include <xflfoil/objects2d/polar.h>
 #include <xflfoil/objects2d/oppoint.h>
 #include <xflfoil/objects2d/polarnamemaker.h>
-#include<xflwidgets/customdlg/renamedlg.h>
+#include <xflgeom/geom_globals/geom_params.h>
 
 QVector<Foil*> Objects2d::s_oaFoil;
 

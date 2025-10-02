@@ -110,12 +110,12 @@ void OpPoint::duplicate(OpPoint const &opp)
 void OpPoint::setHingeMoments(Foil const*pFoil)
 {
     double dx(0), dy(0), xmid(0), ymid(0), pmid(0);
-    double xof = pFoil->m_TEXHinge;
+    double xof = pFoil->TEXHinge();
     double ymin = pFoil->baseLowerY(xof);
     double ymax = pFoil->baseUpperY(xof);
-    double yof = ymin + (ymax-ymin) * pFoil->m_TEYHinge;
+    double yof = ymin + (ymax-ymin) * pFoil->TEYHinge();
 
-    if(pFoil->m_bTEFlap)
+    if(pFoil->hasTEFlap())
     {
         double hmom = 0.0;
         double hfx  = 0.0;

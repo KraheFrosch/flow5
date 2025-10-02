@@ -952,8 +952,9 @@ void gl3dView::mouseReleaseEvent(QMouseEvent * pEvent)
 
 void gl3dView::keyPressEvent(QKeyEvent *pEvent)
 {
-    bool bCtrl = (pEvent->modifiers() & Qt::ControlModifier);
+    bool bCtrl  = (pEvent->modifiers() & Qt::ControlModifier);
     bool bShift = (pEvent->modifiers() & Qt::ShiftModifier);
+//    bool bAlt   = (pEvent->modifiers() & Qt::AltModifier);
 
     switch (pEvent->key())
     {
@@ -981,8 +982,11 @@ void gl3dView::keyPressEvent(QKeyEvent *pEvent)
         }
         case Qt::Key_L:
         {
-            onSetupLight();
-            pEvent->accept();
+            if(bCtrl)
+            {
+                onSetupLight();
+                pEvent->accept();
+            }
             return;
         }
         case Qt::Key_H:
@@ -1168,7 +1172,7 @@ void gl3dView::onSetupLight()
         m_pglLightDlg = new GLLightDlg(this);
         m_pglLightDlg->setgl3dView(this);
     }
-    m_pglLightDlg->exec();
+    m_pglLightDlg->show();
 }
 
 

@@ -44,7 +44,8 @@ void XSailActions::makeActions()
     }
 
     m_p3dLightAct = new  QAction(QIcon(":/icons/light.png"), "Light settings", m_pXSail);
-    m_p3dLightAct->setStatusTip("Define the light options in 3D view");
+    m_p3dLightAct->setStatusTip("<p>Define the light options in 3d views</p>");
+    m_p3dLightAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
     connect(m_p3dLightAct, SIGNAL(triggered()), m_pXSail->m_pgl3dXSailView, SLOT(onSetupLight()));
 
     m_pBackImageLoad = new QAction("Load", this);

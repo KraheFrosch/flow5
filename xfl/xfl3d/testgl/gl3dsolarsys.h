@@ -20,7 +20,6 @@ class IntEdit;
 class FloatEdit;
 
 
-
 class gl3dSolarSys : public gl3dTestGLView
 {
     Q_OBJECT
@@ -39,6 +38,7 @@ class gl3dSolarSys : public gl3dTestGLView
 
         void onCeres(bool bShow);
         void onHalley(bool bShow);
+
 
     private:
         void hideEvent(QHideEvent *pEvent) override;
@@ -66,7 +66,6 @@ class gl3dSolarSys : public gl3dTestGLView
         QTimer m_Timer;
 
         FloatEdit *m_pdeDt, *m_pdePlanetSize;
-
 
         QLabel *m_plabDate;
         QLabel *m_plabHalley;

@@ -20,6 +20,7 @@
 #include <xflfoil/objects2d/objects2d.h>
 #include <xflfoil/objects2d/foil.h>
 #include <xflgeom/geom2d/splines/spline.h>
+#include <xflmath/constants.h>
 #include <xflwidgets/customwts/floatedit.h>
 #include <xflwidgets/customwts/intedit.h>
 #include <xflwidgets/customdlg/intvaluesdlg.h>
@@ -109,33 +110,36 @@ void Foil1SplineDlg::onApply()
     if(s_bCubicSpline) pSpline = &s_CS;
     else               pSpline = &s_BS;
 
+    QVector<Node2d> basenodes;
+
     if(!pSpline->issymmetric())
     {
         int npts = pSpline->outputSize();
-        m_pBufferFoil->m_BaseNode.resize(npts);
+        basenodes.resize(npts);
         for(int i=0; i<npts; i++)
         {
-            m_pBufferFoil->m_BaseNode[i] = pSpline->outputPt(i);
+            basenodes[i] = pSpline->outputPt(i);
         }
     }
     else
     {
         int npts = pSpline->outputSize();
-        m_pBufferFoil->m_BaseNode.resize(npts*2-1);
+        basenodes.resize(npts*2-1);
         for(int i=0; i<npts; i++)
         {
-            m_pBufferFoil->m_BaseNode[i] = pSpline->outputPt(i);
+            basenodes[i] = pSpline->outputPt(i);
         }
 
         //make symmetric half
         int j = npts;
         for(int i=npts-2; i>=0; i--)
         {
-            m_pBufferFoil->m_BaseNode[j] = pSpline->outputPt(i);
+            basenodes[j] = pSpline->outputPt(i);
             j++;
         }
     }
 
+    m_pBufferFoil->setBaseNodes(basenodes);
     m_pBufferFoil->initGeometry();
 
     m_pFoilWt->update();
