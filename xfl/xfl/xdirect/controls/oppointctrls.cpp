@@ -61,10 +61,11 @@ void OpPointCtrls::setupLayout()
         {
             m_pchFillFoil      = new QCheckBox("Fill foil");
             m_pchShowBL        = new QCheckBox("BL (d*)");
-            m_pchShowBL->setToolTip("Displacement thickness");
+            m_pchShowBL->setToolTip("<p>Displacement thickness</p>");
             m_pchShowPressure  = new QCheckBox("Pressure");
             m_plbBLStyle       = new LineBtn;
             m_plbPressureStyle = new LineBtn;
+            m_pchShowInviscid  = new QCheckBox("Show inviscid");
             m_pchAnimate       = new QCheckBox("Animate");
             m_pslAnimateSpeed  = new QSlider(Qt::Horizontal);
             m_pslAnimateSpeed->setMinimum(0);
@@ -80,9 +81,10 @@ void OpPointCtrls::setupLayout()
             pOppDisplayLayout->addWidget(m_plbBLStyle,           2,2);
             pOppDisplayLayout->addWidget(m_pchShowPressure,      3,1);
             pOppDisplayLayout->addWidget(m_plbPressureStyle,     3,2);
-            pOppDisplayLayout->addWidget(m_pchAnimate,           4,1,1,2);
-            pOppDisplayLayout->addWidget(m_pslAnimateSpeed,      5,1,1,2);
-            pOppDisplayLayout->addWidget(m_pchShowActiveOppOnly, 6,1,1,2);
+            pOppDisplayLayout->addWidget(m_pchShowInviscid,      4,1,1,2);
+            pOppDisplayLayout->addWidget(m_pchAnimate,           7,1,1,2);
+            pOppDisplayLayout->addWidget(m_pslAnimateSpeed,      8,1,1,2);
+            pOppDisplayLayout->addWidget(m_pchShowActiveOppOnly, 9,1,1,2);
             pOppDisplayLayout->setRowStretch(7,5);
         }
         pMainLayout->addLayout(pGraphBoxLayout);
@@ -105,6 +107,7 @@ void OpPointCtrls::connectSignals()
     connect(m_prbCpCurve,           SIGNAL(clicked(bool)), s_pXDirect, SLOT(onCpGraph()));
     connect(m_prbQCurve,            SIGNAL(clicked(bool)), s_pXDirect, SLOT(onOppGraph()));
     connect(m_pchShowActiveOppOnly, SIGNAL(clicked(bool)), s_pXDirect, SLOT(onCurOppOnly(bool)));
+    connect(m_pchShowInviscid,      SIGNAL(clicked(bool)), s_pXDirect, SLOT(onCpi(bool)));
 
     connect(m_pAnimateTimer,        SIGNAL(timeout()),            SLOT(onAnimateSingle()));
     connect(m_pchAnimate,           SIGNAL(clicked(bool)),        SLOT(onAnimate(bool)));
@@ -150,14 +153,17 @@ void OpPointCtrls::setControls()
     m_prbCpCurve->setEnabled(s_pXDirect->curOpp());
     m_prbQCurve->setEnabled(s_pXDirect->curOpp());
 
+    m_pchShowInviscid->setEnabled(s_pXDirect->curOpp());
+    m_pchShowInviscid->setChecked(s_pXDirect->bShowInviscid());
+
     m_pchFillFoil->setChecked(OpPointWt::bFillFoil());
 
     m_pchShowPressure->setEnabled(!s_pXDirect->isPolarView() && XDirect::curOpp());
     m_pchShowBL->setEnabled(!s_pXDirect->isPolarView() && XDirect::curOpp());
     m_pchAnimate->setEnabled(!s_pXDirect->isPolarView() && XDirect::curOpp());
     m_pslAnimateSpeed->setEnabled(!s_pXDirect->isPolarView() && XDirect::curOpp() && m_pchAnimate->isChecked());
-    m_plbBLStyle->setEnabled(!s_pXDirect->isPolarView() && XDirect::curOpp() && m_pchShowBL->isChecked());
-    m_plbPressureStyle->setEnabled(!s_pXDirect->isPolarView() && XDirect::curOpp() && m_pchShowPressure->isChecked());
+/*    m_plbBLStyle->setEnabled(!s_pXDirect->isPolarView() && XDirect::curOpp() && m_pchShowBL->isChecked());
+    m_plbPressureStyle->setEnabled(!s_pXDirect->isPolarView() && XDirect::curOpp() && m_pchShowPressure->isChecked());*/
 
     m_plbBLStyle->setTheStyle(OpPointWt::BLStyle());
     m_plbPressureStyle->setTheStyle(OpPointWt::pressureStyle());
@@ -175,8 +181,8 @@ void OpPointCtrls::onBLCurveStyle(LineStyle)
     LineStyle ls = m_pLineMenu->theStyle();
     m_plbBLStyle->setTheStyle(ls);
     m_pOpPointWt->setBLStyle(ls);
+    s_pXDirect->updateView();
 }
-
 
 
 void OpPointCtrls::onPressureCurveStyle(LineStyle)
@@ -187,6 +193,7 @@ void OpPointCtrls::onPressureCurveStyle(LineStyle)
     LineStyle ls = m_pLineMenu->theStyle();
     m_plbPressureStyle->setTheStyle(ls);
     m_pOpPointWt->setPressureStyle(ls);
+    s_pXDirect->updateView();
 }
 
 

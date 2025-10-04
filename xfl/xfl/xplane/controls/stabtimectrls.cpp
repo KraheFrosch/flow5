@@ -1099,7 +1099,7 @@ void StabTimeCtrls::loadSettings(QSettings &settings)
     {
         QString strong;
         int functionsize = settings.value("timefunctsize", 5).toInt();
-        QVector<Vector2d> pts(functionsize);
+        QVector<Node2d> pts(functionsize);
         for(int i=0; i<functionsize; i++)
         {
             strong = QString("ForcedTime%1").arg(i);

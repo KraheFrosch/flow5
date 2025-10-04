@@ -483,57 +483,20 @@ void XDirect::createBLCurves()
         m_BLGraph[ig]->clearSelection();
     }
 
-//    for (int k=0; k<Objects2d::nOpPoints(); k++)
-//    {
-//        OpPoint *pOpPoint = Objects2d::opPointAt(k);
-        // curOpp only in this case to avoid overloading the graphs;
-        OpPoint *pOpPoint = curOpp();
-        if(!pOpPoint) return;
+    // curOpp only in this case to avoid overloading the graphs;
+    OpPoint *pOpPoint = curOpp();
+    if(!pOpPoint) return;
 
-        pOpPoint->clearCurves();
-        if (pOpPoint && pOpPoint->isVisible() && (pOpPoint==curOpp() || !s_bCurOppOnly))
+    pOpPoint->clearCurves();
+    if (pOpPoint && pOpPoint->isVisible() && (pOpPoint==curOpp() || !s_bCurOppOnly))
+    {
+        for(int ig=0; ig<m_BLGraph.size(); ig++)
         {
-            for(int ig=0; ig<m_BLGraph.size(); ig++)
-            {
-                // left axis curves
-                Curve * pCurve = m_BLGraph.at(ig)->addCurve(pOpPoint->name(), AXIS::LEFTYAXIS, DisplayOptions::isDarkTheme());
-                pCurve->setTheStyle(pOpPoint->theStyle());
-                pOpPoint->appendCurve(pCurve);
-                if(pOpPoint==curOpp()) m_BLGraph.at(ig)->selectCurve(pCurve);
-                Curve *pCurve_i = nullptr;
-                if(m_bShowInviscid)
-                {
-                    pCurve_i = m_BLGraph.at(ig)->addCurve();
-                    pCurve_i->setName(pOpPoint->name()+"_inv");
-                    pCurve_i->setTheStyle(pOpPoint->theStyle());
-                    pOpPoint->appendCurve(pCurve);
-                }
-
-                if(pOpPoint->isXFoil()) fillBLXFoilCurves(pOpPoint, m_BLGraph.at(ig), false);
-                if(pOpPoint==curOpp()) m_BLGraph.at(ig)->selectCurve(pCurve);
-
-                // add the right axis curve
-                if(m_BLGraph.at(ig)->hasRightAxis())
-                {
-                    Curve * pCurve = m_BLGraph.at(ig)->addCurve(pOpPoint->name(), AXIS::RIGHTYAXIS, DisplayOptions::isDarkTheme());
-                    pOpPoint->appendCurve(pCurve);
-                    pCurve->setTheStyle(pOpPoint->theStyle());
-                    if(pOpPoint==curOpp()) m_BLGraph.at(ig)->selectCurve(pCurve);
-                    Curve *pCurve_i = nullptr;
-                    if(m_bShowInviscid)
-                    {
-                        pCurve_i = m_BLGraph.at(ig)->addCurve();
-                        pCurve_i->setName(pOpPoint->name()+"_inv");
-                        pCurve_i->setTheStyle(pOpPoint->theStyle());
-                        pOpPoint->appendCurve(pCurve);
-                    }
-
-                    if(pOpPoint->isXFoil()) fillBLXFoilCurves(pOpPoint, m_BLGraph.at(ig), false);
-                    if(pOpPoint==curOpp()) m_BLGraph.at(ig)->selectCurve(pCurve);
-                }
-            }
+            // left axis curves only
+            if(pOpPoint->isXFoil()) fillBLXFoilCurves(pOpPoint, m_BLGraph.at(ig), m_bShowInviscid);
         }
-//    }
+    }
+
 
     for(int ig=0; ig<m_BLGraph.size(); ig++)
     {
@@ -672,32 +635,31 @@ void XDirect::fillBLXFoilCurves(OpPoint *pOpp, Graph *pGraph, bool bInviscid)
         case 0:  // Cp
         {
             pGraph->setYInverted(0, true);
-            Curve *pViscCurve    = pGraph->addCurve();
-            pViscCurve->setTheStyle(pOpp->theStyle());
-            pViscCurve->setName(pOpp->name());
-            pOpp->appendCurve(pViscCurve);
+            Curve *pCpv    = pGraph->addCurve();
+            pCpv->setTheStyle(pOpp->theStyle());
+            pCpv->setName(pOpp->name());
+            pOpp->appendCurve(pCpv);
 
-            Curve *pCpi = pGraph->addCurve();
+            Curve *pCpi = nullptr;
+
+            pCpi = pGraph->addCurve();
             pOpp->appendCurve(pCpi);
             pCpi->setVisible(bInviscid);
             pCpi->setSymbol(pOpp->pointStyle());
             pCpi->setStipple(Line::DASH);
             pCpi->setColor(pOpp->lineColor().darker(150));
             pCpi->setWidth(pOpp->lineWidth());
-            QString str= QString("Re=%1-Alpha=%2_Inviscid").arg(pOpp->Reynolds(),8,'f',0).arg(pOpp->aoa(),5,'f',2);
-
-            pCpi->setName(str);
+            pCpi->setName(pOpp->name() + " - Inviscid");
 
             for (int j=0; j<pOpFoil->nNodes(); j++)
             {
-                if(pOpp->bViscResults()) pViscCurve->appendPoint(pOpFoil->x(j), pOpp->Cpv.at(j));
-                if(pOpp==curOpp())       pCpi->appendPoint(pOpFoil->x(j), pOpp->Cpi.at(j));
+                if(pOpp->bViscResults())    pCpv->appendPoint(pOpFoil->x(j), pOpp->Cpv.at(j));
+                if(pOpp==curOpp() && pCpi)  pCpi->appendPoint(pOpFoil->x(j), pOpp->Cpi.at(j));
             }
 
             if(pOpp==curOpp())
             {
-                pGraph->selectCurve(pViscCurve);
-                pGraph->selectCurve(pCpi);
+                pGraph->selectCurve(pCpv);
             }
 
             break;
@@ -1156,7 +1118,7 @@ void XDirect::onFinishAnalysis()
 
 void XDirect::onBatchAnalysis()
 {
-    XFoilBatchDlg *pBatchDlg = new XFoilBatchDlg;
+    XFoilBatchDlg *pBatchDlg = new XFoilBatchDlg(s_pMainFrame);
     pBatchDlg->setFoil(Objects2d::curFoil());
     pBatchDlg->initDialog();
 
@@ -1206,12 +1168,12 @@ void XDirect::onCpGraph()
 }
 
 
-void XDirect::onCpi()
+void XDirect::onCpi(bool bInviscid)
 {
-    m_bShowInviscid = !m_bShowInviscid;
+    m_bShowInviscid = bInviscid;
 
     m_bResetCurves = true;
-    setControls();
+//    setControls();
     updateView();
 }
 
@@ -3850,7 +3812,7 @@ void XDirect::onExportXMLAnalysis()
 
 
     QFile XFile(FileName);
-    if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+    if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
 
 
     XmlPolarWriter polarWriter(XFile);
@@ -3860,10 +3822,11 @@ void XDirect::onExportXMLAnalysis()
 }
 
 
-void XDirect::updateTreeView()
+void XDirect::updateFoilExplorers()
 {
     m_pFoilTreeView->updateObjectView();
     m_pFoilTable->updateTable();
+    m_pDFoilWt->resetLegend();
 }
 
 

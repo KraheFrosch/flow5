@@ -38,6 +38,7 @@ INCLUDEPATH += $$PWD/../XFoil-lib/
 DEPENDPATH += $$PWD/../XFoil-lib/
 
 
+
 linux-g++ {
     CONFIG += thread
 
@@ -59,24 +60,19 @@ linux-g++ {
 
 
 #comment out to use OpenBLAS
-#CONFIG += INTEL_MKL
+CONFIG += INTEL_MKL
 
     INTEL_MKL {
         #------------ MKL --------------------
         #    MKL can use the c++ matrices in row major order order
         DEFINES += INTEL_MKL
 
-        # LEAP 16
         #   Ensure that the paths to the include files and to the binary libraries
         #   are set either by defining them in the environment variables
         #   or by setting them explicitely in the following two lines
         #
-        #   INCLUDEPATH += /opt/intel/oneapi/mkl/latest/include/
-        #   LIBS += -L/opt/intel/oneapi/mkl/latest/lib/intel64/
-
-        # LEAP 15.1
-        #    INCLUDEPATH += /home/techwinder/bin/mkl/latest/include/
-        #     LIBS += -L/home/techwinder/bin/mkl/latest/lib/intel64/
+          INCLUDEPATH += /opt/intel/oneapi/mkl/latest/include/
+          LIBS += -L/opt/intel/oneapi/mkl/latest/lib/intel64/
 
             LIBS += -lmkl_intel_lp64  -lmkl_core -lmkl_gnu_thread
             LIBS += -lgomp
@@ -89,7 +85,7 @@ linux-g++ {
             LIBS += -llapack -llapacke
 
             #link to either the cblas (slow) or openblas (fast) library
-            LIBS += -lcblas
+#            LIBS += -lcblas
             LIBS += -lopenblas
 
     }
@@ -100,15 +96,8 @@ linux-g++ {
     #   are known either by defining them at system level
     #   or by setting them explicitely in this section
     #   The include paths to the development headers must be set explicitely
-
-    #LEAP 16
         INCLUDEPATH += /usr/local/include/opencascade/
-   #    LIBS += -L/usr/local/lib/
-
-    # LEAP 15.1
-    #    INCLUDEPATH += /home/techwinder/bin/opencascade-7.5.0/inc/
-    #    LIBS += -L/home/techwinder/bin/opencascade-7.5.0/build/lin64/gcc/lib/
-
+        LIBS += -L/usr/local/lib/
 
     #   To analyze with gprof - Debug config only
     #QMAKE_CXXFLAGS+=-pg
@@ -116,11 +105,13 @@ linux-g++ {
     # .../build/debug> gprof -pb flow5 gmon.out > ./analysis_flat.txt
     # .../build/debug> gprof -q flow5 gmon.out > ./analysis_callgraph.txt
 
-# warnings with OpenCascade
+
+# issues with OpenCascade
 QMAKE_CXXFLAGS_WARN_ON += -Wno-deprecated-declarations
 
 
 }
+
 
 
 win32-msvc {
@@ -153,7 +144,7 @@ win32-msvc {
 #------------ OPEN CASCADE --------------------------
     INCLUDEPATH += D:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc
     LIBS += -LD:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib
-    LIBS += -LprintD:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\bin
+    LIBS += -LD:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\bin
 
 
 
@@ -190,10 +181,9 @@ macx {
     QMAKE_BUNDLE_DATA += XFoil
 
     #-------------OPENCASCADE -----------------
-
+    # set the paths to the OpenCascade header and lib directories
     INCLUDEPATH += /Users/techwinder/bin/opencascade-7.3.0/inc
     LIBS += -L/Users/techwinder/bin/opencascade-7.3.0/build_fat/mac64/clang/lib
-#    LIBS += -L/Users/techwinder/bin/opencascade-7.3.0/build_x86_64/mac64/clang/lib
 
     #-------------vecLib -----------------
     DEFINES += ACCELERATE

@@ -136,11 +136,11 @@ double Spline::getY(double xinterp, bool bRelative) const
 
 void Spline::appendControlPoint(double x, double y, double w)
 {
-    appendControlPoint(Vector2d(x,y),w);
+    appendControlPoint(Node2d(x,y),w);
 }
 
 
-void Spline::appendControlPoint(Vector2d const &Pt, double w)
+void Spline::appendControlPoint(Node2d const &Pt, double w)
 {
     m_CtrlPt.push_back(Pt);
     m_Weight.push_back(w);
@@ -176,7 +176,7 @@ void Spline::resizeControlPoints(int nPts)
 }
 
 
-void Spline::setCtrlPoints(QVector<Vector2d> const & ptList, double w)
+void Spline::setCtrlPoints(QVector<Node2d> const & ptList, double w)
 {
     m_CtrlPt = ptList;
 
@@ -191,7 +191,7 @@ void Spline::setCtrlPoints(QVector<Vector2d> const & ptList, double w)
 }
 
 
-void Spline::appendCtrlPoints(QVector<Vector2d> const & ptList, double w)
+void Spline::appendCtrlPoints(QVector<Node2d> const & ptList, double w)
 {
     m_CtrlPt.append(ptList);
     for(int i=0; i<ptList.size(); i++) m_Weight.push_back(w);
@@ -200,7 +200,7 @@ void Spline::appendCtrlPoints(QVector<Vector2d> const & ptList, double w)
 }
 
 
-void Spline::appendCtrlPoints(QVector<Vector2d> const & ptList, QVector<double> weightlist)
+void Spline::appendCtrlPoints(QVector<Node2d> const & ptList, QVector<double> weightlist)
 {
     m_CtrlPt.append(ptList);
     m_Weight.append(weightlist);
@@ -215,7 +215,7 @@ void Spline::insertCtrlPointAt(int iSel, double x, double y, double w)
 }
 
 
-void Spline::insertCtrlPointAt(int iSel, const Vector2d &pt, double w)
+void Spline::insertCtrlPointAt(int iSel, const Node2d &pt, double w)
 {
     m_CtrlPt.insert(m_CtrlPt.begin()+iSel, pt);
     m_Weight.insert(m_Weight.begin()+iSel, w);
@@ -256,12 +256,12 @@ bool Spline::insertCtrlPoint(double x, double y, double w)
 {
     int kc = 0;
     double dmax2=1.e10;
-    double d1=0.0, d2=0.0;
+    double d1(0), d2(0);
     if(m_CtrlPt.size()<=1) return false;
     for (int k=0; k<m_CtrlPt.size()-1; k++)
     {
-        Vector2d const &p1 = m_CtrlPt.at(k);
-        Vector2d const &p2 = m_CtrlPt.at(k+1);
+        Node2d const &p1 = m_CtrlPt.at(k);
+        Node2d const &p2 = m_CtrlPt.at(k+1);
         d1 = (p1.x-x)*(p1.x-x) + (p1.y-y)*(p1.y-y);
         d2 = (p2.x-x)*(p2.x-x) + (p2.y-y)*(p2.y-y);
         if(d1+d2<dmax2)
@@ -270,7 +270,7 @@ bool Spline::insertCtrlPoint(double x, double y, double w)
             kc=k;
         }
     }
-    m_CtrlPt.insert(m_CtrlPt.begin()+kc+1, Vector2d(x,y));
+    m_CtrlPt.insert(m_CtrlPt.begin()+kc+1, Node2d(x,y));
     m_Weight.insert(m_Weight.begin()+kc+1, w);
     m_iSelect = kc+1;
 
@@ -421,9 +421,10 @@ bool Spline::serializeFl5(QDataStream &ar, bool bIsStoring)
         ar << m_bForcesymmetric;
 
         ar << m_BunchAmp;
-        n=0;
+
         switch(m_BunchType)
         {
+            default:
             case NOBUNCH:    n=0;        break;
             case UNIFORM:    n=1;        break;
             case SIGMOID:    n=2;        break;
@@ -455,7 +456,7 @@ bool Spline::serializeFl5(QDataStream &ar, bool bIsStoring)
         for (int j=0; j<n; j++)
         {
             ar>>x>>y;
-            m_CtrlPt.push_back(Vector2d(x,y));
+            m_CtrlPt.push_back(Node2d(x,y));
         }
 
         ar >> n;

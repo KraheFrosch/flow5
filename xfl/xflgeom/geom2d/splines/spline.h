@@ -84,32 +84,32 @@ class Spline
         bool isNaca4Spline()  const {return m_SplineType==Spline::NACA4;}
 
         void appendControlPoint(double x, double y, double w=1.0);
-        void appendControlPoint(const Vector2d &Pt, double w=1.0);
+        void appendControlPoint(const Node2d &Pt, double w=1.0);
         void resizeControlPoints(int nPts);
 
         void clearControlPoints() {m_CtrlPt.clear();}
         int ctrlPointCount() const {return m_CtrlPt.size();}
         int nCtrlPoints() const {return m_CtrlPt.size();}
         void setControlSize(int n) {m_CtrlPt.resize(n); m_Weight.resize(n);}
-        void setCtrlPoints(const QVector<Vector2d> &ptList, double w=1.0);
+        void setCtrlPoints(const QVector<Node2d> &ptList, double w=1.0);
 
-        QVector<Vector2d> const &ctrlPts() {return m_CtrlPt;}
-        Vector2d &controlPoint(int i) {return m_CtrlPt[i];}
-        Vector2d const &controlPoint(int i) const {return m_CtrlPt.at(i);}
-        Vector2d const &lastCtrlPoint()     const {return m_CtrlPt.last();}
-        Vector2d const &firstCtrlPoint()    const {return m_CtrlPt.first();}
-        void setCtrlPoint(int n, double x, double y) {m_CtrlPt[n]=Vector2d(x,y);}
-        void setCtrlPoint(int n, Vector2d const &pt) {m_CtrlPt[n]=pt;}
-        void setFirstCtrlPoint(Vector2d const&pt) {if(m_CtrlPt.size()>0) m_CtrlPt.first()=pt;}
-        void setLastCtrlPoint(double x, double y) {if(m_CtrlPt.size()>0) m_CtrlPt.back()=Vector2d(x,y);}
-        void setLastCtrlPoint(Vector2d const&pt)  {if(m_CtrlPt.size()>0) m_CtrlPt.last()=pt;}
+        QVector<Node2d> const &ctrlPts() {return m_CtrlPt;}
+        Node2d &controlPoint(int i) {return m_CtrlPt[i];}
+        Node2d const &controlPoint(int i) const {return m_CtrlPt.at(i);}
+        Node2d const &lastCtrlPoint()     const {return m_CtrlPt.last();}
+        Node2d const &firstCtrlPoint()    const {return m_CtrlPt.first();}
+        void setCtrlPoint(int n, double x, double y) {m_CtrlPt[n]=Node2d(x,y);}
+        void setCtrlPoint(int n, Node2d const &pt) {m_CtrlPt[n]=pt;}
+        void setFirstCtrlPoint(Node2d const&pt) {if(m_CtrlPt.size()>0) m_CtrlPt.first()=pt;}
+        void setLastCtrlPoint(double x, double y) {if(m_CtrlPt.size()>0) m_CtrlPt.back()=Node2d(x,y);}
+        void setLastCtrlPoint(Node2d const&pt)  {if(m_CtrlPt.size()>0) m_CtrlPt.last()=pt;}
 
-        void appendCtrlPoints(QVector<Vector2d> const & ptList, double w=1.0);
-        void appendCtrlPoints(QVector<Vector2d> const & ptList, QVector<double> weightList);
+        void appendCtrlPoints(QVector<Node2d> const & ptList, double w=1.0);
+        void appendCtrlPoints(QVector<Node2d> const & ptList, QVector<double> weightList);
 
         bool insertCtrlPoint(double x, double y, double w=1.0);
         void insertCtrlPointAt(int iSel, double x, double y, double w=1.0);
-        void insertCtrlPointAt(int iSel, Vector2d const &pt, double w=1.0);
+        void insertCtrlPointAt(int iSel, Node2d const &pt, double w=1.0);
         void insertCtrlPointAt(int iSel);
         bool removeCtrlPoint(int k);
         int isCtrlPoint(double x, double y, double tolx, double toly) const;
@@ -154,11 +154,11 @@ class Spline
         int outputSize() const {return m_Output.size();}
         void setOutputSize(int n) {m_Output.resize(n);}
         QVector<Node2d> const &outputPts() const {return m_Output;}
-        Vector2d outputPt(int i) const {if(i<m_Output.size()) return m_Output.at(i); else return Vector2d();}
+        Node2d outputPt(int i) const {if(i<m_Output.size()) return m_Output.at(i); else return Node2d();}
 
         int selectedPoint() const {return m_iSelect;}
         void setSelectedPoint(int iPoint) {m_iSelect = iPoint;}
-        void setSelectedPoint(Vector2d const&pt) {if(m_iSelect>=0 && m_iSelect<m_CtrlPt.size()) m_CtrlPt[m_iSelect]=pt;}
+        void setSelectedPoint(Node2d const&pt) {if(m_iSelect>=0 && m_iSelect<m_CtrlPt.size()) m_CtrlPt[m_iSelect]=pt;}
 
         int highlightedPoint() const {return m_iHighlight;}
         void setHighlighted(int n) {m_iHighlight=n;}
@@ -191,7 +191,7 @@ class Spline
         int m_iHighlight;                /**< the index of the currently highlighted control point, i.e. the point over which the mouse hovers, or -1 of none. */
         int m_iSelect;                   /**< the index of the currently selected control point, i.e. the point on which the user has last click, or -1 if none. */
 
-        QVector<Vector2d> m_CtrlPt;      /**< the array of the positions of the spline's control points */
+        QVector<Node2d> m_CtrlPt;      /**< the array of the positions of the spline's control points */
         QVector<double> m_Weight;   /**< the array of weight of control points. Used for B-Splines only. Default is 1. The higher the value, the more the curve will be pulled towards the control points. */
         QVector<Node2d> m_Output;      /**< the array of output points */
 

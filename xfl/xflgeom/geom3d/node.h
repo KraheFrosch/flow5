@@ -23,36 +23,34 @@ class Node : public Vector3d
         QVector<int> m_NeighbourIndex;        /** the array of neighbour node indexes */
         Vector3d m_Normal;                    /** the node's normal */
         int m_Index;                          /** the index of the node in the global node array */
-        int m_iU;                             /** index of the upstream   node, or -1 if none */
-        int m_iD;                             /** index of the downstream node, or -1 if none; note: avoid since LE nodes have two downstream nodes */
         bool m_bTrailing;                     /** true if the node is trailing, false otherwise */
         xfl::enumSurfacePosition m_Position;  /** defines on which type of surface the node is positioned */
 
     public:
         Node() :
-            m_Index{-1}, m_iU{-1}, m_iD{-1}, m_bTrailing{false}, m_Position{xfl::NOSURFACE}
+            m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}
         {
         }
 
         Node(double xx, double yy, double zz) :
-            Vector3d(xx,yy,zz), m_Index{-1}, m_iU{-1}, m_iD{-1}, m_bTrailing{false}, m_Position{xfl::NOSURFACE}
+            Vector3d(xx,yy,zz), m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}
         {
         }
 
         Node(Vector3d const &v3d) :
-            Vector3d(v3d), m_Index{-1}, m_iU{-1}, m_iD{-1}, m_bTrailing{false}, m_Position{xfl::NOSURFACE}
+            Vector3d(v3d), m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}
 
         {
         }
 
         Node(double xx, double yy, double zz, Vector3d const &N, int idx=-1, xfl::enumSurfacePosition pos=xfl::NOSURFACE) :
-            Vector3d(xx,yy,zz), m_Normal{N}, m_Index{idx}, m_iU{-1}, m_iD{-1}, m_bTrailing{false}, m_Position{pos}
+            Vector3d(xx,yy,zz), m_Normal{N}, m_Index{idx}, m_bTrailing{false}, m_Position{pos}
         {
 
         }
 
         Node(Vector3d const &v3d, Vector3d const &N, int idx=-1, xfl::enumSurfacePosition pos=xfl::NOSURFACE) :
-            Vector3d(v3d), m_Normal{N}, m_Index{idx}, m_iU{-1}, m_iD{-1}, m_bTrailing{false}, m_Position{pos}
+            Vector3d(v3d), m_Normal{N}, m_Index{idx}, m_bTrailing{false}, m_Position{pos}
 
         {
         }
@@ -92,12 +90,10 @@ class Node : public Vector3d
             m_TriangleIndex = node.m_TriangleIndex;
             m_NeighbourIndex = node.m_NeighbourIndex;
 
-            m_iU = node.m_iU;
-            m_iD = node.m_iD;
         }
 
-        bool isWingNode() const {return m_Position==xfl::TOPSURFACE || m_Position==xfl::BOTSURFACE || m_Position==xfl::MIDSURFACE || m_Position==xfl::SIDESURFACE;};
-        bool isFuseNode() const {return m_Position==xfl::FUSESURFACE;};
+        bool isWingNode() const {return m_Position==xfl::TOPSURFACE || m_Position==xfl::BOTSURFACE || m_Position==xfl::MIDSURFACE || m_Position==xfl::SIDESURFACE;}
+        bool isFuseNode() const {return m_Position==xfl::FUSESURFACE;}
 
         Vector3d const &normal() const {return m_Normal;}
         Vector3d &normal() {return m_Normal;}
@@ -189,12 +185,6 @@ class Node : public Vector3d
             Node T(x/d, y/d, z/d, m_Normal);
             return T;
         }
-
-        int downstream() const {return m_iD;}
-        void setDownStream(int idx) {m_iD=idx;}
-        int upstream() const {return m_iU;}
-        void setUpStream(  int idx) {m_iU=idx;}
-
 };
 
 

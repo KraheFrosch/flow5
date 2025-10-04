@@ -30,25 +30,25 @@ void XDirectActions::makeActions()
         m_pDesignAct = new QAction(QIcon(":/icons/OnDFoil.png"), "Foil design view\tF3", this);
         m_pDesignAct->setShortcut(Qt::Key_F3);
         m_pDesignAct->setCheckable(true);
-        m_pDesignAct->setStatusTip("Switch to the foil design view");
+        m_pDesignAct->setToolTip("<p>Switch to the foil design view</p>");
         connect(m_pDesignAct, SIGNAL(triggered()), m_pXDirect, SLOT(onDesignView()));
 
         m_pBLAct = new QAction(QIcon(":/icons/OnBLView.png"), "Boundary layer view\tF4", this);
         m_pBLAct->setShortcut(Qt::Key_F4);
         m_pBLAct->setCheckable(true);
-        m_pBLAct->setStatusTip("Switch to the BL view");
+        m_pBLAct->setToolTip("Switch to the boundary layer view");
         connect(m_pBLAct, SIGNAL(triggered()), m_pXDirect, SLOT(onBLView()));
 
         m_pOpPointsAct = new QAction(QIcon(":/icons/OnCpView.png"), "Operating point view\tF5", this);
         m_pOpPointsAct->setShortcut(Qt::Key_F5);
         m_pOpPointsAct->setCheckable(true);
-        m_pOpPointsAct->setStatusTip("Show Operating point view");
+        m_pOpPointsAct->setToolTip("<p>Switch to the operating point view</p>");
         connect(m_pOpPointsAct, SIGNAL(triggered()), m_pXDirect, SLOT(onOpPointView()));
 
         m_pPolarsAct = new QAction(QIcon(":/icons/OnPolarView.png"), "Polar view\tF8", this);
         m_pPolarsAct->setShortcut(Qt::Key_F8);
         m_pPolarsAct->setCheckable(true);
-        m_pPolarsAct->setStatusTip("Show Polar view");
+        m_pPolarsAct->setToolTip("<p>Switch to the polar view<p>");
         connect(m_pPolarsAct, SIGNAL(triggered()), m_pXDirect, SLOT(onPolarView()));
 
         pViewActionGroup->addAction(m_pDesignAct);
@@ -82,7 +82,7 @@ void XDirectActions::makeActions()
     //    connect(m_pSetCurFoilStyle, SIGNAL(triggered()), this, SLOT(onCurFoilStyle()));
 
     m_pDeleteFoilPolars = new QAction("Delete", this);
-    m_pDeleteFoilPolars->setStatusTip("Delete all the polars associated to this foil");
+    m_pDeleteFoilPolars->setToolTip("<p>Delete all the polars associated to this foil</p>");
     connect(m_pDeleteFoilPolars, SIGNAL(triggered()), m_pXDirect, SLOT(onDeleteFoilPolars()));
 
     m_pShowFoilPolarsOnly = new QAction("Show only foil polars", this);
@@ -121,28 +121,28 @@ void XDirectActions::makeActions()
 
     m_pDefinePolarAct = new QAction("Define an analysis", this);
     m_pDefinePolarAct->setShortcut(Qt::Key_F6);
-    m_pDefinePolarAct->setStatusTip("Define a single analysis/polar");
+    m_pDefinePolarAct->setToolTip("<p>Define a single analysis/polar</p>");
     connect(m_pDefinePolarAct, SIGNAL(triggered()), m_pXDirect, SLOT(onDefineAnalysis()));
 
     m_pMultiThreadedBatchAct = new QAction("Multi-threaded Batch Analysis", this);
     m_pMultiThreadedBatchAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F6));
-    m_pMultiThreadedBatchAct->setStatusTip("<p>Launches a batch of analysis using all available computer CPU cores</p>");
+    m_pMultiThreadedBatchAct->setToolTip("<p>Launches a batch of analysis using all available computer CPU cores</p>");
     connect(m_pMultiThreadedBatchAct, SIGNAL(triggered()), m_pXDirect, SLOT(onBatchAnalysis()));
 
     m_pDeletePolar = new QAction("Delete", this);
-    m_pDeletePolar->setStatusTip("Deletes the currently selected polar");
+    m_pDeletePolar->setToolTip("Deletes the currently selected polar");
     connect(m_pDeletePolar, SIGNAL(triggered()), m_pXDirect, SLOT(onDeleteCurPolar()));
 
     m_pResetCurPolar = new QAction("Reset", this);
-    m_pResetCurPolar->setStatusTip("Deletes the contents of the currently selected polar");
+    m_pResetCurPolar->setToolTip("<p>Deletes the contents of the currently selected polar</p>");
     connect(m_pResetCurPolar, SIGNAL(triggered()), m_pXDirect, SLOT(onResetCurPolar()));
 
     m_pEditCurPolar = new QAction("Edit", this);
-    m_pEditCurPolar->setStatusTip("Edit and modify the analysis parameters");
+    m_pEditCurPolar->setToolTip("<p>Edit and modify the analysis parameters</p>");
     connect(m_pEditCurPolar, SIGNAL(triggered()), m_pXDirect, SLOT(onEditCurPolar()));
 
     m_pEditCurPolarPts = new QAction("Edit data points", this);
-    m_pEditCurPolarPts->setStatusTip("Remove the unconverged or erroneous points of the currently selected polar");
+    m_pEditCurPolarPts->setToolTip("<p>Remove the unconverged or erroneous points of the currently selected polar</p>");
     connect(m_pEditCurPolarPts, SIGNAL(triggered()), m_pXDirect, SLOT(onEditCurPolarPts()));
 
     m_pExportCurPolar = new QAction("to file", this);
@@ -162,7 +162,7 @@ void XDirectActions::makeActions()
     m_pShowNeutralLine->setCheckable(true);
 
     m_pResetFoilScale = new QAction("Reset foil scale", this);
-    m_pResetFoilScale->setStatusTip("Resets the foil's scale to original size");
+    m_pResetFoilScale->setToolTip("<p>Resets the foil's scale to original size</p>");
 
     m_pRenamePolarAct = new QAction("Rename", this);
 //    m_pRenamePolarAct->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F2));
@@ -170,8 +170,8 @@ void XDirectActions::makeActions()
 
     m_pShowInviscidCurve = new QAction("Show inviscid curve", this);
     m_pShowInviscidCurve->setCheckable(true);
-    m_pShowInviscidCurve->setStatusTip("Display the operating point's inviscid curve");
-    connect(m_pShowInviscidCurve, SIGNAL(triggered()), m_pXDirect, SLOT(onCpi()));
+    m_pShowInviscidCurve->setToolTip("<p>Display the operating point's inviscid curve</p>");
+    connect(m_pShowInviscidCurve, SIGNAL(triggered(bool)), m_pXDirect, SLOT(onCpi(bool)));
 
     m_pExportFoilCpGraphAct = new QAction("to file", this);
     connect(m_pExportFoilCpGraphAct, SIGNAL(triggered(bool)), m_pXDirect, SLOT(onExportCpGraph()));
@@ -298,12 +298,12 @@ void XDirectActions::makeActions()
 
     m_pSetCpVarGraph = new QAction("Cp", this);
     m_pSetCpVarGraph->setCheckable(true);
-    m_pSetCpVarGraph->setStatusTip("Sets Cp vs. chord graph");
+    m_pSetCpVarGraph->setToolTip("<p>Sets Cp vs. chord graph</p>");
     connect(m_pSetCpVarGraph, SIGNAL(triggered()), m_pXDirect, SLOT(onCpGraph()));
 
     m_pSetQVarGraph = new QAction("Velocity", this);
     m_pSetQVarGraph->setCheckable(true);
-    m_pSetQVarGraph->setStatusTip("Sets Speed vs. chord graph");
+    m_pSetQVarGraph->setToolTip("<p>Sets Speed vs. chord graph</p>");
     connect(m_pSetQVarGraph, SIGNAL(triggered()), m_pXDirect, SLOT(onOppGraph()));
 
     // design view actions

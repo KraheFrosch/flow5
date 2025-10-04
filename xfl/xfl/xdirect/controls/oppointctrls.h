@@ -50,7 +50,7 @@ class OpPointCtrls : public QWidget
 
     private:
         QCheckBox *m_pchFillFoil;
-        QCheckBox *m_pchShowBL, *m_pchShowPressure;
+        QCheckBox *m_pchShowBL, *m_pchShowPressure, *m_pchShowInviscid;
 
         LineBtn *m_plbBLStyle, *m_plbPressureStyle;
 

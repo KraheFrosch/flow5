@@ -1663,7 +1663,7 @@ void Foil::makeNormalsFromCubic()
     double dx{0}, dy{0};
     for(int t=0; t<nBaseNodes(); t++)
     {
-        m_CubicSpline.splineDerivative(double(t)/double(nNodes()-1), dx, dy);
+        m_CubicSpline.splineDerivative(double(t)/double(nBaseNodes()-1), dx, dy);
         double norm = sqrt(dx*dx+dy*dy);
         m_BaseNode[t].setNormal(dy/norm, -dx/norm);
     }

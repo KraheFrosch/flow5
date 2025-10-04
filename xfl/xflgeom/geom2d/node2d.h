@@ -19,32 +19,23 @@ class Node2d : public Vector2d
     public:
         int m_Index = -1;         /** the index of the node in the array of foil nodes; useful when nodes are re-ordered in streamwise direction for BL calculations */
         bool m_bIsWakeNode = false;
-        bool m_bIsFoilNode;
-        bool m_bIsBoundary;
-        bool bRight;
-        bool bLeft;
-        bool bTop;
-        bool bBottom;
+        bool m_bIsFoilNode = false;
 
-        float floatfield = 0;  // a convenience field typically used to store the node's parameter on a spline
         Vector2d m_N;
 
         QVector<int> m_Triangles; /**< triangles of which this node is a vertex */
         QVector<int> m_Neigh;     /**< node neighbours */
 
     public:        
-        Node2d() : Vector2d(), m_Index{-1}, m_bIsFoilNode{false}, m_bIsBoundary{false},
-            bRight{false}, bLeft{false}, bTop{false}, bBottom{false}
+        Node2d() : Vector2d(), m_Index{-1}, m_bIsFoilNode{false}
         {
         }
 
-        Node2d(double const &xi, double const &yi) : Vector2d(xi,yi), m_Index{-1}, m_bIsFoilNode{false}, m_bIsBoundary{false},
-            bRight{false}, bLeft{false}, bTop{false}, bBottom{false}
+        Node2d(double const &xi, double const &yi) : Vector2d(xi,yi), m_Index{-1}, m_bIsFoilNode{false}
         {
         }
 
-        Node2d(Vector2d const&v2d) : Vector2d(v2d), m_Index{-1}, m_bIsFoilNode{false}, m_bIsBoundary{false},
-            bRight{false}, bLeft{false}, bTop{false}, bBottom{false}
+        Node2d(Vector2d const&v2d) : Vector2d(v2d), m_Index{-1}, m_bIsFoilNode{false}
         {
         }
 
@@ -66,9 +57,6 @@ class Node2d : public Vector2d
         bool isWakeNode() const {return m_bIsWakeNode;}
         void setWakeNode(bool bWakeNode) {m_bIsWakeNode = bWakeNode;}
 
-        bool isBoundary() const {return m_bIsBoundary;}
-        void setBoundary(bool bBoundary) {m_bIsBoundary= bBoundary;}
-
         Vector2d const T() const {return Vector2d(m_N.y, -m_N.x);}
         void setT(Vector2d const &tangent) {m_N.set(tangent.y, tangent.x);}
         void setT(double x, double y) {m_N.set(y, x);}
@@ -78,9 +66,6 @@ class Node2d : public Vector2d
         void setNormal(double nx, double ny) {m_N={nx,ny};}
 
         void flipNormal() {m_N.x=-m_N.x; m_N.y=-m_N.y;}
-
-        float tau() const {return floatfield;}
-        void setTau(float t) {floatfield = t;}
 
         void printNode() const
         {

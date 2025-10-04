@@ -887,7 +887,7 @@ void OpPointWt::paintOpPoint(QPainter &painter)
     if(m_bPressure && pCurOpp) paintPressure(painter, m_fScale, m_fScale*m_fScaleY);
     if(m_bBL && pCurOpp)
     {
-        if     (pCurOpp->isXFoil()) paintBLXFoil(painter, pCurOpp, m_fScale, m_fScale*m_fScaleY);
+        if (pCurOpp->isXFoil()) paintBLXFoil(painter, pCurOpp, m_fScale, m_fScale*m_fScaleY);
     }
 
     if(s_bNeutralLine)

@@ -257,8 +257,6 @@ int Surface::makeTipNodes(QVector<Node> &nodes, bool bLeft, int nStrips) const
                 else if(is==ist) node.setSurfacePosition(xfl::TOPSURFACE);
                 else             node.setSurfacePosition(xfl::SIDESURFACE);
                 node.setIndex(n0);
-                if(l>0)          node.setDownStream(n0-1); else node.setDownStream(-1);
-                if(l<m_NXPanels) node.setUpStream(n0+1);   else node.setUpStream(-1);
 
                 nodetiplist.replace(in, node);
                 n0++;
@@ -287,9 +285,6 @@ int Surface::makeTipNodes(QVector<Node> &nodes, bool bLeft, int nStrips) const
                 else if(is==ist) node.setSurfacePosition(xfl::TOPSURFACE);
                 else             node.setSurfacePosition(xfl::SIDESURFACE);
                 node.setIndex(n0);
-
-                if(l>0)          node.setDownStream(n0-1); else node.setDownStream(-1);
-                if(l<m_NXPanels) node.setUpStream(n0+1);   else node.setUpStream(-1);
 
                 nodetiplist.replace(in, node);
                 n0++;
@@ -329,9 +324,6 @@ void Surface::makePanelNodes(QVector<Node> &nodes, bool bMakeLeftNodes, bool bMi
                 node.setSurfacePosition(xfl::MIDSURFACE);
                 node.setIndex(n0);
 
-                if(l>0)          node.setDownStream(n0-1); else node.setDownStream(-1);
-                if(l<m_NXPanels) node.setUpStream(n0+1);   else node.setUpStream(-1);
-
                 lefttiplist.append(node);
                 n0++;
             }
@@ -345,9 +337,6 @@ void Surface::makePanelNodes(QVector<Node> &nodes, bool bMakeLeftNodes, bool bMi
                 node.setSurfacePosition(xfl::BOTSURFACE);
                 node.setIndex(n0);
 
-                if(l>0)          node.setDownStream(n0-1); else node.setDownStream(-1);
-                if(l<m_NXPanels) node.setUpStream(n0+1);   else node.setUpStream(-1);
-
                 lefttiplist.append(node);
                 n0++;
             }
@@ -358,9 +347,6 @@ void Surface::makePanelNodes(QVector<Node> &nodes, bool bMakeLeftNodes, bool bMi
                 node.setSurfacePosition(xfl::TOPSURFACE);
                 node.setIndex(n0);
 
-                if(l>0)             node.setDownStream(n0+1); else node.setDownStream(-1);
-//                if(l<m_NXPanels-1)  node.setUpStream(n0-1);   else node.setUpStream(-1);
-                node.setUpStream(n0-1);
 
                 lefttiplist.append(node);
                 n0++;
@@ -382,9 +368,6 @@ void Surface::makePanelNodes(QVector<Node> &nodes, bool bMakeLeftNodes, bool bMi
                 node.setSurfacePosition(xfl::MIDSURFACE);
                 node.setIndex(n0);
 
-                if(l>0)          node.setDownStream(n0-1); else node.setDownStream(-1);
-                if(l<m_NXPanels) node.setUpStream(n0+1);   else node.setUpStream(-1);
-
                 nodes.append(node);
                 n0++;
             }
@@ -398,9 +381,6 @@ void Surface::makePanelNodes(QVector<Node> &nodes, bool bMakeLeftNodes, bool bMi
                 node.setSurfacePosition(xfl::BOTSURFACE);
                 node.setIndex(n0);
 
-                if(l>0)          node.setDownStream(n0-1); else node.setDownStream(-1);
-                if(l<m_NXPanels) node.setUpStream(n0+1);   else node.setUpStream(-1);
-
                 nodes.append(node);
                 n0++;
             }
@@ -410,10 +390,6 @@ void Surface::makePanelNodes(QVector<Node> &nodes, bool bMakeLeftNodes, bool bMi
                 node = m_SideA_Top.at(l)*(1.0-y2) + m_SideB_Top.at(l)*y2;
                 node.setSurfacePosition(xfl::TOPSURFACE);
                 node.setIndex(n0);
-
-                if(l>0)             node.setDownStream(n0+1); else node.setDownStream(-1);
-//                if(l<m_NXPanels-1)  node.setUpStream(n0-1);   else node.setUpStream(-1);
-                node.setUpStream(n0-1);
 
                 nodes.append(node);
                 n0++;

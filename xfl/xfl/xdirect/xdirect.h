@@ -84,7 +84,7 @@ class XDirect : public QObject
         void setGraphTiles();
         void setBLView(xfl::enumGraphView eView) {m_iBLView=eView;}
         void stopAnimate();
-        void updateTreeView();
+        void updateFoilExplorers();
 
         Foil* setFoil(Foil* pFoil=nullptr);
         Polar *setPolar(Polar *pPolar=nullptr);
@@ -119,6 +119,9 @@ class XDirect : public QObject
         Polar *insertNewPolar(Polar *pNewPolar);
 
         void checkNeutralLineAction(bool bShow);
+
+        bool bShowInviscid() const {return m_bShowInviscid;}
+
 
         static bool bKeepOpenOnErrors() {return s_bKeepOpenErrors;}
         static void setKeepOpenOnErrors(bool bKeepOpen) {s_bKeepOpenErrors=bKeepOpen;}
@@ -161,7 +164,7 @@ class XDirect : public QObject
         void onBLView();
         void onCircleFoil();
         void onCpGraph();
-        void onCpi();
+        void onCpi(bool bInviscid);
         void onCurOppOnly(bool bCurOppOnly=false);
         void onCurveClicked(Curve*pCurve);
         void onCurveDoubleClicked(Curve*pCurve);

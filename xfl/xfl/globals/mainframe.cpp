@@ -1166,7 +1166,7 @@ void MainFrame::deleteProject()
     Objects2d::deleteObjects();
 
     m_pXDirect->setFoil(nullptr);
-    m_pXDirect->updateTreeView();
+    m_pXDirect->updateFoilExplorers();
     m_pXDirect->resetCurves();
     m_pDFoilWt->resetLegend();
 
@@ -1564,7 +1564,7 @@ void MainFrame::onLoadFoilFile()
 
     if(s_iApp==xfl::XDIRECT)
     {
-        m_pXDirect->updateTreeView();
+        m_pXDirect->updateFoilExplorers();
         m_pXDirect->m_pFoilTreeView->selectFoil(Objects2d::curFoil());
         m_pXDirect->setControls();
     }
@@ -1629,7 +1629,7 @@ void MainFrame::onLoadPlrFile()
 
     if(s_iApp==xfl::XDIRECT)
     {
-        m_pXDirect->updateTreeView();
+        m_pXDirect->updateFoilExplorers();
         m_pXDirect->m_pFoilTreeView->selectFoil(Objects2d::curFoil());
         m_pXDirect->setControls();
     }
@@ -2069,7 +2069,7 @@ void MainFrame::onInsertProject()
     else if(s_iApp == xfl::XDIRECT)
     {
         m_pXDirect->createCurves();
-        m_pXDirect->updateTreeView();
+        m_pXDirect->updateFoilExplorers();
     }
     else if(s_iApp == xfl::XSAIL)
     {
@@ -2322,7 +2322,7 @@ void MainFrame::onXDirect()
 
     if(m_pXDirect->m_pOpPointWt) m_pXDirect->m_pOpPointWt->setFoilScale(true);
 
-    m_pXDirect->updateTreeView();
+    m_pXDirect->updateFoilExplorers();
 
     m_pXDirect->setControls();
     m_pXDirect->showDockWidgets();

@@ -107,7 +107,7 @@ bool XmlXSailReader::readSplineSail(SplineSail *pSSail, Vector3d &position, doub
     QVector<int>nzpanels;
     QVector<xfl::enumDistribution> distribs;
     QVector<int>degree;
-    QVector<QVector<Vector2d>> ctrlpts;
+    QVector<QVector<Node2d>> ctrlpts;
     QVector<QVector<double>> weights;
 
     while(!atEnd() && !hasError() && readNextStartElement())
@@ -176,7 +176,7 @@ bool XmlXSailReader::readSplineSail(SplineSail *pSSail, Vector3d &position, doub
             positions.push_back(Vector3d());
             ry.push_back(0.0);
             degree.push_back(2);
-            ctrlpts.push_back(QVector<Vector2d>());
+            ctrlpts.push_back(QVector<Node2d>());
             weights.push_back(QVector<double>());
 
             while(!atEnd() && !hasError() && readNextStartElement() )

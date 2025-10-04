@@ -138,9 +138,6 @@ bool CubicSpline::updateSpline()
         return false;
     }
 
-//    computeArcLengths();
-//    computeArcCurvatures();
-
     m_bSingular = false;
 
     return true;
@@ -419,7 +416,7 @@ bool CubicSpline::serializeFl5(QDataStream &ar, bool bIsStoring)
 
 
 /**
- * @brief CubicSpline::getPoint Searches for the point on the spline betaween spline parameters smin and smax which intersects segment AB
+ * @brief CubicSpline::getPoint Searches for the point on the spline between spline parameters smin and smax which intersects segment AB
  */
 bool CubicSpline::getPoint(bool bBefore, double sfrac, Vector2d const &A, Vector2d const &B, Vector2d &I) const
 {
@@ -470,8 +467,7 @@ bool CubicSpline::approximate(int nCtrlPts, QVector<Node2d> const& node)
     if(nCtrlPts<0)
     {
         //use them all
-        m_CtrlPt.resize(node.size());
-        for(int i=0; i<node.size(); i++) m_CtrlPt[i] = node.at(i);
+        m_CtrlPt = node;
     }
     else
     {
