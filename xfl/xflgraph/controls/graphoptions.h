@@ -37,6 +37,16 @@ class GraphOptions : public QWidget
         void setButtonColors();
         void readData();
 
+        static bool bMouseTrack() {return s_bMouseTracking;}
+        static void setMouseTrack(bool bTrack) {s_bMouseTracking=bTrack;}
+
+        static void setSpinAnimation(bool b) {s_bSpinAnimation=b;}
+        static void setSpinDamping(double damp) {s_SpinDamping=damp;}
+
+        static bool bSpinAnimation() {return s_bSpinAnimation;}
+        static double spinDamping() {return s_SpinDamping;}
+
+
         static void setTitleFontStruct(FontStruct const &fntstruct);
         static void setLabelFontStruct(FontStruct const &fntstruct);
         static void setLegendFontStruct(FontStruct const &fntstruct);
@@ -98,7 +108,7 @@ class GraphOptions : public QWidget
         LineBtn *m_plbYAxisStyle[2], *m_plbYMajGridStyle[2], *m_plbYMinGridStyle[2];
 
         QCheckBox *m_pchSpinAnimation;
-        FloatEdit *m_pdeSpinDamping;
+        FloatEdit *m_pfeSpinDamping;
         QCheckBox *m_pchMouseTracking;
         QCheckBox *m_pchShowMousePos;
 
@@ -114,6 +124,10 @@ class GraphOptions : public QWidget
         QVector<QGroupBox *>m_pGroupBox;
 
         // graph data
+        static bool s_bMouseTracking;
+
+        static bool s_bSpinAnimation;
+        static double s_SpinDamping;
 
         static bool s_bBorder;
         static bool s_bShowLegend;

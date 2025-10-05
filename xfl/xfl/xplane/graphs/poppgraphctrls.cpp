@@ -171,7 +171,7 @@ void POppGraphCtrls::setupLayout()
 {
     QGridLayout *pMainLayout = new QGridLayout;
     {
-        m_pchWOppAnimate       = new QCheckBox(tr("Animate"));
+        m_pchWOppAnimate       = new QCheckBox("Animate");
 
         m_pslAnimateWOppSpeed  = new QSlider(Qt::Horizontal);
         m_pslAnimateWOppSpeed->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);

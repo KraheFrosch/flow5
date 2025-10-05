@@ -2798,7 +2798,6 @@ bool MainFrame::loadSettings()
     FoilSVGWriter::loadSettings(settings);
     FuseMesherDlg::loadSettings(settings);
     GraphOptions::loadSettings(settings);
-    GraphWt::loadSettings(settings);
     LogWt::loadSettings(settings);
     MesherWt::loadSettings(settings);
     OneVortonTestDlg::loadSettings(settings);
@@ -2949,7 +2948,6 @@ void MainFrame::saveSettings()
     FoilSVGWriter::saveSettings(settings);
     FuseMesherDlg::saveSettings(settings);
     GraphOptions::saveSettings(settings);
-    GraphWt::saveSettings(settings);
     LogWt::saveSettings(settings);
     MesherWt::saveSettings(settings);
     OneVortonTestDlg::saveSettings(settings);

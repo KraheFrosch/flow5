@@ -773,9 +773,9 @@ void XflExecutor::cleanUpLLTTask(LLTTask *pLLTTask)
     QString strong;
 
     if (!pLLTTask->isCancelled() && !pLLTTask->hasErrors())
-        strong = "\n"+tr("LLT analysis completed successfully")+"\n";
+        strong = "\nLLT analysis completed successfully\n";
     else if (pLLTTask->hasErrors())
-        strong = "\n"+tr("LLT analysis completed ... Errors encountered")+"\n";
+        strong = "\nLLT analysis completed ... Errors encountered\n";
 
     traceLog(strong+"\n");
 }

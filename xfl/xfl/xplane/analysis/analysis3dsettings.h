@@ -64,7 +64,7 @@ class Analysis3dSettings : public QDialog
 
         QDialogButtonBox *m_pButtonBox;
 
-        FloatEdit *m_pdeCoreRadius;
+        FloatEdit *m_pfeCoreRadius;
         QComboBox *m_pcbVortexModel;
 
         FloatEdit *m_pfeLLTRelax;
@@ -83,10 +83,10 @@ class Analysis3dSettings : public QDialog
 
         IntEdit *m_pieQuadPoints;
 
-        FloatEdit *m_pdeMinPanelSize;
-        FloatEdit *m_pdeRFF;
-        FloatEdit *m_pdeVortexPos;
-        FloatEdit *m_pdeControlPos;
+        FloatEdit *m_pfeMinPanelSize;
+        FloatEdit *m_pfeRFF;
+        FloatEdit *m_pfeVortexPos;
+        FloatEdit *m_pfeControlPos;
 
         QRadioButton *m_prbSinglePrecision, *m_prbDoublePrecision;
 

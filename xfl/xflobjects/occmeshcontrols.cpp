@@ -36,10 +36,10 @@ void OccMeshControls::setupLayout()
 
         QGridLayout *pMeshLayout = new QGridLayout;
         {
-            QLabel *plabDeflectionType = new QLabel(tr("Deflection type:"));
+            QLabel *plabDeflectionType = new QLabel("Deflection type:");
             plabDeflectionType->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-            m_prbLinAbs = new QRadioButton(tr("Absolute"));
-            m_prbLinRel = new QRadioButton(tr("Relative"));
+            m_prbLinAbs = new QRadioButton("Absolute");
+            m_prbLinRel = new QRadioButton("Relative");
 
             m_pLabLinDefAbs = new QLabel("Absolute linear deflection:");
             m_pLabLinDefAbs->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
@@ -47,31 +47,29 @@ void OccMeshControls::setupLayout()
             m_plabAbsUnit->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 
             m_pdeLinDefAbs  = new FloatEdit(0.0, 3);
-            m_pdeLinDefAbs->setToolTip(tr("The linear deflection is the maximum distance between an edge of the\n"
-                                            "mesh and the corresponding surface. This will always be non-zero for a\n"
-                                            "curved surface."
-                                            "Caution: too small a value will lead to large tessellation sizes"
-                                            "and slow load times."));
+            m_pdeLinDefAbs->setToolTip("<p>The linear deflection is the maximum distance between an edge of the mesh "
+                                       "and the corresponding surface. This will always be non-zero for a curved surface.<br>"
+                                       "Caution: too small a value will lead to large tessellation sizes and slow load times.</p>");
 
             m_pLabLinDefRel = new QLabel("Relative linear deflection:");
             m_pLabLinDefRel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-            m_plabRelUnit = new QLabel(tr("% edge length"));
+            m_plabRelUnit = new QLabel("% edge length");
             m_plabRelUnit->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 
             m_pdeLinDefRel  = new FloatEdit(0.0, 3);
-            m_pdeLinDefRel->setToolTip(tr("The linear deflection is the maximum distance between an edge of the\n"
-                                            "mesh and the corresponding surface. This will always be non-zero for a\n"
-                                            "curved surface.\n"
-                                            "Recommendation ~1 to 3°"));
+            m_pdeLinDefRel->setToolTip("<p>The linear deflection is the maximum distance between an edge of the "
+                                            "mesh and the corresponding surface. This will always be non-zero for a "
+                                            "curved surface.<br<"
+                                            "Recommendation ~1 to 3&deg;</p>");
 
             QLabel *plabAngDeflection = new QLabel("Angular deflection:");
             plabAngDeflection->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
             QLabel *plabAngUnit = new QLabel("<p>&deg;</p>");
             plabAngUnit->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
             m_pdeAngDeviation  = new FloatEdit(0.0, 3);
-            m_pdeAngDeviation->setToolTip("Angular deflection is the upper limit to the angle between subsequent segments in a polyline\n"
+            m_pdeAngDeviation->setToolTip("<p>Angular deflection is the upper limit to the angle between subsequent segments in a polyline "
                                             "https://www.opencascade.com/doc/occt-7.1.0/overview/html/occt_user_guides__modeling_algos.html#occt_modalg_11_2"
-                                            "Recommendation: ~10°");
+                                            "Recommendation: ~10&deg;</p>");
 
 
             pMeshLayout->addWidget(plabDeflectionType, 2,1);

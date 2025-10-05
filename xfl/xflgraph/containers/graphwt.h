@@ -48,21 +48,9 @@ class GraphWt : public QWidget
 
         void setOverlayedRect(bool bShow, double tlx, double tly, double brx, double bry);
 
-
         void setOutputInfo(QString const &info);
         void clearOutputInfo() {m_plabInfoOutput->setText(QString());}
 
-        static bool bMouseTrack() {return s_bMouseTracking;}
-        static void setMouseTrack(bool bTrack) {s_bMouseTracking=bTrack;}
-
-        static void setSpinAnimation(bool b) {s_bSpinAnimation=b;}
-        static void setSpinDamping(double damp) {s_SpinDamping=damp;}
-
-        static bool bSpinAnimation() {return s_bSpinAnimation;}
-        static double spinDamping() {return s_SpinDamping;}
-
-        static void loadSettings(QSettings &settings);
-        static void saveSettings(QSettings &settings);
 
     public:
         void showEvent(QShowEvent *pEvent) override;
@@ -147,11 +135,5 @@ class GraphWt : public QWidget
 
 
         QLabel *m_plabInfoOutput;
-
-
-        static bool s_bMouseTracking;
-
-        static bool s_bSpinAnimation;
-        static double s_SpinDamping;
 };
 

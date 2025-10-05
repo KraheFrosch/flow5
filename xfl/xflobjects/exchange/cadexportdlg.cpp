@@ -128,7 +128,7 @@ void CADExportDlg::makeCommonWts()
                 connect(m_prbSTEP, SIGNAL(clicked(bool)), SLOT(onFormat()));
             }
 
-            QLabel *pLab = new QLabel(tr("Select STEP Format:"));
+            QLabel *pLab = new QLabel("Select STEP Format:");
             m_plwListFormat = new QListWidget;
             {
                 QString tip("OpenCascade documentation:\n"
@@ -146,7 +146,7 @@ void CADExportDlg::makeCommonWts()
                 m_plwListFormat->addItems(formats);
                 m_plwListFormat->setCurrentRow(0);
             }
-            m_ppbExport = new QPushButton(tr("Export"));
+            m_ppbExport = new QPushButton("Export");
             connect(m_ppbExport, SIGNAL(clicked(bool)), SLOT(onExport()));
 
             pControlsLayout->addLayout(pFormatSelLayout);
@@ -190,9 +190,9 @@ void CADExportDlg::onButton(QAbstractButton *pButton)
 void CADExportDlg::onFormat()
 {
     m_plwListFormat->setEnabled(m_prbSTEP->isChecked());
-    if     (m_prbSTEP->isChecked()) m_ppbExport->setText(tr("Export STEP"));
-    else if(m_prbBRep->isChecked()) m_ppbExport->setText(tr("Export BRep"));
-    else if(m_prbIGES->isChecked()) m_ppbExport->setText(tr("Export IGES"));
+    if     (m_prbSTEP->isChecked()) m_ppbExport->setText("Export STEP");
+    else if(m_prbBRep->isChecked()) m_ppbExport->setText("Export BRep");
+    else if(m_prbIGES->isChecked()) m_ppbExport->setText("Export IGES");
 }
 
 
@@ -225,7 +225,7 @@ void CADExportDlg::exportSTEP()
 {
     QString filter = "STEP Files (*.step)";
     QString filename = SaveOptions::CADDirName()+QDir::separator()+m_PartName+".step";
-    filename = QFileDialog::getSaveFileName(this, tr("Export STEP file"),filename,filter);
+    filename = QFileDialog::getSaveFileName(this, "Export STEP file",filename,filter);
     if(!filename.length())
     {
         return;
@@ -359,7 +359,7 @@ void CADExportDlg::exportBRep()
 {
     QString filter = "BRep Files (*.brep)";
     QString filename = SaveOptions::CADDirName()+QDir::separator()+m_PartName+".brep";
-    filename = QFileDialog::getSaveFileName(this, tr("Export BRep file"),filename,filter);
+    filename = QFileDialog::getSaveFileName(this, "Export BRep file",filename,filter);
     if(!filename.length())
     {
         return;
@@ -392,7 +392,7 @@ void CADExportDlg::exportIGES()
 {
     QString filter = "IGES Files (*.igs *.iges)";
     QString filename = SaveOptions::CADDirName()+QDir::separator()+m_PartName+".iges";
-    filename = QFileDialog::getSaveFileName(this, tr("Export IGES file"),filename,filter);
+    filename = QFileDialog::getSaveFileName(this, "Export IGES file",filename,filter);
     if(!filename.length())
     {
         return;

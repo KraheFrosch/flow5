@@ -24,19 +24,16 @@
 #include <xflgraph/controls/graphdlg.h>
 #include <xflgraph/graph/graph.h>
 #include <xflgraph/globals/graph_globals.h>
-
+#include <xflgraph/controls/graphoptions.h>
 
 #define ANIMATIONFRAMES 30
 
 
-bool GraphWt::s_bMouseTracking = true;
-bool GraphWt::s_bSpinAnimation = true;
-double GraphWt::s_SpinDamping = 0.01;
 
 GraphWt::GraphWt(QWidget *pParent) : QWidget(pParent)
 {
     setCursor(Qt::CrossCursor);
-    setMouseTracking(s_bMouseTracking);
+    setMouseTracking(GraphOptions::bMouseTrack());
     setFocusPolicy(Qt::WheelFocus);
 
     m_DefaultSize = QSize(500,500);
@@ -156,7 +153,7 @@ void GraphWt::paintEvent(QPaintEvent* )
 //        if(fabs(xm)<1.e-3) strong = QString::asprintf("x = %9.5g", xm);
 //        else               strong = QString::asprintf("x = %9.5f", xm);
         if(xfl::isLocalized()) strong = QString("x = %L1").arg(xm, 9, 'g', 5);
-        else            strong = QString("x = %1" ).arg(xm, 9, 'g', 5);
+        else                   strong = QString("x = %1" ).arg(xm, 9, 'g', 5);
 
         painter.drawText(width()-14*fm.averageCharWidth(),fmheight, strong);
 
@@ -165,7 +162,7 @@ void GraphWt::paintEvent(QPaintEvent* )
 //        if(fabs(ym)<1.e-3) strong = QString::asprintf("y = %9.5g", ym);
 //        else               strong = QString::asprintf("y = %9.5f", ym);
         if(xfl::isLocalized()) strong = QString("y = %L1").arg(ym, 9, 'g', 5);
-        else            strong = QString("y = %1" ).arg(ym, 9, 'g', 5);
+        else                   strong = QString("y = %1" ).arg(ym, 9, 'g', 5);
         painter.drawText(width()-14*fm.averageCharWidth(),2*fmheight, strong);
     }
     painter.restore();
@@ -191,7 +188,7 @@ void GraphWt::resizeEvent (QResizeEvent * pEvent)
 
 void GraphWt::showEvent(QShowEvent *pEvent)
 {
-    setMouseTracking(s_bMouseTracking);
+    setMouseTracking(GraphOptions::bMouseTrack());
 
     QString stylesheet = QString::asprintf("color: %s; font-family: %s; font-size: %dpt",
                                            DisplayOptions::textColor().name(QColor::HexRgb).toStdString().c_str(),
@@ -284,7 +281,7 @@ void GraphWt::contextMenuEvent(QContextMenuEvent *pEvent)
         m_pShowGraphLegend->setChecked(m_pGraph->isLegendVisible());
         pContextMenu->addAction(m_pGraphSettings);
         pContextMenu->addSeparator();
-        QMenu *pExportMenu =  pContextMenu->addMenu(tr("Export"));
+        QMenu *pExportMenu =  pContextMenu->addMenu("Export");
         {
             pExportMenu->addAction(m_pToFile);
             pExportMenu->addAction(m_pToClipboard);
@@ -398,7 +395,7 @@ void GraphWt::mouseMoveEvent(QMouseEvent *pEvent)
 {
     if(!m_pGraph) return;
 
-    setFocus();
+    if(GraphOptions::bMouseTrack()) setFocus();
 
     QPointF point = pEvent->pos();
 
@@ -496,7 +493,7 @@ void GraphWt::onHovered()
         if(pCurve->isLeftAxis())
             QToolTip::showText(QCursor::pos(), pCurve->name(), this, QRect(), 15000);
         else
-            QToolTip::showText(QCursor::pos(), pCurve->name()+ tr("_Right"), this, QRect(), 15000);
+            QToolTip::showText(QCursor::pos(), pCurve->name()+ "_Right", this, QRect(), 15000);
     }
 }
 
@@ -544,7 +541,7 @@ void GraphWt::mouseReleaseEvent(QMouseEvent *pEvent)
         }
     }
 
-    if(s_bSpinAnimation && pEvent->button()==Qt::LeftButton)
+    if(GraphOptions::bSpinAnimation() && pEvent->button()==Qt::LeftButton)
     {
         int movetime = m_MoveTime.elapsed();
         if(movetime<300 && !m_LastPressedPt.isNull())
@@ -576,7 +573,7 @@ void GraphWt::wheelEvent(QWheelEvent *pEvent)
     int dy = pEvent->pixelDelta().y();
     if(dy==0) dy = pEvent->angleDelta().y();
 
-    if(s_bSpinAnimation && (abs(dy)>120))
+    if(GraphOptions::bSpinAnimation() && (abs(dy)>120))
     {
         m_bDynScaling = true;
         m_ZoomFactor = dy;
@@ -628,7 +625,7 @@ void GraphWt::onResetGraphScales()
     stopDynamicTimer();
 
     if(!m_pGraph) return;
-    if(s_bSpinAnimation)
+    if(GraphOptions::bSpinAnimation())
     {
         QRect r(rect());
         Graph graph(*m_pGraph);
@@ -718,7 +715,7 @@ void GraphWt::onDynamicIncrement()
                 m_pGraph->setYWindow(iy, ymin, ymax);
             }
             m_pGraph->invalidate();
-            m_Trans *= (1.0-s_SpinDamping);
+            m_Trans *= (1.0-GraphOptions::spinDamping());
         }
 
         if(m_bDynScaling)
@@ -735,7 +732,7 @@ void GraphWt::onDynamicIncrement()
             int iy = -1; // both axes
             scaleAxes(iy, scalefactor);
 
-            m_ZoomFactor *= (1.0-s_SpinDamping);
+            m_ZoomFactor *= (1.0-GraphOptions::spinDamping());
         }
     }
 
@@ -757,7 +754,7 @@ void GraphWt::stopDynamicTimer()
         m_DynTimer.stop();
     }
     m_bDynTranslation = m_bDynScaling = m_bDynResetting = false;
-    setMouseTracking(true);
+    setMouseTracking(GraphOptions::bMouseTrack());
 }
 
 
@@ -767,7 +764,7 @@ void GraphWt::scaleAxes(int iy, double zoomfactor)
 
     double val[]{0,0,0};
     m_pGraph->clientToGraph(m_LastPoint, val);
-    double y[] = {val[1], val[2]};
+    double y[]{val[1], val[2]};
 
     if(m_bXPressed && m_bYPressed)
     {
@@ -876,7 +873,6 @@ void GraphWt::onCloseWindow()
 }
 
 
-
 void GraphWt::setOverlayedRect(bool bShow, double tlx, double tly, double brx, double bry)
 {
     m_bOverlayRectangle = bShow;
@@ -902,26 +898,3 @@ void GraphWt::setOutputInfo(QString const &info)
 }
 
 
-void GraphWt::loadSettings(QSettings &settings)
-{
-    settings.beginGroup("GraphWt");
-    {
-        s_bSpinAnimation = settings.value("bDynMouse",          s_bSpinAnimation).toBool();
-        s_SpinDamping    = settings.value("MouseDamping",       s_SpinDamping).toDouble();
-        s_bMouseTracking = settings.value("GraphMouseTracking", s_bMouseTracking).toBool();
-    }
-    settings.endGroup();
-}
-
-
-void GraphWt::saveSettings(QSettings &settings)
-{
-    settings.beginGroup("GraphWt");
-    {
-        settings.setValue("bDynMouse",          s_bSpinAnimation);
-        settings.setValue("MouseDamping",       s_SpinDamping);
-        settings.setValue("GraphMouseTracking", s_bMouseTracking);
-    }
-    settings.endGroup();
-
-}

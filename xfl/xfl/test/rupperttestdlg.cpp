@@ -204,17 +204,17 @@ void RuppertTestDlg::setupLayout()
                 m_pdeMaxEdgeSize   = new FloatEdit;
                 m_pdeQualityBound  = new FloatEdit(sqrt(2.0), 3);
                 QString tip;
-                tip = tr("The upper limit for the quality of the triangular panels.\n"
-                      "The quality is defined as the ratio of the radius of the triangle's circumcircle to the length of the shortest edge.\n"
-                      "See for instance:\n"
-                      "Delaunay Refinement Algorithms for Triangular Mesh Generation, Jonathan R. Shewchuk, May 21, 2001.\n"
-                      "A max. quality factor equal to sqrt(2) is recommended.");
+                tip = "<p>The upper limit for the quality of the triangular panels.<\n>br>"
+                      "The quality is defined as the ratio of the radius of the triangle's circumcircle to the length of the shortest edge.<br>"
+                      "See for instance:<br>"
+                      "Delaunay Refinement Algorithms for Triangular Mesh Generation, Jonathan R. Shewchuk, May 21, 2001.<br>"
+                      "A max. quality factor equal to sqrt(2) is recommended.</p>";
                 m_pdeQualityBound->setToolTip(tip);
                 m_pieMaxMeshIters  = new IntEdit;
                 m_pieMaxPanelCount = new IntEdit;
-                tip = tr("The mesh operation will stop if the number of triangular panels\n"
-                      "exceeds this value. Prevents excessive mesh sizes and and lengthy operations.\n"
-                      "Recommendation 1000-3000.");
+                tip = "<p>The mesh operation will stop if the number of triangular panels "
+                      "exceeds this value. Prevents excessive mesh sizes and and lengthy operations.<br>"
+                      "Recommendation 1000-3000.</p>";
                 m_pieMaxPanelCount->setToolTip(tip);
 
                 m_ppbRestorePSLG = new QPushButton("Restore PSLG");
@@ -253,8 +253,8 @@ void RuppertTestDlg::setupLayout()
 
         QHBoxLayout *pIndexesLayout = new QHBoxLayout;
         {
-            m_pchTriIndexes = new QCheckBox(tr("Triangle indexes"));
-            m_pchPSLGIndexes = new QCheckBox(tr("PSLG indexes"));
+            m_pchTriIndexes = new QCheckBox("Triangle indexes");
+            m_pchPSLGIndexes = new QCheckBox("PSLG indexes");
             pIndexesLayout->addWidget(m_pchTriIndexes);
             pIndexesLayout->addWidget(m_pchPSLGIndexes);
             pIndexesLayout->addStretch();
@@ -266,7 +266,7 @@ void RuppertTestDlg::setupLayout()
 
         m_pButtonBox = new QDialogButtonBox(QDialogButtonBox::Close);
         {
-            QPushButton *pClearOutput = new QPushButton(tr("Clear output"));
+            QPushButton *pClearOutput = new QPushButton("Clear output");
             m_pButtonBox->addButton(pClearOutput, QDialogButtonBox::ActionRole);
             connect(pClearOutput, SIGNAL(clicked()), m_ppto, SLOT(clear()));
             connect(m_pButtonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(onButton(QAbstractButton*)));

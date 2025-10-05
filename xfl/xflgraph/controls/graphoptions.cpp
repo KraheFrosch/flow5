@@ -26,6 +26,11 @@
 #include <xflwidgets/line/linecbbox.h>
 
 
+bool GraphOptions::s_bMouseTracking = true;
+
+bool GraphOptions::s_bSpinAnimation = true;
+double GraphOptions::s_SpinDamping = 0.01;
+
 bool GraphOptions::s_bIsGraphModified = false;
 
 FontStruct GraphOptions::s_TitleFontStruct;
@@ -383,12 +388,12 @@ void GraphOptions::makeWidgets()
             QHBoxLayout *pDynamicLayout = new QHBoxLayout;
             {
                 m_pchSpinAnimation = new QCheckBox("Enable mouse animations");
-                m_pdeSpinDamping = new FloatEdit;
-                m_pdeSpinDamping->setToolTip("<p>Defines the damping of the animation at each frame update.<br>"
+                m_pfeSpinDamping = new FloatEdit;
+                m_pfeSpinDamping->setToolTip("<p>Defines the damping of the animation at each frame update.<br>"
                                              "Set to 0 for perpetual movement.</p>");
                 QLabel *plabpcDamping = new QLabel("% damping");
                 pDynamicLayout->addWidget(m_pchSpinAnimation);
-                pDynamicLayout->addWidget(m_pdeSpinDamping);
+                pDynamicLayout->addWidget(m_pfeSpinDamping);
                 pDynamicLayout->addWidget(plabpcDamping);
                 pDynamicLayout->addStretch();
             }
@@ -522,11 +527,11 @@ void GraphOptions::initWidget()
     m_pieTMargin->setValue(s_Margin[2]);
     m_pieBMargin->setValue(s_Margin[3]);
 
-    m_pchSpinAnimation->setChecked(GraphWt::bSpinAnimation());
-    m_pdeSpinDamping->setValue(GraphWt::spinDamping()*100.0);
-    m_pdeSpinDamping->setEnabled(GraphWt::bSpinAnimation());
+    m_pchSpinAnimation->setChecked(s_bSpinAnimation);
+    m_pfeSpinDamping->setValue(s_SpinDamping*100.0);
+    m_pfeSpinDamping->setEnabled(s_bSpinAnimation);
 
-    m_pchMouseTracking->setChecked(GraphWt::bMouseTrack());
+    m_pchMouseTracking->setChecked(s_bMouseTracking);
     m_pchShowMousePos->setChecked(Graph::bMousePos());
 
     m_pchSVGFillBackground->setChecked(GraphSVGWriter::bFillBackground());
@@ -566,7 +571,7 @@ void GraphOptions::initWidget()
 
 void GraphOptions::onSpinAnimation(bool bSpin)
 {
-    m_pdeSpinDamping->setEnabled(bSpin);
+    m_pfeSpinDamping->setEnabled(bSpin);
 }
 
 
@@ -575,10 +580,10 @@ void GraphOptions::readData()
     // dynamically read when something is modified
     /** @todo set all read instructions here instead*/
 
-    GraphWt::setSpinAnimation(m_pchSpinAnimation->isChecked());
-    GraphWt::setSpinDamping(m_pdeSpinDamping->value()/100.0);
+    setSpinAnimation(m_pchSpinAnimation->isChecked());
+    setSpinDamping(m_pfeSpinDamping->value()/100.0);
 
-    GraphWt::setMouseTrack(m_pchMouseTracking->isChecked());
+    setMouseTrack(m_pchMouseTracking->isChecked());
     Graph::showMousePos(m_pchShowMousePos->isChecked());
     Graph::setAntiAliasing(m_pchAntiAliasing->isChecked());
 
@@ -932,6 +937,9 @@ void GraphOptions::loadSettings(QSettings &settings)
 
         if(settings.contains("ShowLegend")) s_bShowLegend = settings.value("ShowLegend", false).toBool();
 
+        s_bMouseTracking = settings.value("GraphMouseTracking", s_bMouseTracking).toBool();
+        s_bSpinAnimation = settings.value("bDynMouse",          s_bSpinAnimation).toBool();
+        s_SpinDamping    = settings.value("MouseDamping",       s_SpinDamping).toDouble();
 
         GraphSVGWriter::setFillBackground(settings.value("SVGFillBackground", GraphSVGWriter::bFillBackground()).toBool());
         GraphSVGWriter::setRefFontSize(settings.value("SVGRefFontSize", GraphSVGWriter::refFontSize()).toInt());
@@ -992,8 +1000,10 @@ void GraphOptions::saveSettings(QSettings &settings)
         settings.setValue("tmargin", s_Margin[2]);
         settings.setValue("bmargin", s_Margin[3]);
 
-        settings.setValue("ShowLegend", s_bShowLegend);
-
+        settings.setValue("ShowLegend",         s_bShowLegend);
+        settings.setValue("bDynMouse",          s_bSpinAnimation);
+        settings.setValue("MouseDamping",       s_SpinDamping);
+        settings.setValue("GraphMouseTracking", s_bMouseTracking);
 
         settings.setValue("SVGFillBackground", GraphSVGWriter::bFillBackground());
         settings.setValue("SVGRefFontSize",    GraphSVGWriter::refFontSize());

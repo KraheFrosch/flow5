@@ -68,7 +68,7 @@ bool Vortex::serializeFl5(QDataStream &ar, bool bIsStoring)
  * at a field point C
  */
 void vortexInducedVelocity(Vector3d const &A, Vector3d const &B, Vector3d const &C,
-                             Vector3d &vel, double coreradius, Vortex::enumVortex vortexmodel)
+                           Vector3d &vel, double coreradius, Vortex::enumVortex vortexmodel)
 {
     double r0_x = B.x - A.x;
     double r0_y = B.y - A.y;
@@ -144,7 +144,6 @@ double damp(double r, Vortex::enumVortex vortexmodel, double core)
         {
             if(core>0.0)
             {
-                // using rc = sqrt(4.nu.t)
                 if(r>0.0)
                 {
                     return (1.0-exp(-r*r/core/core));

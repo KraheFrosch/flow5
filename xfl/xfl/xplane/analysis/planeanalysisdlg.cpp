@@ -77,7 +77,7 @@ void PlaneAnalysisDlg::setupLayout()
         m_pButtonBox->addButton(m_pchLiveVortons, QDialogButtonBox::ActionRole);
         connect(m_pchLiveVortons, SIGNAL(clicked(bool)), SLOT(onLiveVortons()));
 
-        m_pchKeepOpenOnErrors = new QCheckBox(tr("Keep opened on errors"));
+        m_pchKeepOpenOnErrors = new QCheckBox("Keep opened on errors");
         m_pButtonBox->addButton(m_pchKeepOpenOnErrors, QDialogButtonBox::ActionRole);
         connect(m_pchKeepOpenOnErrors, SIGNAL(clicked(bool)), SLOT(onKeepOpenErrors()));
 

@@ -410,7 +410,7 @@ void SectionGraphWt::contextMenuEvent(QContextMenuEvent *pEvent)
             m_pShowGraphLegend->setChecked(m_pGraph->isLegendVisible());
             pContextMenu->addAction(m_pGraphSettings);
             pContextMenu->addSeparator();
-            QMenu *pExportMenu =  pContextMenu->addMenu(tr("Export"));
+            QMenu *pExportMenu =  pContextMenu->addMenu("Export");
             {
                 pExportMenu->addAction(m_pToFile);
                 pExportMenu->addAction(m_pToClipboard);

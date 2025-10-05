@@ -101,14 +101,14 @@ void Analysis3dSettings::setupLayout()
 
                 QLabel *plabWingPanels  = new QLabel("Ignore wing panels with span width <");
                 QLabel *plabLength1     = new QLabel(Units::lengthUnitLabel());
-                m_pdeMinPanelSize = new FloatEdit;
-                m_pdeMinPanelSize->setToolTip("<p>Wing surfaces with span width less than this value will be ignored "
+                m_pfeMinPanelSize = new FloatEdit;
+                m_pfeMinPanelSize->setToolTip("<p>Wing surfaces with span width less than this value will be ignored "
                                               "in the mesh operation.<br>"
                                               "This is to allow the definition of duplicate sections at a given span positions.</p>");
 
                 QLabel *plabRFF = new QLabel("Far field factor=");
-                m_pdeRFF = new FloatEdit;
-                m_pdeRFF->setToolTip("<p>RFF is the far-field radius factor used in the evaluation of influence coefficients. "
+                m_pfeRFF = new FloatEdit;
+                m_pfeRFF->setToolTip("<p>RFF is the far-field radius factor used in the evaluation of influence coefficients. "
                                           "If the evaluation point is at a distance greater than  RFF x panel_size, then the "
                                           "panel is considered to be a point source or point doublet with strength = area x density.<br>"
                                           "This reduces significantly the computation times at the expense of precision. Practically, "
@@ -120,10 +120,10 @@ void Analysis3dSettings::setupLayout()
                 pGeomLayout->addWidget(plabnRHS,             4,1, Qt::AlignRight);
                 pGeomLayout->addWidget(m_pieMaxRHS,          4,2);
                 pGeomLayout->addWidget(plabWingPanels,       5,1, Qt::AlignRight);
-                pGeomLayout->addWidget(m_pdeMinPanelSize,    5,2);
+                pGeomLayout->addWidget(m_pfeMinPanelSize,    5,2);
                 pGeomLayout->addWidget(plabLength1,          5,3);
                 pGeomLayout->addWidget(plabRFF,              6,1, Qt::AlignRight);
-                pGeomLayout->addWidget(m_pdeRFF,             6,2);
+                pGeomLayout->addWidget(m_pfeRFF,             6,2);
                 pGeomLayout->setRowStretch(                  7,1);
                 pGeomLayout->setColumnStretch(               4,1);
             }
@@ -163,8 +163,8 @@ void Analysis3dSettings::setupLayout()
         {
             QGridLayout *pVLMLayout = new QGridLayout;
             {
-                m_pdeVortexPos    = new FloatEdit(25.0, 2);
-                m_pdeControlPos   = new FloatEdit(75.0, 2);
+                m_pfeVortexPos    = new FloatEdit(25.0, 2);
+                m_pfeControlPos   = new FloatEdit(75.0, 2);
 
                 QLabel *pLab6  = new QLabel("Vortex position=");
                 QLabel *pLab7  = new QLabel("Control point position=");
@@ -176,8 +176,8 @@ void Analysis3dSettings::setupLayout()
                 pLab9->setAlignment(Qt::AlignLeft  | Qt::AlignVCenter);
                 pVLMLayout->addWidget(pLab6,1,1);
                 pVLMLayout->addWidget(pLab7,2,1);
-                pVLMLayout->addWidget(m_pdeVortexPos,1,2);
-                pVLMLayout->addWidget(m_pdeControlPos,2,2);
+                pVLMLayout->addWidget(m_pfeVortexPos,1,2);
+                pVLMLayout->addWidget(m_pfeControlPos,2,2);
                 pVLMLayout->addWidget(pLab8,1,3);
                 pVLMLayout->addWidget(pLab9,2,3);
                 pVLMLayout->setColumnStretch(3,5);
@@ -225,11 +225,11 @@ void Analysis3dSettings::setupLayout()
                 QLabel *pLabPrecision = new QLabel("Matrix float precision:");
                 m_prbSinglePrecision = new QRadioButton("Single precision, 4 bytes/value");
                 m_prbDoublePrecision = new QRadioButton("Double precision, 8 bytes/value (recommended)");
-                QString precisiontip = "This defines with what precision the influence matrix will be stored. "
+                QString precisiontip = "<p>This defines with what precision the influence matrix will be stored. "
                                        "Single precision will use half the memory required for double precision. "
-                                       "Accurracy of the results may also be reduced by a few percent.<br>"
+                                       "Accuracy of the results may also be reduced by a few percent.<br>"
                                        "Use single precision only for large calculations where memory allocation "
-                                       "may be an issue.";
+                                       "may be an issue.</p>";
                 pLabPrecision->setToolTip(precisiontip);
                 m_prbSinglePrecision->setToolTip(precisiontip);
                 m_prbDoublePrecision->setToolTip(precisiontip);
@@ -304,21 +304,21 @@ void Analysis3dSettings::setupLayout()
                 {
                     QGridLayout *pVortexCoreLayout = new QGridLayout;
                     {
-                       QLabel *pLabRadius = new QLabel("Core radius");
-                        pLabRadius->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                        m_pdeCoreRadius    = new FloatEdit(Vortex::coreRadius());
+                       QLabel *plabRadius = new QLabel("Core radius");
+                        plabRadius->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                        m_pfeCoreRadius    = new FloatEdit(Vortex::coreRadius());
                         QLabel *plabLength2 = new QLabel(Units::lengthUnitLabel());
 
-                        QLabel *pLabVortexModel = new QLabel("Vortex model");
+                        QLabel *plabVortexModel = new QLabel("Vortex model");
                         m_pcbVortexModel = new QComboBox;
                         QStringList items;
                         items << "POTENTIAL" << "CUT_OFF" << "LAMB_OSEEN" << "RANKINE" << "SCULLY" << "VATISTAS";
                         m_pcbVortexModel->addItems(items);
 
-                        pVortexCoreLayout->addWidget(pLabRadius,       1, 1);
-                        pVortexCoreLayout->addWidget(m_pdeCoreRadius,  1, 2);
+                        pVortexCoreLayout->addWidget(plabRadius,       1, 1);
+                        pVortexCoreLayout->addWidget(m_pfeCoreRadius,  1, 2);
                         pVortexCoreLayout->addWidget(plabLength2,      1, 3);
-                        pVortexCoreLayout->addWidget(pLabVortexModel,  2, 1);
+                        pVortexCoreLayout->addWidget(plabVortexModel,  2, 1);
                         pVortexCoreLayout->addWidget(m_pcbVortexModel, 2, 2);
                         pVortexCoreLayout->setColumnStretch(3,1);
                         pVortexCoreLayout->setRowStretch(3,1);
@@ -375,17 +375,17 @@ void Analysis3dSettings::setupLayout()
         {
             QGridLayout *pVPWBoxLayout = new QGridLayout;
             {
-                QString tip = "Activates the vorton strength exchange due to viscous diffusion and vortex stretching.\n"
-                      "See \'A boundary element-vortex particle hybrid method with inviscid shedding scheme\', Youjiang Wang et al.\n"
-                      "for detailed explanations.\n"
-                      "Recommendation: activate";
+                QString tip = "<p>Activates the vorton strength exchange due to viscous diffusion and vortex stretching.<br>"
+                              "See \'A boundary element-vortex particle hybrid method with inviscid shedding scheme\', Youjiang Wang et al."
+                              "for detailed explanations.<br>"
+                              "Recommendation: activate</p>";
                 m_pchVortonStrengthEx = new QCheckBox("Vorton strength exchange");
                 m_pchVortonStrengthEx->setToolTip(tip);
 
-                tip = "Activates the vorton space redistribution do imporve numerical stability.\n"
-                      "See \'A boundary element-vortex particle hybrid method with inviscid shedding scheme\', Youjiang Wang et al.\n"
-                      "for detailed explanations.\n"
-                      "Recommendation: activate";
+                tip = "<p>Activates the vorton space redistribution do improve numerical stability.<br>"
+                      "See \'A boundary element-vortex particle hybrid method with inviscid shedding scheme\', Youjiang Wang et al."
+                      "for detailed explanations.<br>"
+                      "Recommendation: activate</p>";
                 m_pchVortonRedist = new QCheckBox("Vorton redistribution");
                 m_pchVortonRedist->setToolTip(tip);
 
@@ -425,7 +425,7 @@ void Analysis3dSettings::setupLayout()
     setLayout(pMainLayout);
 
     connect(m_pTabWt,            SIGNAL(currentChanged(int)),           SLOT(onMakeVortexGraph()));
-    connect(m_pdeCoreRadius,     SIGNAL(floatChanged(float)),           SLOT(onMakeVortexGraph()));
+    connect(m_pfeCoreRadius,     SIGNAL(floatChanged(float)),           SLOT(onMakeVortexGraph()));
     connect(m_pcbVortexModel,    SIGNAL(currentIndexChanged(int)),      SLOT(onMakeVortexGraph()));
 }
 
@@ -515,8 +515,8 @@ void Analysis3dSettings::initDialog(int iPage)
 {
     setData();
 
-    m_pdeVortexPos->setEnabled(false);
-    m_pdeControlPos->setEnabled(false);
+    m_pfeVortexPos->setEnabled(false);
+    m_pfeControlPos->setEnabled(false);
 
     if(iPage>=0) s_iPage=iPage;
     m_pTabWt->setCurrentIndex(s_iPage);
@@ -575,14 +575,14 @@ void Analysis3dSettings::setData()
     m_pieMaxRHS->setValue(Task3d::maxNRHS());
 
     m_pcbVortexModel->setCurrentIndex(Vortex::vortexModel());
-    m_pdeCoreRadius->setValue(Vortex::coreRadius()* Units::mtoUnit());
+    m_pfeCoreRadius->setValue(Vortex::coreRadius()* Units::mtoUnit());
 
 
-    m_pdeRFF->setValue(Panel::RFF());
-    m_pdeMinPanelSize->setValue(WingXfl::minSurfaceLength()* Units::mtoUnit());
+    m_pfeRFF->setValue(Panel::RFF());
+    m_pfeMinPanelSize->setValue(WingXfl::minSurfaceLength()* Units::mtoUnit());
 
-    m_pdeControlPos->setValue(Panel4::ctrlPtFracPos()*100.0);
-    m_pdeVortexPos->setValue(Panel4::vortexFracPos()*100.0);
+    m_pfeControlPos->setValue(Panel4::ctrlPtFracPos()*100.0);
+    m_pfeVortexPos->setValue(Panel4::vortexFracPos()*100.0);
 
     m_pieQuadPoints->setValue(Panel3::quadratureOrder());
 
@@ -620,13 +620,13 @@ void Analysis3dSettings::readData()
 
     Panel3::setQuadratureOrder(m_pieQuadPoints->value());
 
-    WingXfl::setMinSurfaceLength(m_pdeMinPanelSize->value() / Units::mtoUnit());
+    WingXfl::setMinSurfaceLength(m_pfeMinPanelSize->value() / Units::mtoUnit());
 
     Task3d::setMaxNRHS(m_pieMaxRHS->value());
 
-    Panel::setRFF(m_pdeRFF->value());
+    Panel::setRFF(m_pfeRFF->value());
 
-    double CoreRadius = m_pdeCoreRadius->value() / Units::mtoUnit();
+    double CoreRadius = m_pfeCoreRadius->value() / Units::mtoUnit();
     Vortex::setCoreRadius(CoreRadius);
     switch(m_pcbVortexModel->currentIndex())
     {
@@ -639,8 +639,8 @@ void Analysis3dSettings::readData()
         case 5: Vortex::setVortexModel(Vortex::VATISTAS);   break;
     }
 
-    Panel4::setCtrlPtFracPos(m_pdeControlPos->value()/100.0);
-    Panel4::setVortexFracPos(m_pdeVortexPos->value()/100.0);
+    Panel4::setCtrlPtFracPos(m_pfeControlPos->value()/100.0);
+    Panel4::setVortexFracPos(m_pfeVortexPos->value()/100.0);
 
     // Viscous loop
     PlaneTask::setViscInitVTwist(m_pchViscInitVTwist->isChecked());
@@ -658,10 +658,11 @@ void Analysis3dSettings::onMakeVortexGraph()
 {
     Graph *pGraph = m_pVortexGraphWt->graph();
     if(!pGraph) return;
+
     if(m_pTabWt->currentIndex()!=6) return;
     pGraph->deleteCurves();
 
-    double corerad = m_pdeCoreRadius->value()/Units::mtoUnit();
+    double corerad = m_pfeCoreRadius->value()/Units::mtoUnit();
 
     int iModel = m_pcbVortexModel->currentIndex();
 

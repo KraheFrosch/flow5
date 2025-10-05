@@ -20,14 +20,15 @@
 #include <xflcore/displayoptions.h>
 #include <xflcore/xflcore.h>
 #include <xflfoil/globals/objects2d_globals.h>
-#include <xflgraph/controls/graphdlg.h>
-#include <xflgraph/graph/curve.h>
-#include <xflgraph/graph/graph.h>
-#include <xflgraph/containers/graphwt.h>
-#include <xflmath/constants.h>
 #include <xflfoil/objects2d/foil.h>
 #include <xflfoil/objects2d/oppoint.h>
 #include <xflfoil/objects2d/polar.h>
+#include <xflgraph/containers/graphwt.h>
+#include <xflgraph/controls/graphdlg.h>
+#include <xflgraph/controls/graphoptions.h>
+#include <xflgraph/graph/curve.h>
+#include <xflgraph/graph/graph.h>
+#include <xflmath/constants.h>
 #include <xflwidgets/line/linemenu.h>
 #include <xflwidgets/view/section2dwt.h>
 
@@ -454,7 +455,7 @@ void OpPointWt::resetGraphScale()
     stopDynamicTimer();
 
     if(!m_pCpGraph) return;
-    if(GraphWt::bSpinAnimation())
+    if(GraphOptions::bSpinAnimation())
     {
         QRect r(rect());
         Graph graph(*m_pCpGraph);
@@ -545,7 +546,7 @@ void OpPointWt::onDynamicIncrement()
                     m_pCpGraph->setYWindow(iy, ymin, ymax);
                 }
                 m_pCpGraph->invalidate();
-                m_Trans *= (1.0-GraphWt::spinDamping());
+                m_Trans *= (1.0-GraphOptions::spinDamping());
             }
 
             if(m_bDynScaling)
@@ -562,7 +563,7 @@ void OpPointWt::onDynamicIncrement()
                 int iy = -1; // both axes
                 scaleAxes(iy, scalefactor);
 
-                m_ZoomFactor *= (1.0-GraphWt::spinDamping());
+                m_ZoomFactor *= (1.0-GraphOptions::spinDamping());
             }
         }
     }
@@ -637,7 +638,7 @@ void OpPointWt::wheelEvent(QWheelEvent *pEvent)
 
     if(m_pCpGraph && m_rGraphRect.contains(pos))
     {
-        if(GraphWt::bSpinAnimation() && (abs(dy)>120))
+        if(GraphOptions::bSpinAnimation() && (abs(dy)>120))
         {
             m_bDynScaling = true;
             m_ZoomFactor = dy;
