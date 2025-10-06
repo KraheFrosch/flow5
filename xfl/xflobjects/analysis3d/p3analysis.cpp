@@ -363,15 +363,14 @@ void P3Analysis::getFarFieldVelocity(const Vector3d &C, const QVector<Panel3> &p
             sign = p3.isBotPanel() ? -1.0 : 1.0;
             A.set(p3.leftTrailingNode());
             A.x += fardist;
-            vortexInducedVelocity(p3.leftTrailingNode(), A, C, VL, coreradius);
+            VL = vortexInducedVelocity(p3.leftTrailingNode(), A, C, coreradius);
             VT +=  VL*(+Mu[3*i3+1] * sign);
 
             B.set(p3.rightTrailingNode());
             B.x += fardist;
-            vortexInducedVelocity(p3.rightTrailingNode(), B, C, VR, coreradius);
+            VR = vortexInducedVelocity(p3.rightTrailingNode(), B, C, coreradius);
             // circulations of each seg are oppposite
             VT +=  VR*(-Mu[3*i3+2] * sign);
-//if(bTrace)    qDebug("  %3d  %13g ---  %13g   %13g   %13g  ---  %13g   %13g   %13g", i3,  Mu[i3], VL.x, VL.y, VL.z, VR.x, VR.y, VR.z);
         }
     }
 }

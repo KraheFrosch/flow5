@@ -58,6 +58,16 @@ Analysis3dSettings::Analysis3dSettings(QWidget *pParent) : QDialog(pParent)
 }
 
 
+Analysis3dSettings::~Analysis3dSettings()
+{
+    if(m_pVortexGraphWt && m_pVortexGraphWt->graph())
+    {
+        delete m_pVortexGraphWt->graph()->curveModel();
+        delete m_pVortexGraphWt->graph();
+    }
+}
+
+
 void Analysis3dSettings::onResetDefaults()
 {
     Task3d::setMaxNRHS(100);
@@ -166,20 +176,20 @@ void Analysis3dSettings::setupLayout()
                 m_pfeVortexPos    = new FloatEdit(25.0, 2);
                 m_pfeControlPos   = new FloatEdit(75.0, 2);
 
-                QLabel *pLab6  = new QLabel("Vortex position=");
-                QLabel *pLab7  = new QLabel("Control point position=");
-                QLabel *pLab8  = new QLabel("%");
-                QLabel *pLab9  = new QLabel("%");
-                pLab6->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                pLab7->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                pLab8->setAlignment(Qt::AlignLeft  | Qt::AlignVCenter);
-                pLab9->setAlignment(Qt::AlignLeft  | Qt::AlignVCenter);
-                pVLMLayout->addWidget(pLab6,1,1);
-                pVLMLayout->addWidget(pLab7,2,1);
+                QLabel *plab6  = new QLabel("Vortex position=");
+                QLabel *plab7  = new QLabel("Control point position=");
+                QLabel *plab8  = new QLabel("%");
+                QLabel *plab9  = new QLabel("%");
+                plab6->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                plab7->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                plab8->setAlignment(Qt::AlignLeft  | Qt::AlignVCenter);
+                plab9->setAlignment(Qt::AlignLeft  | Qt::AlignVCenter);
+                pVLMLayout->addWidget(plab6,1,1);
+                pVLMLayout->addWidget(plab7,2,1);
                 pVLMLayout->addWidget(m_pfeVortexPos,1,2);
                 pVLMLayout->addWidget(m_pfeControlPos,2,2);
-                pVLMLayout->addWidget(pLab8,1,3);
-                pVLMLayout->addWidget(pLab9,2,3);
+                pVLMLayout->addWidget(plab8,1,3);
+                pVLMLayout->addWidget(plab9,2,3);
                 pVLMLayout->setColumnStretch(3,5);
                 pVLMLayout->setRowStretch(4,1);
             }
@@ -192,9 +202,9 @@ void Analysis3dSettings::setupLayout()
             {
                 QHBoxLayout *pQuadratureLayout = new QHBoxLayout;
                 {
-                    QLabel *pQuadLab = new QLabel("Order of 2d Gaussian quadrature for triangle scalar products=");
+                    QLabel *plabQuad = new QLabel("Order of 2d Gaussian quadrature for triangle scalar products=");
                     m_pieQuadPoints = new IntEdit(0);
-                    pQuadratureLayout->addWidget(pQuadLab);
+                    pQuadratureLayout->addWidget(plabQuad);
                     pQuadratureLayout->addWidget(m_pieQuadPoints);
                     pQuadratureLayout->addStretch();
                 }
@@ -350,17 +360,17 @@ void Analysis3dSettings::setupLayout()
                     m_pVortexGraphWt->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
                     m_pVortexGraphWt->enableContextMenu(true);
                     m_pVortexGraphWt->enableCurveStylePage(true);
-                    Graph *m_pGraph = new Graph;
-                    m_pVortexGraphWt->setGraph(m_pGraph);
-                    GraphOptions::resetGraphSettings(*m_pGraph);
-                    m_pGraph->setName("Vortex model");
-                    m_pGraph->setCurveModel(new CurveModel);
-                    m_pGraph->setXVariableList({"r ("+Units::lengthUnitLabel()+")"});
-                    m_pGraph->setYVariableList({"V_"+THETACHAR});
-                    m_pGraph->setLegendPosition(Qt::AlignTop|Qt::AlignLeft);
-                    m_pGraph->setLegendVisible(true);
-                    m_pGraph->setScaleType(GRAPH::RESETTING);
-                    m_pGraph->setAuto(true);
+                    Graph *pGraph = new Graph;
+                    m_pVortexGraphWt->setGraph(pGraph);
+                    GraphOptions::resetGraphSettings(*pGraph);
+                    pGraph->setName("Vortex model");
+                    pGraph->setCurveModel(new CurveModel);
+                    pGraph->setXVariableList({"r ("+Units::lengthUnitLabel()+")"});
+                    pGraph->setYVariableList({"V_"+THETACHAR});
+                    pGraph->setLegendPosition(Qt::AlignTop|Qt::AlignLeft);
+                    pGraph->setLegendVisible(true);
+                    pGraph->setScaleType(GRAPH::RESETTING);
+                    pGraph->setAuto(true);
                 }
 
                 pVortexLayout->addLayout(pLeftLayout);
@@ -673,7 +683,7 @@ void Analysis3dSettings::onMakeVortexGraph()
     double Vyref = 100.0; // used to limit the vertical scale
     if(corerad>0)
     {
-        vortexInducedVelocity(A, B, {corerad,0,0}, V, corerad, Vortex::POTENTIAL);
+        V = vortexInducedVelocity(A, B, {corerad,0,0}, corerad, Vortex::POTENTIAL);
         Vyref = fabs(V.y);
     }
 
@@ -713,23 +723,23 @@ void Analysis3dSettings::onMakeVortexGraph()
         pt.set(x, 0, 0);
         if(x<-DISTANCEPRECISION)
         {
-            vortexInducedVelocity(A, B, pt, V, corerad, Vortex::POTENTIAL);
+            V = vortexInducedVelocity(A, B, pt, corerad, Vortex::POTENTIAL);
             if(fabs(V.y)<2.0*Vyref) pCurve[0]->appendPoint(x*Units::mtoUnit(), V.y);
         }
         else if(x>DISTANCEPRECISION)
         {
-            vortexInducedVelocity(A, B, pt, V, corerad, Vortex::POTENTIAL);
+            V = vortexInducedVelocity(A, B, pt, corerad, Vortex::POTENTIAL);
             if(fabs(V.y)<2.0*Vyref) pCurve[1]->appendPoint(x*Units::mtoUnit(), V.y);
         }
-        vortexInducedVelocity(A, B, pt, V, corerad, Vortex::CUT_OFF);
+        V = vortexInducedVelocity(A, B, pt, corerad, Vortex::CUT_OFF);
         pCurve[2]->appendPoint(x*Units::mtoUnit(), V.y);
-        vortexInducedVelocity(A, B, pt, V, corerad, Vortex::LAMB_OSEEN);
+        V = vortexInducedVelocity(A, B, pt, corerad, Vortex::LAMB_OSEEN);
         pCurve[3]->appendPoint(x*Units::mtoUnit(), V.y);
-        vortexInducedVelocity(A, B, pt, V, corerad, Vortex::RANKINE);
+        V = vortexInducedVelocity(A, B, pt, corerad, Vortex::RANKINE);
         pCurve[4]->appendPoint(x*Units::mtoUnit(), V.y);
-        vortexInducedVelocity(A, B, pt, V, corerad, Vortex::SCULLY);
+        V = vortexInducedVelocity(A, B, pt, corerad, Vortex::SCULLY);
         pCurve[5]->appendPoint(x*Units::mtoUnit(), V.y);
-        vortexInducedVelocity(A, B, pt, V, corerad, Vortex::VATISTAS);
+        V = vortexInducedVelocity(A, B, pt, corerad, Vortex::VATISTAS);
         pCurve[6]->appendPoint(x*Units::mtoUnit(), V.y);
     }
     pGraph->invalidate();

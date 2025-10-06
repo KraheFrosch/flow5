@@ -192,21 +192,21 @@ void OptimFoil::setupLayout()
 
                                                             QLabel *plabNHH = new QLabel("Nb. of functions/side:");
                                                             m_pieNHH = new IntEdit(s_HHn/2); // per side
-                                                            m_pieNHH->setToolTip("The number of design variables is twice the number of bump functions.\nRecommendation: n=3");
+                                                            m_pieNHH->setToolTip("<p>The number of design variables is twice the number of bump functions.\nRecommendation: n=3</p>");
                                                             QLabel *plabt1 = new QLabel("t1:");
                                                             m_pdeHHt1 = new FloatEdit(s_HHt1);
-                                                            m_pdeHHt1->setToolTip("This parameter controls the location of the maximum point of the bump functions.\n"
-                                                                                  "Recommendation: 1 <= t1<= 2");
+                                                            m_pdeHHt1->setToolTip("<p>This parameter controls the location of the maximum point of the bump functions.</br>"
+                                                                                  "Recommendation: 1 <= t1<= 2</p>");
                                                             QLabel *plabt2 = new QLabel("t2:");
                                                             m_pdeHHt2 = new FloatEdit(s_HHt2);
-                                                            m_pdeHHt2->setToolTip("This parameter controls the width of the bump functions.\n"
-                                                                                  "Recommendation: 0.5 <= t2 <= 2");
+                                                            m_pdeHHt2->setToolTip("<p>This parameter controls the width of the bump functions.<br>"
+                                                                                  "Recommendation: 0.5 <= t2 <= 2</p>");
                                                             QLabel *plabLax = new QLabel("Max. HH amplitude:");
                                                             m_pdeHHmax = new FloatEdit(s_HHmax*100);
-                                                            m_pdeHHmax->setToolTip("This parameter controls the amplitude of the bump functions.\n"
+                                                            m_pdeHHmax->setToolTip("<p>This parameter controls the amplitude of the bump functions.<br>"
                                                                                    "The greater the amplitude the larger is  the design space, "
-                                                                                   "however large amplitudes will lead to wobbly surfaces and may hinder XFoil's convergence.\n"
-                                                                                   "Recommendation; 1.5% or less.");
+                                                                                   "however large amplitudes will lead to wobbly surfaces and may hinder XFoil's convergence.<br>"
+                                                                                   "Recommendation; 1.5% or less.</p>");
                                                             QLabel *plabPercent = new QLabel("% Ch.");
 
                                                             pHHLayout->addWidget(plabNHH,     1, 1);

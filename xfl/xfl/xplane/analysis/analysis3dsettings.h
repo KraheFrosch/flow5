@@ -31,6 +31,8 @@ class Analysis3dSettings : public QDialog
 
     public:
         Analysis3dSettings(QWidget *pParent);
+        ~Analysis3dSettings();
+
         void initDialog(int iPage=s_iPage);
 
         QSize sizeHint() const override {return QSize(900,550);}

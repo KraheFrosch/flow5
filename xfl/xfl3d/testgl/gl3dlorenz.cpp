@@ -137,6 +137,7 @@ gl3dLorenz::gl3dLorenz(QWidget *pParent) : gl3dTestGLView (pParent)
                 m_pGraphWt->setDefaultSize(QSize(100,150));
                 m_pGraphWt->show();
                 Graph *pGraph = new Graph;
+                pGraph->setName("Lorenz");
                 GraphOptions::resetGraphSettings(*pGraph);
                 pGraph->setMargins(35,20,20,30);
                 pGraph->setXVariableList({"s"});
@@ -179,6 +180,12 @@ gl3dLorenz::~gl3dLorenz()
         m_pTimer->stop();
         delete m_pTimer;
         m_pTimer = nullptr;
+    }
+
+    if(m_pGraphWt && m_pGraphWt->graph())
+    {
+        m_pGraphWt->graph()->deleteCurveModel();
+        delete m_pGraphWt->graph();
     }
 }
 

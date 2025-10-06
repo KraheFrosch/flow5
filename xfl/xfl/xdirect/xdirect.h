@@ -29,7 +29,6 @@ class XFoilAnalysisDlg;
 class FoilTreeView;
 class DFoilWt;
 class FoilTableView;
-class GraphSplitter;
 class XDirectActions;
 class XDirectMenus;
 

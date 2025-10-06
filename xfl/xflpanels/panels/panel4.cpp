@@ -163,12 +163,6 @@ void Panel4::setPanelFrame(Vector3d const &LA, Vector3d const &LB, Vector3d cons
 
     m_MaxSize = std::max(SMP, SMQ);
 
-    //create the transformation matrix
-    /*    lij[0]=l.x;        lij[1]=m.x;       lij[2]=Normal.x;
-    lij[3]=l.y;        lij[4]=m.y;       lij[5]=Normal.y;
-    lij[6]=l.z;        lij[7]=m.z;       lij[8]=Normal.z;
-    invert33(lij);*/
-
     m_CF.setOrigin(m_CollPt);
     m_CF.setIJK(m_l,m_m,m_Normal);
     double const*lij = m_CF.rotationMatrix();
@@ -282,13 +276,6 @@ void Panel4::sourceN4023Potential(Vector3d const &C, double &phi, double corerad
         phi = -m_Area /pjk;
         return;
     }
-
-/*    Vector3d const *pR[5];
-    pR[0] = m_Node + 0;
-    pR[1] = m_Node + 1;
-    pR[2] = m_Node + 2;
-    pR[3] = m_Node + 3;
-    pR[4] = m_Node + 0; */
 
     for (int i=0; i<4; i++)
     {
@@ -428,13 +415,6 @@ void Panel4::sourceN4023Velocity(Vector3d const &C, bool bSelf, Vector3d &Vel, d
         Vel.z = PJK.z * m_Area/pjk/pjk/pjk;
         return;
     }
-
-/*    Vector3d const *pR[5];
-    pR[0] = m_Node + 0;
-    pR[1] = m_Node + 1;
-    pR[2] = m_Node + 2;
-    pR[3] = m_Node + 3;
-    pR[4] = m_Node + 0; */
 
     for (int i=0; i<4; i++)
     {
@@ -615,7 +595,6 @@ void Panel4::doubletN4023Velocity(Vector3d const &C, Vector3d &V, double corerad
 
 void Panel4::doubletN4023Potential(Vector3d const &C, bool bSelf, double &phi, double coreradius, bool bUseRFF) const
 {
-
     Vector3d PJK, a, b, s, h;
     double RNUM(0), DNOM(0), pjk(0), CJKi(0);
     double PN(0), A(0), B(0), PA(0), PB(0), SM(0), SL(0), AM(0), AL(0), Al(0);
@@ -642,14 +621,6 @@ void Panel4::doubletN4023Potential(Vector3d const &C, bool bSelf, double &phi, d
         phi = -PN * m_Area /pjk/pjk/pjk;
         return;
     }
-
-    /*
-    Vector3d const *pR[5];
-    pR[0] = m_Node + 0;
-    pR[1] = m_Node + 1;
-    pR[2] = m_Node + 2;
-    pR[3] = m_Node + 3;
-    pR[4] = m_Node + 0;*/
 
     for (int i=0; i<4; i++)
     {
@@ -706,13 +677,13 @@ void Panel4::doubletN4023Potential(Vector3d const &C, bool bSelf, double &phi, d
                 if(DNOM<0.0)
                 {
                     // Ctrl point lies within the strip
-                    if(PN>0.0)    CJKi =  PI * sign;
+                    if(PN>0.0)  CJKi =  PI * sign;
                     else        CJKi = -PI * sign;
                 }
                 else if(DNOM == 0.0)
                 {
                     // Ctrl point lies on the edge of the strip
-                    if(PN>0.0)    CJKi =  PI/2.0 * sign;
+                    if(PN>0.0)  CJKi =  PI/2.0 * sign;
                     else        CJKi = -PI/2.0 * sign;
                 }
                 else //DNOM >0
@@ -720,19 +691,6 @@ void Panel4::doubletN4023Potential(Vector3d const &C, bool bSelf, double &phi, d
                     // Ctrl point lies outside the strip
                     CJKi = 0.0;
                 }
-                /*                if(fabs(DNOM) <PRECISION)
-                {
-                    if(PN>0.0)    CJKi =  PI/2.0 * sign;
-                    else        CJKi = -PI/2.0 * sign;
-                }
-                else if(DNOM<0.0)
-                {
-                    if(PN>0.0)    CJKi =  PI * sign;
-                    else        CJKi = -PI * sign;
-                }
-                else
-                    CJKi = 0.0;*/
-
             }
             else
             {
@@ -775,13 +733,13 @@ void Panel4::doubletVortexVelocity(Vector3d const &C, Vector3d &V, double corera
         return;
     }
 
-    vortexInducedVelocity(m_Node[0], m_Node[1], C, velseg, coreradius);
+    velseg = vortexInducedVelocity(m_Node[0], m_Node[1], C, coreradius);
     V += velseg;
-    vortexInducedVelocity(m_Node[1], m_Node[2], C, velseg, coreradius);
+    velseg = vortexInducedVelocity(m_Node[1], m_Node[2], C, coreradius);
     V += velseg;
-    vortexInducedVelocity(m_Node[2], m_Node[3], C, velseg, coreradius);
+    velseg = vortexInducedVelocity(m_Node[2], m_Node[3], C, coreradius);
     V += velseg;
-    vortexInducedVelocity(m_Node[3], m_Node[0], C, velseg, coreradius);
+    velseg = vortexInducedVelocity(m_Node[3], m_Node[0], C, coreradius);
     V += velseg;
 
     V.x *= 4.0*PI;

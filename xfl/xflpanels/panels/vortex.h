@@ -43,5 +43,5 @@ class Vortex : public Segment3d
         static double s_CoreRadius;
 };
 
-void vortexInducedVelocity(Vector3d const &A, Vector3d const &B, Vector3d const &C, Vector3d &vel, double coreradius, Vortex::enumVortex vortexmodel=Vortex::POTENTIAL) ;
+Vector3d vortexInducedVelocity(Vector3d const &A, Vector3d const &B, Vector3d const &C, double coreradius, Vortex::enumVortex vortexmodel=Vortex::POTENTIAL);
 double damp(double r, Vortex::enumVortex vortexmodel, double coreradius);

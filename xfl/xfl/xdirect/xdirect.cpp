@@ -55,7 +55,6 @@
 #include <xflfoil/editors/foilrepaneldlg.h>
 #include <xflfoil/editors/foiltegapdlg.h>
 #include <xflfoil/globals/objects2d_globals.h>
-#include <xflgraph/containers/graphsplitter.h>
 #include <xflgraph/containers/graphwt.h>
 #include <xflgraph/controls/graphdlg.h>
 #include <xflgraph/controls/graphoptions.h>

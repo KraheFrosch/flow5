@@ -791,15 +791,15 @@ bool readVSPFoilFile(QString const &FoilFileName, Foil *pFoil)
 void VLMCmnVelocity(Vector3d const &A, Vector3d const &B, Vector3d const &C,
                             Vector3d &V, bool bAll, double fardist)
 {
-    Vector3d VelSeg, Far;
+    Vector3d velseg, Far;
     V.x = 0.0;
     V.y = 0.0;
     V.z = 0.0;
 
     if(bAll)
     {
-        vortexInducedVelocity(A, B, C, VelSeg, Vortex::coreRadius());
-        V += VelSeg;
+        velseg = vortexInducedVelocity(A, B, C, Vortex::coreRadius());
+        V += velseg;
     }
 
     // Create Far points to align the trailing vortices with the reference axis
@@ -810,23 +810,23 @@ void VLMCmnVelocity(Vector3d const &A, Vector3d const &B, Vector3d const &C,
     Far.x = A.x +  fardist;
     Far.y = A.y ;
     Far.z = A.z;// + (Far_x-A.x) * tan(m_Alpha*PI/180.0);
-    vortexInducedVelocity(Far, A, C, VelSeg, Vortex::coreRadius());
-    V += VelSeg;
+    velseg = vortexInducedVelocity(Far, A, C, Vortex::coreRadius());
+    V += velseg;
 
 
     // calculate right vortex contribution
     Far.x = B.x +  fardist;
     Far.y = B.y;
     Far.z = B.z;// + (Far_x-B.x) * tan(m_Alpha*PI/180.0);
-    vortexInducedVelocity(B, Far, C, VelSeg, Vortex::coreRadius());
-    V += VelSeg;
+    velseg = vortexInducedVelocity(B, Far, C, Vortex::coreRadius());
+    V += velseg;
 }
 
 
 /** No explicit formulation of the potential for a vortex filament.
  * Use instead the equivalence of the vortex ring to a uniform doublet strength panel */
 void VLMQmnPotential(Vector3d const &LA, Vector3d const &LB, Vector3d const &TA, Vector3d const &TB,
-                             Vector3d const &C, double &phi)
+                     Vector3d const &C, double &phi)
 {
     // make a false quad Panel
     Panel4 p4Ring(LA, LB, TA, TB);
@@ -847,7 +847,7 @@ void VLMQmnVelocity(Vector3d const &LA, Vector3d const &LB, Vector3d const &TA, 
 
     for (int i=0; i<4; i++)
     {
-        vortexInducedVelocity(m_pR[i], m_pR[i+1], C, velseg, Vortex::coreRadius());
+        velseg = vortexInducedVelocity(m_pR[i], m_pR[i+1], C, Vortex::coreRadius());
         V+= velseg;
     }
 }

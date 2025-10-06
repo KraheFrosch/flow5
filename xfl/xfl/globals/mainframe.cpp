@@ -142,7 +142,6 @@
 #include <xflgeom/geom3d/quad3d.h>
 #include <xflgeom/geom_globals/geom_global.h>
 #include <xflgraph/containers/fastgraphwt.h>
-#include <xflgraph/containers/graphsplitter.h>
 #include <xflgraph/containers/graphwt.h>
 #include <xflgraph/containers/legendwt.h>
 #include <xflgraph/controls/graphdlg.h>

@@ -826,12 +826,12 @@ void P4Analysis::getFarFieldVelocity(const Vector3d &C, const QVector<Panel4> &p
         {
             A = p4.TA();
             A.x += fardist;
-            vortexInducedVelocity(p4.TA(), A, C, VL, coreradius);
+            VL = vortexInducedVelocity(p4.TA(), A, C, coreradius);
             VT +=  VL*(+Mu[i4]);
 
             B = p4.TB();
             B.x += fardist;
-            vortexInducedVelocity(p4.TB(), B, C, VR, coreradius);
+            VR = vortexInducedVelocity(p4.TB(), B, C, coreradius);
             // circulations of each seg are oppposite
             VT +=  VR*(-Mu[i4]);
 

@@ -51,6 +51,7 @@ StabTimeCtrls::StabTimeCtrls(QWidget *pParent) : QFrame(pParent)
 {
     setWindowTitle("Stability time controls");
 
+    m_InputGraph.setName("StabTime graph");
     m_InputGraph.setCurveModel(new CurveModel);
     m_InputGraph.setXVariableList({"s"});
     m_InputGraph.setYVariableList({"amp."});

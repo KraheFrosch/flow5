@@ -32,7 +32,7 @@ Vortex::Vortex(Node const &vtx0, Node const &vtx1, double gamma) : Segment3d(vtx
 void Vortex::getInducedVelocity(Vector3d const &C, Vector3d &vel,
                              double coreradius, enumVortex vortexmodel) const
 {
-    vortexInducedVelocity(m_S[0], m_S[1], C, vel, coreradius, vortexmodel);
+    vel = vortexInducedVelocity(m_S[0], m_S[1], C, coreradius, vortexmodel);
     vel *= m_Circulation;
 }
 
@@ -67,9 +67,10 @@ bool Vortex::serializeFl5(QDataStream &ar, bool bIsStoring)
  * Returns the velocity induced by the vortex defined by the segment AB with unit strength
  * at a field point C
  */
-void vortexInducedVelocity(Vector3d const &A, Vector3d const &B, Vector3d const &C,
-                           Vector3d &vel, double coreradius, Vortex::enumVortex vortexmodel)
+Vector3d vortexInducedVelocity(Vector3d const &A, Vector3d const &B, Vector3d const &C,
+                               double coreradius, Vortex::enumVortex vortexmodel)
 {
+    Vector3d vel;
     double r0_x = B.x - A.x;
     double r0_y = B.y - A.y;
     double r0_z = B.z - A.z;
@@ -87,8 +88,7 @@ void vortexInducedVelocity(Vector3d const &A, Vector3d const &B, Vector3d const 
 
     if(r0<DISTANCEPRECISION || r1<DISTANCEPRECISION || r2<DISTANCEPRECISION)
     {
-        vel.set(0.0,0.0,0.0);
-        return;
+        return Vector3d();
     }
 
     double Psi_x = r1_y*r2_z - r1_z*r2_y;
@@ -99,8 +99,7 @@ void vortexInducedVelocity(Vector3d const &A, Vector3d const &B, Vector3d const 
 
     if(fabs(ftmp)<PRECISION)
     {
-        vel.set(0,0,0);
-        return;
+        return Vector3d();
     }
 
     //get the distance of the field point to the line
@@ -116,11 +115,13 @@ void vortexInducedVelocity(Vector3d const &A, Vector3d const &B, Vector3d const 
     Psi_z /= ftmp;
 
     double Omega =  (r0_x*r1_x + r0_y*r1_y + r0_z*r1_z)/sqrt((r1_x*r1_x + r1_y*r1_y + r1_z*r1_z))
-            -(r0_x*r2_x + r0_y*r2_y + r0_z*r2_z)/sqrt((r2_x*r2_x + r2_y*r2_y + r2_z*r2_z));
+                   -(r0_x*r2_x + r0_y*r2_y + r0_z*r2_z)/sqrt((r2_x*r2_x + r2_y*r2_y + r2_z*r2_z));
 
     vel.x = Psi_x * Omega/4.0/PI * visc;
     vel.y = Psi_y * Omega/4.0/PI * visc;
     vel.z = Psi_z * Omega/4.0/PI * visc;
+
+    return vel;
 }
 
 

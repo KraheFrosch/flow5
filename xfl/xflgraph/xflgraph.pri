@@ -1,6 +1,5 @@
 HEADERS += \
     xflgraph/containers/fastgraphwt.h \
-    xflgraph/containers/graphsplitter.h \
     xflgraph/containers/graphwt.h \
     xflgraph/containers/legendwt.h \
     xflgraph/containers/splinedgraphwt.h \
@@ -17,7 +16,6 @@ HEADERS += \
 
 SOURCES += \
     xflgraph/containers/fastgraphwt.cpp \
-    xflgraph/containers/graphsplitter.cpp \
     xflgraph/containers/graphwt.cpp \
     xflgraph/containers/legendwt.cpp \
     xflgraph/containers/splinedgraphwt.cpp \

@@ -33,7 +33,6 @@ class DFoil;
 class DFoilWt;
 class Foil;
 class Graph;
-class GraphSplitter;
 class GraphWt;
 class FastGraphWt;
 class LogWt;
@@ -73,9 +72,6 @@ class MainFrame : public QMainWindow
     friend class XSailMenus;
 
     Q_OBJECT
-
-    public:
-
 
     public:
         MainFrame(QWidget * parent = nullptr);

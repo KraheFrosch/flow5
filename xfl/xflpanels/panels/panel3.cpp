@@ -1394,7 +1394,7 @@ bool Panel3::isTrailingEdgeNode(int iv) const
 
 void Panel3::doubletVortexVelocity(Vector3d const &C, Vector3d &V, double coreradius, Vortex::enumVortex vortexmodel, bool bUseRFF) const
 {
-    Vector3d velSeg;
+    Vector3d velseg;
     Vector3d PJK, T1;
     V.x=0.0; V.y=0.0; V.z=0.0;
 
@@ -1420,8 +1420,8 @@ void Panel3::doubletVortexVelocity(Vector3d const &C, Vector3d &V, double corera
 
     for (int i=0; i<3; i++)
     {
-        vortexInducedVelocity(m_S[i%3], m_S[(i+1)%3], C, velSeg, coreradius, vortexmodel);
-        V += velSeg;
+        velseg = vortexInducedVelocity(m_S[i%3], m_S[(i+1)%3], C, coreradius, vortexmodel);
+        V += velseg;
     }
 
     V.x *= 4.0*PI;
