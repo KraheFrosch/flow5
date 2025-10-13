@@ -2471,7 +2471,12 @@ void gl3dXSailView::moveBoids()
 
     m_shadFlow.bind();
     {
-        m_shadFlow.setUniformValue(m_shadFlowLoc.m_RK,           FlowCtrls::s_iRK);
+        switch(FlowCtrls::s_ODE)
+        {
+            case FlowCtrls::EULER:  m_shadFlow.setUniformValue(m_shadFlowLoc.m_RK, 1);    break;
+            case FlowCtrls::RK2:    m_shadFlow.setUniformValue(m_shadFlowLoc.m_RK, 2);    break;
+            case FlowCtrls::RK4:    m_shadFlow.setUniformValue(m_shadFlowLoc.m_RK, 4);    break;
+        }
         m_shadFlow.setUniformValue(m_shadFlowLoc.m_NPanels,      NPanels+NWakePanels);
         m_shadFlow.setUniformValue(m_shadFlowLoc.m_VInf,         Qinf);
         m_shadFlow.setUniformValue(m_shadFlowLoc.m_Dt,           FlowCtrls::s_Flowdt);

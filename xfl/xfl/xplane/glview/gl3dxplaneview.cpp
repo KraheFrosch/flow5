@@ -3557,7 +3557,14 @@ void gl3dXPlaneView::moveBoids()
         else if(pWPolar->bFreeSurfaceEffect()) m_shadFlow.setUniformValue(m_shadFlowLoc.m_HasGround, -1);
         else                                   m_shadFlow.setUniformValue(m_shadFlowLoc.m_HasGround, 0);
         m_shadFlow.setUniformValue(m_shadFlowLoc.m_GroundHeight, float(pWPolar->groundHeight()));
-        m_shadFlow.setUniformValue(m_shadFlowLoc.m_RK,           FlowCtrls::s_iRK);
+
+        switch(FlowCtrls::s_ODE)
+        {
+            case FlowCtrls::EULER:  m_shadFlow.setUniformValue(m_shadFlowLoc.m_RK, 1);    break;
+            case FlowCtrls::RK2:    m_shadFlow.setUniformValue(m_shadFlowLoc.m_RK, 2);    break;
+            case FlowCtrls::RK4:    m_shadFlow.setUniformValue(m_shadFlowLoc.m_RK, 4);    break;
+        }
+
         m_shadFlow.setUniformValue(m_shadFlowLoc.m_Dt,           FlowCtrls::s_Flowdt);
 
         m_shadFlow.setUniformValue(m_shadFlowLoc.m_TopLeft,      QVector4D(FlowCtrls::flowTopLeft().x,  FlowCtrls::flowTopLeft().y,  FlowCtrls::flowTopLeft().z,  0.0));

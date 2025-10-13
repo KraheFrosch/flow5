@@ -38,7 +38,7 @@ XSail *FlowCtrls::s_pXSail(nullptr);
 
 int FlowCtrls::s_FlowNGroups(16);
 float FlowCtrls::s_Flowdt(0.01f);
-int FlowCtrls::s_iRK(1);
+FlowCtrls::flowODE FlowCtrls::s_ODE(FlowCtrls::RK4);
 Vector3d FlowCtrls::s_FlowTopLeft{-1,-1,1};
 Vector3d FlowCtrls::s_FlowBotRight{5,1,-1};
 
@@ -266,9 +266,9 @@ void FlowCtrls::initWidget()
 
     updateFlowInfo();
     m_plbFlowLines->setTheStyle(W3dPrefs::s_FlowStyle);
-    m_prbRK1->setChecked(s_iRK==1);
-    m_prbRK2->setChecked(s_iRK==2);
-    m_prbRK4->setChecked(FlowCtrls::s_iRK==4);
+    m_prbRK1->setChecked(s_ODE==EULER);
+    m_prbRK2->setChecked(s_ODE==RK2);
+    m_prbRK4->setChecked(s_ODE==RK4);
 }
 
 
@@ -278,7 +278,10 @@ void FlowCtrls::loadSettings(QSettings &settings)
     {
         s_FlowNGroups    = settings.value("NGroups",        s_FlowNGroups).toInt();
         s_Flowdt         = settings.value("dt",             s_Flowdt).toFloat();
-        s_iRK            = settings.value("RK",             s_iRK).toInt();
+        int iODE         = settings.value("ODE",             2).toInt();
+        if     (iODE==0) s_ODE = EULER;
+        else if(iODE==1) s_ODE = RK2;
+        else             s_ODE = RK4;
 
         s_FlowTopLeft.x = settings.value("FlowTopLeft_x",   s_FlowTopLeft.x).toDouble();
         s_FlowTopLeft.y = settings.value("FlowTopLeft_y",   s_FlowTopLeft.y).toDouble();
@@ -299,7 +302,13 @@ void FlowCtrls::saveSettings(QSettings &settings)
     {
         settings.setValue("NGroups",        s_FlowNGroups);
         settings.setValue("dt",             s_Flowdt);
-        settings.setValue("RK",             s_iRK);
+
+        switch(s_ODE)
+        {
+            case EULER: settings.setValue("ODE",  0);   break;
+            case RK2:   settings.setValue("ODE",  1);   break;
+            case RK4:   settings.setValue("ODE",  2);   break;
+        }
 
         settings.setValue("FlowTopLeft_x",  s_FlowTopLeft.x);
         settings.setValue("FlowTopLeft_y",  s_FlowTopLeft.y);
@@ -378,9 +387,9 @@ void FlowCtrls::onFlowUpdate()
     s_FlowBotRight.y = m_pfeRight->value()/Units::mtoUnit();
     s_FlowBotRight.z = m_pfeBot->value()/Units::mtoUnit();
 
-    if     (m_prbRK1->isChecked()) s_iRK = 1;
-    else if(m_prbRK2->isChecked()) s_iRK = 2;
-    else if(m_prbRK4->isChecked()) s_iRK = 4;
+    if     (m_prbRK1->isChecked()) s_ODE = EULER;
+    else if(m_prbRK2->isChecked()) s_ODE = RK2;
+    else if(m_prbRK4->isChecked()) s_ODE = RK4;
 
     updateFlowInfo();
 }

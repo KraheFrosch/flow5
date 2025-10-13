@@ -22,10 +22,7 @@
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 #include <BRepAdaptor_Surface.hxx>
-#include <BRepBuilderAPI_Sewing.hxx>
 #include <BRepBuilderAPI_MakeShell.hxx>
-#include <GeomAbs_SurfaceType.hxx>
-#include <Geom_BSplineSurface.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
 #include <xfl/opengl/gl3dboatview.h>

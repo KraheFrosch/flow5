@@ -90,7 +90,7 @@ Grid SailDlg::s_SectionGrid;
 SailDlg::SailDlg(QWidget *pParent) : XflDialog(pParent)
 {
     setWindowTitle("Sail Edition");
-    setWindowFlags(Qt::Window);
+//    setWindowFlags(Qt::Window);
 
     m_pTabWidget = nullptr;
     m_pViewVSplitter = m_pViewHSplitter = m_pExternalSplitter = m_pInternalSplitter = m_pSectionTableSplitter = nullptr;

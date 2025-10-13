@@ -32,6 +32,7 @@ class FlowCtrls : public QWidget
     public:
         FlowCtrls(QWidget *pParent=nullptr);
 
+        enum flowODE {EULER, RK2, RK4};
 
         void initWidget();
 
@@ -93,7 +94,7 @@ class FlowCtrls : public QWidget
     public:
         static float s_Flowdt;
         static int s_FlowNGroups;
-        static int s_iRK;
+        static flowODE s_ODE;
         static Vector3d s_FlowTopLeft, s_FlowBotRight;
 
 };

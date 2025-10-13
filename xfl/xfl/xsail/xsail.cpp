@@ -496,7 +496,7 @@ void XSail::onEditCurBoat()
     Boat *pModBoat = new Boat;
     pModBoat->duplicate(m_pCurBoat);
 
-    BoatDlg dlg;
+    BoatDlg dlg(s_pMainFrame);
     dlg.initDialog(pModBoat, false);
 
     if(dlg.exec()==QDialog::Rejected)

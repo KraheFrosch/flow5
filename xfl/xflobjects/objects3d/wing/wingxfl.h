@@ -26,27 +26,6 @@
 #include <xflpanels/panels/panel3.h>
 #include <xflpanels/panels/panel4.h>
 
-/**
- * @class Wing
- * @brief  This class defines the wing object, provides the methods for the calculation of the wing geometric properties, and
-           provides methods for LLT, VLM and Panel methods.
- *
- * A wing is identified and reference by its name, which is used  by the parent Plane objects and by child Polar and WingOPpp objects.
- *
- * The wing is defined by geometric data at a finite number of span-stations : chord, chord position, foil, dihedral and washout.
- *
- * The panel between two span-stations is a WingSection object. The term "panel" is reserved for the mesh panels used to perform a VLM or Panel analysis.
- *
- * The term stations is reserved for the spanwise points used by the LLT, or by the spanwise position of the panels in a VLM or panel analysis.
- * During an LLT or a Panel analysis, the value of the aerodynamic parameters of interest are stored in the member variables of this Wing object.
- * The data is retrieved and stored in an operating point at the end of the analysis.
- * The choice to include the wing-specific methods used in the analysis in this wing class is arbitrary.
- * It simplifies somewhat the implementation of the PanelAnalysis classes, but makes this Wing class more complex.
- *
- * The data is stored in International Standard Units, i.e. meters, kg, and seconds. Angular data is stored in degrees.
-*/
-
-
 
 class WPolar;
 class PlaneOpp;

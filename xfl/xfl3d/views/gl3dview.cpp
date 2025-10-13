@@ -1309,38 +1309,6 @@ void gl3dView::paintGl3()
     int width  = geometry().width();
     int height = geometry().height();
 
-/*    QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
-    float ratio = float(width)/float(height);
-    QVector2D off(0.0f, 0.0f);
-    m_shadBack.bind();
-    {
-        int stride = 6;
-        float w = m_GLViewRect.width();
-        float h = fabs(m_GLViewRect.height());
-        m_shadBack.setUniformValue(m_locBackWidth,  w);
-        m_shadBack.setUniformValue(m_locBackHeight, h);
-        m_shadBack.setUniformValue(m_locBackViewRatio, ratio);
-
-        m_shadBack.setUniformValue(m_locBackViewTrans, off);
-        m_shadBack.setUniformValue(m_locBackViewScale, 1.0f);
-
-        m_vboBackgroundQuad.bind();
-        {
-            m_shadBack.enableAttributeArray(m_attrBackVertexPosition);
-            m_shadBack.setAttributeBuffer(m_attrBackVertexPosition, GL_FLOAT, 0, 3, stride*sizeof(GLfloat));
-
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glDisable(GL_CULL_FACE);
-
-            int nvtx = m_vboBackgroundQuad.size()/stride/int(sizeof(float));
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, nvtx);
-
-            m_shadBack.disableAttributeArray(m_attrBackVertexPosition);
-        }
-        m_vboBackgroundQuad.release();
-    }
-    m_shadBack.release();*/
-
     // Enable blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
