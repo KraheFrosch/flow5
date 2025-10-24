@@ -11,13 +11,11 @@
 #include "panel3.h"
 #include <xflpanels/panels/mctriangle.h>
 #include <xflpanels/panels/vortex.h>
-#include <xflmath/matrix.h>
 #include <xflmath/constants.h>
 #include <xflcore/units.h>
 #include <xflcore/xflcore.h>
 
 #include <xflgeom/geom_globals/geom_global.h>
-//#include <xflgeom/geom_globals/geom_global.h>
 #include <xflgeom/geom3d/triangle3d.h>
 #include <xflgeom/geom3d/node.h>
 

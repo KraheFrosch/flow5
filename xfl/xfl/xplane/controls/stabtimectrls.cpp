@@ -31,7 +31,6 @@
 #include <xflgraph/controls/graphoptions.h>
 #include <xflgraph/graph/curve.h>
 #include <xflmath/constants.h>
-#include <xflmath/matrix.h>
 #include <xflobjects/objects3d/analysis/planeopp.h>
 #include <xflobjects/objects3d/analysis/wpolar.h>
 #include <xflobjects/objects3d/plane/planexfl.h>

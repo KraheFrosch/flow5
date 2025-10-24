@@ -11,7 +11,6 @@
 #include <xflobjects/objects3d/analysis/polar3d.h>
 #include <xflmath/cubicinterpolation.h>
 #include <xflmath/mathelem.h>
-#include <xflmath/matrix.h> // remove
 
 
 

@@ -10,8 +10,6 @@
 #include <QMessageBox>
 
 #include "renamedlg.h"
-#include <xflgraph/graph/graph.h>
-#include <xflgraph/graph/curve.h>
 
 QByteArray RenameDlg::s_WindowGeometry;
 

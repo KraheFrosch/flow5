@@ -2,7 +2,6 @@
 HEADERS += \
     xflpanels/mesh/interfaces/mesherwt.h \
     xflpanels/mesh/interfaces/panelcheckdlg.h \
-    xflpanels/mesh/interfaces/pslgtestview.h \
     xflpanels/mesh/mesh_globals.h \
     xflpanels/mesh/quadmesh.h \
     xflpanels/mesh/shell/afmesher.h \
@@ -23,7 +22,6 @@ HEADERS += \
 SOURCES += \
     xflpanels/mesh/interfaces/mesherwt.cpp \
     xflpanels/mesh/interfaces/panelcheckdlg.cpp \
-    xflpanels/mesh/interfaces/pslgtestview.cpp \
     xflpanels/mesh/mesh_globals.cpp \
     xflpanels/mesh/quadmesh.cpp \
     xflpanels/mesh/shell/afmesher.cpp \

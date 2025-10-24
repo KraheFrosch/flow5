@@ -25,7 +25,6 @@
 #include <xflobjects/objects3d/wing/wingxfl.h>
 #include <xflobjects/objects3d/plane/planexfl.h>
 
-#include <xflmath/matrix.h>
 
 int LLTTask::s_IterLim = 100;
 int LLTTask::s_NLLTStations = 20;

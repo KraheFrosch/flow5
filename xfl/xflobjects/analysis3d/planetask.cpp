@@ -596,6 +596,8 @@ bool PlaneTask::T6Loop()
 {
     QString log, str, strange;
 
+    QElapsedTimer t;
+
     double error(0), CL(0);
 
     Vector3d F;
@@ -663,10 +665,11 @@ bool PlaneTask::T6Loop()
         onTraceLog(strange);
 
         //reset the initial geometry before a new angle is processed
+        onTraceLog("\n      Restoring the base mesh\n");
         m_pPlane->restoreMesh();
         m_pPA->restorePanels();
 
-        onTraceLog("\n      Setting control positions\n");
+        onTraceLog("      Setting control positions\n");
 
         PlaneXfl *pPlaneXfl = dynamic_cast<PlaneXfl*>(m_pPlane);
         if(pPlaneXfl)
@@ -709,8 +712,13 @@ bool PlaneTask::T6Loop()
             m_pPA->m_VortexNeg.clear();
         }
 
-        onTraceLog("      Making the influence matrix...\n");
+        t.start();
+
+        onTraceLog("      Making the influence matrix...");
         m_pPA->makeInfluenceMatrix();
+
+        strange = QString::asprintf("     done in %.3f s\n", double(t.restart())/1000.0);
+        onTraceLog(strange);
 
         if(m_pPA->m_bMatrixError) return false;
         if (isCancelled()) return true;
@@ -722,13 +730,21 @@ bool PlaneTask::T6Loop()
         }
         if (isCancelled()) return true;
 
+        onTraceLog("      LAPACK - LU factorization...");
+
         if (!m_pPA->LUfactorize())
         {
+            onTraceLog(" singular matrix, aborting\n");
             m_bError = true;
             return true;
         }
 
+        strange = QString::asprintf("       done in %.3f s\n", double(t.restart())/1000.0);
+        onTraceLog(strange);
+
+        onTraceLog("      Making source strengths...");
         m_pPA->makeSourceStrengths(windDirection(m_Alpha, 0.0)); // unit source strengths
+        onTraceLog("         done\n");
 
         // go through the loop at least once
         int nWakeIter = 1;
@@ -742,6 +758,8 @@ bool PlaneTask::T6Loop()
 
         // start the roll-up iterations
         if(s_bViscInitTwist || !bConvergedLast) m_gamma.fill(0);
+
+        onTraceLog("      Starting wake iterations\n");
 
         for(int ivw=0; ivw<nWakeIter; ivw++)
         {

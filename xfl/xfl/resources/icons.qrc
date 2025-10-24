@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/Occ_logo.png</file>
         <file>icons/On3DView.png</file>
         <file>icons/OnBLView.png</file>
         <file>icons/OnCpView.png</file>
@@ -32,7 +31,6 @@
         <file>icons/empty.png</file>
         <file>icons/f5.png</file>
         <file>icons/f5_doc.png</file>
-        <file>icons/icon_mkl.png</file>
         <file>icons/level+.png</file>
         <file>icons/level-.png</file>
         <file>icons/level0.png</file>

@@ -50,7 +50,6 @@
 #include <xflcore/xflcore.h>
 #include <xflgeom/geom3d/bspline3d.h>
 #include <xflgeom/geom_globals/geom_global.h>
-#include <xflmath/matrix.h>
 #include <xflobjects/objects3d/analysis/planeopp.h>
 #include <xflobjects/objects3d/analysis/wingopp.h>
 #include <xflobjects/objects3d/analysis/wpolar.h>

@@ -10,7 +10,6 @@
 
 
 #include "mctriangle.h"
-#include <xflmath/matrix.h>
 #include <xflmath/constants.h>
 #include <xflpanels/panels/panel.h>
 #include <xflpanels/panels/panelprecision.h>

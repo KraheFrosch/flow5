@@ -15,7 +15,6 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "p4analysis.h"
-#include <xflmath/matrix.h>
 
 #include <xflcore/units.h>
 #include <xflcore/xflcore.h>

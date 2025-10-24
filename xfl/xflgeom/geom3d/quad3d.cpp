@@ -10,7 +10,6 @@
 
 #include "quad3d.h"
 #include <xflmath/constants.h>
-#include <xflmath/matrix.h>
 
 #include <xflgeom/geom2d/segment2d.h>
 #include <xflgeom/geom_globals/geom_global.h>

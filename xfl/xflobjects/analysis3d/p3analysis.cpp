@@ -20,9 +20,6 @@
 
 #include <xflcore/units.h>
 #include <xflcore/xflcore.h>
-#include <xflmath/mathelem.h>
-#include <xflmath/matrix.h>
-#include <xflmath/gaussquadrature.h>
 #include <xflobjects/objects3d/analysis/polar3d.h>
 #include <xflfoil/objects2d/objects2d.h>
 #include <xflobjects/objects3d/analysis/stabderivatives.h>

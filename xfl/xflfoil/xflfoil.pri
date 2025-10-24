@@ -1,5 +1,4 @@
 HEADERS += \
-    $$PWD/panels2d/afmesher2d.h \
     xflfoil/analysis2d/foiltaskevent.h \
     xflfoil/analysis2d/stream2d.h \
     xflfoil/analysis2d/xfoiltask.h \
@@ -33,7 +32,6 @@ HEADERS += \
 
 
 SOURCES += \
-    $$PWD/panels2d/afmesher2d.cpp \
     xflfoil/analysis2d/stream2d.cpp \
     xflfoil/analysis2d/xfoiltask.cpp \
     xflfoil/editors/foil1splinedlg.cpp \

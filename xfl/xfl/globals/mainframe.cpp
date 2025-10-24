@@ -55,7 +55,6 @@
 #include <xfl/test/onevortontestdlg.h>
 #include <xfl/test/panel3testdlg.h>
 #include <xfl/test/panelanalysistest.h>
-#include <xfl/test/rupperttestdlg.h>
 #include <xfl/test/test3d/gl3daxesview.h>
 #include <xfl/test/test3d/gl3dcontourview.h>
 #include <xfl/test/test3d/gl3dflightview.h>
@@ -148,8 +147,6 @@
 #include <xflgraph/controls/graphoptions.h>
 #include <xflgraph/globals/graphsvgwriter.h>
 #include <xflgraph/graph/curve.h>
-#include <xflmath/matrix.h>
-#include <xflmath/sgsmooth.h>
 #include <xflobjects/sailobjects/sails/wingsail.h>
 #include <xflobjects/objects3d/analysis/boatopp.h>
 #include <xflobjects/objects3d/analysis/boatpolar.h>
@@ -1252,16 +1249,6 @@ void MainFrame::keyPressEvent(QKeyEvent *pEvent)
                     pTestView->setAttribute(Qt::WA_DeleteOnClose);
                     pTestView->show();
                     pTestView->activateWindow();
-                }
-                break;
-            }
-            case Qt::Key_R:
-            {
-                if(bAlt)
-                {
-                    RuppertTestDlg dlg(this);
-                    dlg.initDialog();
-                    dlg.exec();
                 }
                 break;
             }
@@ -2806,7 +2793,6 @@ bool MainFrame::loadSettings()
     PanelAnalysisTest::loadSettings(settings);
     PrefsDlg::loadSettings(settings);
     RenameDlg::loadSettings(settings);
-    RuppertTestDlg::loadSettings(settings);
     Section2dOptions::loadSettings(settings);
     SelectionDlg::loadSettings(settings);
     SeparatorsDlg::loadSettings(settings);
@@ -2956,7 +2942,6 @@ void MainFrame::saveSettings()
     PanelAnalysisTest::saveSettings(settings);
     PrefsDlg::saveSettings(settings);
     RenameDlg::saveSettings(settings);
-    RuppertTestDlg::saveSettings(settings);
     Section2dOptions::saveSettings(settings);
     SelectionDlg::saveSettings(settings);
     SeparatorsDlg::saveSettings(settings);

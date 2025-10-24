@@ -55,16 +55,13 @@ linux-g++{
         PREFIX = /usr/local
     }
 
-    INCLUDEDIR = $$PREFIX/include
-    inc.path = $$INCLUDEDIR
+    inc.path = $$PREFIX/include/$$TARGET
     inc.files += xfoil.h xfoil_params.h
 
 
-    LIBDIR = $$PREFIX/lib
-    target.path = $$PREFIX/lib
+    target.path = $$PREFIX/lib/$$TARGET
 
     # MAKE INSTALL
     INSTALLS += target inc
-
 }
 

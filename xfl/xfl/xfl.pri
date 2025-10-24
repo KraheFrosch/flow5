@@ -121,7 +121,6 @@ HEADERS += \
     xfl/test/onevortontestdlg.h \
     xfl/test/panel3testdlg.h \
     xfl/test/panelanalysistest.h \
-    xfl/test/rupperttestdlg.h \
     xfl/test/test3d/gl3daxesview.h \
     xfl/test/test3d/gl3dcontourview.h \
     xfl/test/test3d/gl3dflightview.h \
@@ -290,7 +289,6 @@ SOURCES += \
     xfl/test/onevortontestdlg.cpp \
     xfl/test/panel3testdlg.cpp \
     xfl/test/panelanalysistest.cpp \
-    xfl/test/rupperttestdlg.cpp \
     xfl/test/test3d/gl3daxesview.cpp \
     xfl/test/test3d/gl3dcontourview.cpp \
     xfl/test/test3d/gl3dflightview.cpp \

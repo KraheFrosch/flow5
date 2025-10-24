@@ -30,7 +30,6 @@
 #include <xflgeom/geom3d/node.h>
 #include <xflgeom/geom3d/triangle3d.h>
 #include <xflgeom/geom_globals/geom_global.h>
-#include <xflmath/matrix.h>
 #include <xflwidgets/customdlg/imagedlg.h>
 
 #define ZANIMINTERVAL 15
