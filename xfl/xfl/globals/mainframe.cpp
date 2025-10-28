@@ -193,8 +193,6 @@ QString MainFrame::s_XflProjectPath;
 
 bool MainFrame::s_bSaved = true;
 
-QDate MainFrame::s_RefDate(2020,7,17);
-QDate MainFrame::s_LastServerCheckDate(2020,7,17);
 
 MainFrame::MainFrame(QWidget *parent) : QMainWindow(parent)
 {
@@ -2757,9 +2755,6 @@ bool MainFrame::loadSettings()
 
         s_XflProjectPath = settings.value("XflProjectPath",SaveOptions::lastDirName()).toString();
 
-        int nDays = settings.value("ReferenceId", 0).toInt();
-        s_LastServerCheckDate = s_RefDate.addDays(nDays);
-
         m_pLogMessageDlg->restoreGeometry(settings.value("LogMsgGeom").toByteArray());
         ObjectPropsDlg::setWindowGeometry(settings.value("ObjectPropsDlg").toByteArray());
         GraphDlg::setWindowGeometry(settings.value("GraphDlg").toByteArray());
@@ -2907,8 +2902,6 @@ void MainFrame::saveSettings()
 
         settings.setValue("XflProjectPath",s_XflProjectPath);
 
-        int nDays = s_RefDate.daysTo(s_LastServerCheckDate);
-        settings.setValue("ReferenceId", nDays);
 
         settings.setValue("LogMsgGeom", m_pLogMessageDlg->saveGeometry());
         settings.setValue("ObjectPropsDlg", ObjectPropsDlg::windowGeometry());

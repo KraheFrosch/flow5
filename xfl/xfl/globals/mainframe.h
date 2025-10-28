@@ -101,7 +101,6 @@ class MainFrame : public QMainWindow
 
         static xfl::enumApp xflApp()  {return s_iApp;}
 
-        static void setLastServerCheckDate(QDate const &date) {s_LastServerCheckDate=date;}
 
     private:
         void keyPressEvent(QKeyEvent *pEvent) override;
@@ -336,8 +335,6 @@ class MainFrame : public QMainWindow
 
         static QString s_XflProjectPath; /** the path to the xfl project files */
 
-        static QDate s_RefDate;
-        static QDate s_LastServerCheckDate;
 
 };
 

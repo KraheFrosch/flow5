@@ -1149,7 +1149,6 @@ void PlaneTreeView::setCurveParams()
     ObjectTreeItem *pRootItem = m_pModel->rootItem();
     if(!pRootItem)
     {
-        qDebug()<<"No root item=";
         return;
     }
 

@@ -209,11 +209,8 @@ LIBS += \
     -lTKMesh \
     -lTKOffset \
     -lTKPrim \
-    -lTKIGES \
-    -lTKSTEP \
-    -lTKSTEPAttr \
-    -lTKSTEPBase \
-    -lTKSTEP209 \
+    -lTKDEIGES \
+    -lTKDESTEP \
     -lTKShHealing \
     -lTKTopAlgo \
     -lTKXSBase \
