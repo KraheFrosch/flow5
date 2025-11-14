@@ -142,10 +142,9 @@ win32-msvc {
 
 
 #------------ OPEN CASCADE --------------------------
-    INCLUDEPATH += D:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc
-    LIBS += -LD:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib
-    LIBS += -LD:\bin\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\bin
-
+    INCLUDEPATH += D:\bin\OCCT-7_9_2\build\inc
+    LIBS += -LD:\bin\OCCT-7_9_2\build\win64\vc14\lib
+    LIBS += -LD:\bin\OCCT-7_9_2\build\win64\vc14\bin
 
 
 
@@ -172,7 +171,7 @@ macx {
 
     DEFINES += GL_SILENCE_DEPRECATION   #Shame
 
-#-------XFoil
+    #-------XFoil
     # link to the lib:
     LIBS += -L$$OUT_PWD/../XFoil-lib -lXFoil
     # deploy the libs:
@@ -180,10 +179,11 @@ macx {
     XFoil.path = Contents/Frameworks
     QMAKE_BUNDLE_DATA += XFoil
 
+
     #-------------OPENCASCADE -----------------
     # set the paths to the OpenCascade header and lib directories
-    INCLUDEPATH += /Users/techwinder/bin/opencascade-7.3.0/inc
-    LIBS += -L/Users/techwinder/bin/opencascade-7.3.0/build_fat/mac64/clang/lib
+    INCLUDEPATH += /usr/local/include/opencascade/
+    LIBS += -L/usr/local/lib/
 
     #-------------vecLib -----------------
     DEFINES += ACCELERATE

@@ -1,8 +1,8 @@
 /****************************************************************************
 
     flow5
-    Copyright (C) 2025 André Deperrois 
-    
+    Copyright (C) 2025 André Deperrois
+
     This file is part of flow5.
 
     flow5 is free software: you can redistribute it and/or modify it
@@ -61,8 +61,9 @@ void AboutFlow5::setupLayout()
         pLogoLayout->addWidget(pFlow5Link);
     }
 
-    QString copyright = QString::fromUtf8("Copyright © André Deperrois - All rights reserved");
+    QString copyright = QString::fromUtf8("Copyright © 2025 André Deperrois");
     QLabel *plab4  = new QLabel(copyright);
+    QLabel *plab5 = new QLabel("Application released under the terms of the GNU General Public License v3");
     QString trademark = QString::fromUtf8("flow5® is a product and a registered trademark of the company Vic-Aéro");
     QLabel *plab3  = new QLabel(trademark);
     QLabel *plab6  = new QLabel(  "This program is distributed in the hope that it will be useful\n"
@@ -81,6 +82,7 @@ void AboutFlow5::setupLayout()
 
         pMainLayout->addWidget(plab3);
         pMainLayout->addWidget(plab4);
+        pMainLayout->addWidget(plab5);
         pMainLayout->addSpacing(17);
         pMainLayout->addStretch();
         pMainLayout->addWidget(plab6);
