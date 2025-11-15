@@ -85,43 +85,30 @@ class FL5LIB_EXPORT XFoilTask
         void appendRange(AnalysisRange const &range) {m_AnalysisRange.push_back(range);}
         void appendRange(bool b, double vmin, double vmax, double vinc) {m_AnalysisRange.push_back({b, vmin, vmax, vinc});}
 
-        bool initialize(FoilAnalysis *pFoilAnalysis, bool bStoreOpp, bool bViscous=true, bool bInitBL=true);
-        bool initialize(Foil *pFoil, Polar *pPolar, bool bStoreOpp, bool bViscous=true, bool bInitBL=true);
+        bool initialize(FoilAnalysis *pFoilAnalysis, bool bKeepOpps);
+        bool initialize(Foil *pFoil, Polar *pPolar, bool bKeepOpps);
+
+        void initializeBL();
 
         XFoil const &XFoilInstance() const {return m_XFoilInstance;}
 
         void setAlphaRange(double vMin, double vMax, double vDelta);
         void setClRange(double vMin, double vMax, double vDelta);
 
+        void setKeepOpps(bool b) {m_bKeepOpps = b;}
+
+        bool bAlpha()   const   {return m_bAlpha;}
+        void setAoAAnalysis(bool b) {m_bAlpha=b;}
+
+        void clearOpps() {m_OpPoints.clear();}
 
         void traceLog(const std::string &str);
 
         static void cancelAnalyses() {s_bCancel=true;}
         static void setCancelled(bool b) {s_bCancel=b;}
 
-        static void setSkipOpp(bool b) {s_bSkipOpp=b;}
-        static bool bSkipOpp() {return s_bSkipOpp;}
-
-        static void setSkipPolar(bool b) {s_bSkipPolar=b;}
-        static bool bSkipPolar() {return s_bSkipPolar;}
-
         static int maxIterations() {return s_IterLim;}
         static void setMaxIterations(int maxiter) {s_IterLim=maxiter;}
-
-        static bool bAutoInitBL() {return s_bAutoInitBL;}
-        static void setAutoInitBL(bool b) {s_bAutoInitBL=b;}
-
-        static bool bStoreOpps() {return s_bStoreOpp;}
-        static void setStoreOpps(bool b) {s_bStoreOpp=b;}
-
-        static bool bAlpha()     {return s_bAlpha;}
-        static void setAoAAnalysis(bool b) {s_bAlpha=b;}
-
-        static bool bViscous()   {return s_bViscous;}
-        static void setViscous(bool b) {s_bViscous=b;}
-
-        static bool bInitBL()    {return s_bInitBL;}
-        static void setInitBL(bool b) {s_bInitBL=b;}
 
         static double CdError() {return s_CdError;}
         static double setCdError(double cderr) {return s_CdError=cderr;}
@@ -138,27 +125,26 @@ class FL5LIB_EXPORT XFoilTask
         bool m_bErrors;
 
 
-        XFoil m_XFoilInstance;     /**< An instance of the XFoil class specific for this object */
+        XFoil m_XFoilInstance;     /**< An instance of the XFoil class specific to this task */
 
         std::vector<OpPoint*> m_OpPoints;
 
         Foil *m_pFoil;                 /**< A pointer to the instance of the Foil object for which the calculation is performed */
         Polar *m_pPolar;                /**< A pointer to the instance of the Polar object for which the calculation is performed */
 
+        bool m_bViscous;           /**< true if performing a viscous calculation - ALWAYS TRUE */
+        bool m_bAlpha;             /**< true if performing an analysis based on aoa, false if based on Cl */
+
+        bool m_bKeepOpps;
+
         xfl::enumAnalysisStatus m_AnalysisStatus;
 
         std::vector<AnalysisRange> m_AnalysisRange;
 
-        static bool s_bSkipPolar;
         static bool s_bCancel;            /**< True if the user has asked to cancel the analysis */
-        static bool s_bSkipOpp;
 
         static int  s_IterLim;
         static bool s_bAutoInitBL;        /**< true if the BL initialization is left to the code's decision */
-        static bool s_bViscous;           /**< true if performing a viscous calculation, false if inviscid */
-        static bool s_bAlpha;             /**< true if performing an analysis based on aoa, false if based on Cl */
-        static bool s_bInitBL;            /**< true if the boundary layer should be initialized for the next xfoil calculation */
-        static bool s_bStoreOpp;          /**< true if the operating points should be stored */
         static double s_CdError;          /**< discard points with |Cd| less than this value: these operating points are likely erroneous (spurious?) */
 
 

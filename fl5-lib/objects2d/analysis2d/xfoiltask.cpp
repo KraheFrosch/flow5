@@ -1,7 +1,7 @@
 /****************************************************************************
 
     flow5 application
-    Copyright (C) Andre Deperrois
+    Copyright © 2025 André Deperrois
     
     This file is part of flow5.
 
@@ -28,27 +28,17 @@
 
 #include <api/xfoiltask.h>
 #include <api/foil.h>
-#include <api/objects2d.h>
 #include <api/oppoint.h>
-#include <api/polar.h>
 #include <api/polar.h>
 #include <api/geom_params.h>
 #include <api/constants.h>
 
 
 
-bool XFoilTask::s_bCancel    = false;
-bool XFoilTask::s_bSkipOpp   = false;
-bool XFoilTask::s_bSkipPolar = false;
-bool XFoilTask::s_bStoreOpp  = true;
-bool XFoilTask::s_bViscous = true;
-bool XFoilTask::s_bAlpha = true;
-bool XFoilTask::s_bInitBL = true;
+bool XFoilTask::s_bCancel   = false;
 double XFoilTask::s_CdError = 1.0e-3;
 
 int XFoilTask::s_IterLim=100;
-bool XFoilTask::s_bAutoInitBL = true;
-
 
 
 XFoilTask::XFoilTask()
@@ -56,13 +46,16 @@ XFoilTask::XFoilTask()
     m_pFoil    = nullptr;
     m_pPolar   = nullptr;
 
+    m_bViscous = true; // always true
+    m_bAlpha   = true;
+
     m_bErrors = false;
 }
 
 
 void XFoilTask::setAlphaRange(double vMin, double vMax, double vDelta)
 {
-    s_bAlpha = true;
+    m_bAlpha = true;
     m_AnalysisRange.resize(1);
     AnalysisRange &range = m_AnalysisRange.front();
     range.setActive(true);
@@ -74,7 +67,7 @@ void XFoilTask::setAlphaRange(double vMin, double vMax, double vDelta)
 
 void XFoilTask::setClRange(double vMin, double vMax, double vDelta)
 {
-    s_bAlpha = false;
+    m_bAlpha = false;
     m_AnalysisRange.resize(1);
     AnalysisRange &range = m_AnalysisRange.front();
     range.setActive(true);
@@ -105,7 +98,7 @@ void XFoilTask::run()
 
         if(m_pPolar->isFixedaoaPolar())     ReSequence();
         else if(m_pPolar->isControlPolar()) thetaSequence();
-        else                                alphaSequence(s_bAlpha);
+        else                                alphaSequence(m_bAlpha);
 
         m_AnalysisStatus = xfl::FINISHED;
 
@@ -118,23 +111,21 @@ void XFoilTask::run()
 }
 
 
-bool XFoilTask::initialize(FoilAnalysis *pFoilAnalysis, bool bStoreOpp, bool bViscous, bool bInitBL)
+bool XFoilTask::initialize(FoilAnalysis *pFoilAnalysis, bool bKeepOpps)
 {
-    return initialize(pFoilAnalysis->pFoil, pFoilAnalysis->pPolar, bStoreOpp, bViscous, bInitBL);
+    return initialize(pFoilAnalysis->pFoil, pFoilAnalysis->pPolar, bKeepOpps);
 }
 
 
-bool XFoilTask::initialize(Foil *pFoil, Polar *pPolar, bool bStoreOpp, bool bViscous, bool bInitBL)
+bool XFoilTask::initialize(Foil *pFoil, Polar *pPolar, bool bKeepOpps)
 {
     s_bCancel = false;
-    s_bSkipOpp = s_bSkipPolar = false;
-    s_bStoreOpp = bStoreOpp;
+
+    m_bKeepOpps = bKeepOpps;
 
     m_bErrors = false;
     m_pFoil = pFoil;
     m_pPolar = pPolar;
-
-    s_bInitBL = bInitBL;
 
     m_AnalysisStatus = xfl::PENDING;
 
@@ -151,10 +142,12 @@ bool XFoilTask::initialize(Foil *pFoil, Polar *pPolar, bool bStoreOpp, bool bVis
 
     if(!m_XFoilInstance.initXFoilGeometry(m_pFoil->nNodes(), x.data(), y.data(), nx.data(), ny.data()))
         return false;
+
+    bool bViscous = true;
     if(!m_XFoilInstance.initXFoilAnalysis(m_pPolar->Reynolds(), m_pPolar->aoaSpec(), m_pPolar->Mach(),
                                           m_pPolar->NCrit(), m_pPolar->XTripTop(), m_pPolar->XTripBot(),
-                                          m_pPolar->ReType(), m_pPolar->MaType(),
-                                          bViscous)) return false;
+                                          m_pPolar->ReType(), m_pPolar->MaType(), bViscous))
+        return false;
     return true;
 }
 
@@ -205,7 +198,7 @@ bool XFoilTask::processCl(double Cl, double Re, double &Cd, double &XTrTop, doub
     else
     {
         str = std::format("   ...unconverged after {0:d} iterations\n", iterations);
-        traceLog(str);
+        traceLog(str);     
 
         // fallback: interpolate
 
@@ -312,6 +305,15 @@ bool XFoilTask::processClList(std::vector<double> const& ClList, std::vector<dou
     return true;
 }
 
+
+void XFoilTask::initializeBL()
+{
+    traceLog("   Initializing B.L.\n");
+    m_XFoilInstance.lblini = false;
+    m_XFoilInstance.lipan = false;
+}
+
+
 /** aoa or Cl ranges */
 bool XFoilTask::alphaSequence(bool bAlpha)
 {
@@ -333,12 +335,7 @@ bool XFoilTask::alphaSequence(bool bAlpha)
             continue;
         }
 
-        if(s_bInitBL)
-        {
-            m_XFoilInstance.lblini = false;
-            m_XFoilInstance.lipan = false;
-            traceLog("   Initializing BL\n");
-        }
+        initializeBL();
 
         int iter=0;
         SpMin = range.m_vMin;
@@ -352,14 +349,6 @@ bool XFoilTask::alphaSequence(bool bAlpha)
         do
         {
             if(s_bCancel) break;
-            if(s_bSkipPolar)
-            {
-                m_XFoilInstance.lblini = false;
-                m_XFoilInstance.lipan = false;
-                s_bSkipPolar = false;
-                traceLog("    .......skipping polar \n");
-                return false;
-            }
 
             if(bAlpha)
             {
@@ -414,7 +403,6 @@ bool XFoilTask::alphaSequence(bool bAlpha)
                 }
                 else
                 {
-
                     OpPoint *pOpPoint = new OpPoint;
                     pOpPoint->setFoilName(m_pFoil->name());
                     pOpPoint->setPolarName(m_pPolar->name());
@@ -423,13 +411,18 @@ bool XFoilTask::alphaSequence(bool bAlpha)
                     m_pPolar->addOpPointData(pOpPoint); // store the data on the fly; a polar is only used by one task at a time
                     pOpPoint->setTheta(m_pPolar->TEFlapAngle());
 
-                    m_OpPoints.push_back(pOpPoint);
+                    if(m_bKeepOpps) m_OpPoints.push_back(pOpPoint);
+                    else delete pOpPoint;
                 }
             }
             else
             {
                 str = std::format("   ...unconverged after {0:3d} iterations\n", iterations);
                 traceLog(str);
+                traceLog("      ...initializing BL\n");
+                m_XFoilInstance.lblini = false;
+                m_XFoilInstance.lipan = false;
+
                 m_bErrors = true;
             }
 
@@ -492,13 +485,7 @@ bool XFoilTask::thetaSequence()
             continue;
         }
 
-        if(s_bInitBL)
-        {
-            m_XFoilInstance.lblini = false;
-            m_XFoilInstance.lipan = false;
-            traceLog("   Initializing BL\n");
-        }
-
+        initializeBL();
 
         SpMin = range.m_vMin;
         SpMax = range.m_vMax;
@@ -514,14 +501,6 @@ bool XFoilTask::thetaSequence()
         for(int iter=0; iter<nTheta; iter++)
         {
             if(s_bCancel) break;
-            if(s_bSkipPolar)
-            {
-                m_XFoilInstance.lblini = false;
-                m_XFoilInstance.lipan = false;
-                s_bSkipPolar = false;
-                traceLog("    .......skipping polar \n");
-                return false;
-            }
 
             m_XFoilInstance.alfa = alphadeg * PI/180.0;
             m_XFoilInstance.lalfa = true;
@@ -584,13 +563,18 @@ bool XFoilTask::thetaSequence()
                     addXFoilData(pOpPoint, m_XFoilInstance, m_pFoil);
                     m_pPolar->addOpPointData(pOpPoint); // store the data on the fly; a polar is only used by one task at a time
 
-                    m_OpPoints.push_back(pOpPoint);
+                    if(m_bKeepOpps) m_OpPoints.push_back(pOpPoint);
+                    else delete pOpPoint;
                 }
             }
             else
             {
                 str = std::format("   ...unconverged after {0:3d} iterations\n", iterations);
                 traceLog(str);
+                traceLog("      ...initializing BL\n");
+                m_XFoilInstance.lblini = false;
+                m_XFoilInstance.lipan = false;
+
                 m_bErrors = true;
             }
 
@@ -630,14 +614,7 @@ bool XFoilTask::ReSequence()
             continue;
         }
 
-        if(s_bSkipPolar)
-        {
-            m_XFoilInstance.lblini = false;
-            m_XFoilInstance.lipan = false;
-            s_bSkipPolar = false;
-            traceLog("    .......skipping polar \n");
-            return false;
-        }
+        initializeBL();
 
         int iter=0;
         double SpMin = range.m_vMin;
@@ -677,6 +654,10 @@ bool XFoilTask::ReSequence()
             {
                 str = std::format("   ...unconverged after {0:3d} iterations\n", iterations);
                 traceLog(str);
+                traceLog("      ...initializing BL\n");
+                m_XFoilInstance.lblini = false;
+                m_XFoilInstance.lipan = false;
+
                 m_bErrors = true;
             }
 
@@ -687,8 +668,11 @@ bool XFoilTask::ReSequence()
             pOpPoint->setTheStyle(m_pPolar->theStyle());
             addXFoilData(pOpPoint, m_XFoilInstance, m_pFoil);
             pOpPoint->setTheta(m_pPolar->TEFlapAngle());
+            m_pPolar->addOpPointData(pOpPoint);
 
-            m_OpPoints.push_back(pOpPoint);
+            if(m_bKeepOpps) m_OpPoints.push_back(pOpPoint);
+            else delete pOpPoint;
+
 
             if(XFoil::s_bFullReport)
             {
@@ -729,14 +713,6 @@ int XFoilTask::loop()
             iterations++;
         }
         else iterations = s_IterLim;
-
-        if(s_bSkipOpp || s_bSkipPolar)
-        {
-            m_XFoilInstance.lblini = false;
-            m_XFoilInstance.lipan = false;
-            s_bSkipOpp = false;
-            return iterations;
-        }
     }
 
     if(s_bCancel)  return -1;// to exit loop
@@ -753,11 +729,6 @@ int XFoilTask::loop()
 
     if(iterations>=s_IterLim && !m_XFoilInstance.lvconv)
     {
-        if(s_bAutoInitBL)
-        {
-            m_XFoilInstance.lblini = false;
-            m_XFoilInstance.lipan = false;
-        }
         m_XFoilInstance.fcpmin();// Is it of any use?
         return iterations;
     }

@@ -1,5 +1,4 @@
 
-#include <stdio.h>
 #include <iostream>
 #include <format>
 
@@ -42,7 +41,7 @@ int main()
     task.appendRange({true, 0.0, -7.0, 0.5});
     task.run();
 
-    // retrieve the results and store them in SORTED orde in the database
+    // retrieve the results and store them in SORTED order in the database
     for(OpPoint *pOpp : task.operatingPoints())
     {
         Objects2d::insertOpPoint(pOpp); 

@@ -1,7 +1,7 @@
 /****************************************************************************
 
     flow5 application
-    Copyright (C) Andre Deperrois
+    Copyright © 2025 André Deperrois
     
     This file is part of flow5.
 
@@ -240,7 +240,6 @@ class FL5LIB_EXPORT Foil : public XflObject
         Vector2d m_TE;                       /**< the trailing edge point */
         Vector2d m_LE;                       /**< the leading edge point. Note: NOT a foil point*/
 
-        double m_BSfracLE;         /**< the B-spline parameter such that m_BSpline(frac)=LE */
         double m_CSfracLE;         /**< the cubic spline parameter such that m_CSpline(frac)=LE */
 
         std::vector<Node2d> m_CbLine;          /**< the mid camber line points for the flapped foil */

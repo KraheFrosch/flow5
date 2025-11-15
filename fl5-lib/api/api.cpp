@@ -1,7 +1,7 @@
 /****************************************************************************
 
     flow5 application
-    Copyright (C) Andre Deperrois
+    Copyright © 2025 André Deperrois
     
     This file is part of flow5.
 
@@ -22,6 +22,9 @@
 
 *****************************************************************************/
 
+#define _MATH_DEFINES_DEFINED
+
+
 #include <QString>
 
 #include "api.h"
@@ -38,6 +41,8 @@
 #include <api/sailobjects.h>
 #include <api/planepolar.h>
 #include <api/xmlpolarreader.h>
+#include <api/xfoiltask.h>
+
 
 std::queue<std::string> globals::g_log;
 
@@ -73,7 +78,7 @@ bool globals::saveFl5Project(std::string const &pathname)
 
         return false;
     }
-    fp.close(); // to authorize removal
+    fp.close();
 
     FileIO saver;
     QDataStream ar(&fp);
@@ -174,8 +179,6 @@ PlaneXfl *plane::makeEmptyPlane()
 }
 
 
-
-
 Polar *foil::importAnalysisFromXml(std::string const &pathname)
 {
     Polar *pPolar = new Polar;
@@ -208,3 +211,9 @@ Polar *foil::importAnalysisFromXml(std::string const &pathname)
     Objects2d::insertPolar(pPolar);
     return pPolar;
 }
+
+
+
+
+
+

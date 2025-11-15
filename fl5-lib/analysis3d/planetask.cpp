@@ -2847,7 +2847,7 @@ bool PlaneTask::computeViscousDragOTF(WingXfl *pWing, double alpha, double beta,
         // Process span stations incrementally and in sequence, assuming that convergence
         // is optimized because 2d BL is similar from one station to the next
 
-        pTask->initialize(&foilA, &a2dPolar, false, true, true);
+        pTask->initialize(&foilA, &a2dPolar, false);
         pTask->processClList(ClList, ReList, CdAList, XTrTopAList, XTrBotAList, CvAList);
 
         int cnt = 0;
@@ -2894,7 +2894,7 @@ bool PlaneTask::computeViscousDragOTF(WingXfl *pWing, double alpha, double beta,
             }
         }
 
-        pTask->initialize(&foilB, &a2dPolar, false, true, true);
+        pTask->initialize(&foilB, &a2dPolar, false);
         pTask->processClList(ClList, ReList, CdBList, XTrTopBList, XTrBotBList, CvBList);
 
         cnt = 0;

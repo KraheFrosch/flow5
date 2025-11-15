@@ -44,5 +44,8 @@
         <file>icons/save.png</file>
         <file>icons/unsaved.png</file>
         <file>icons/OnLoadFoils.png</file>
+        <file>icons/fillfoil.png</file>
+        <file>icons/showLE.png</file>
+        <file>icons/TEHinge.png</file>
     </qresource>
 </RCC>

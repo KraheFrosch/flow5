@@ -27,7 +27,6 @@
 #define _MATH_DEFINES_DEFINED
 
 #include <thread>
-#include <iostream>
 
 #include <api/task3d.h>
 

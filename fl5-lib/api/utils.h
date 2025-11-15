@@ -1,7 +1,7 @@
 /****************************************************************************
 
     flow5 application
-    Copyright (C) Andre Deperrois
+    Copyright © 2025 André Deperrois
     
     This file is part of flow5.
 
@@ -100,6 +100,7 @@ namespace xfl
     FL5LIB_EXPORT  bool stringToBool(QString const &str);
     FL5LIB_EXPORT  QString boolToString(bool b);
 
+    FL5LIB_EXPORT std::string MklVersion();
 
     /** @enum The status of the 3d analysis */
     enum enumAnalysisStatus {PENDING, RUNNING, CANCELLED, FINISHED};

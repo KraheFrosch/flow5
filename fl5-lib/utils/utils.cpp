@@ -1,7 +1,7 @@
 /****************************************************************************
 
     flow5 application
-    Copyright (C) Andre Deperrois
+    Copyright © 2025 André Deperrois
     
     This file is part of flow5.
 
@@ -25,8 +25,20 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <format>
 
 #include <QString>
+
+#if defined ACCELERATE
+  #include <Accelerate/Accelerate.h>
+  #define lapack_int int
+#elif defined INTEL_MKL
+    #include <mkl.h>
+#elif defined OPENBLAS
+//    #include <cblas.h>
+    #include <openblas/lapacke.h>
+#endif
+
 
 #include <api/utils.h>
 
@@ -364,5 +376,19 @@ QString xfl::boolToString(bool b)
     return b ? "true" : "false";
 }
 
+std::string xfl::MklVersion()
+{
+    std::string strange;
+
+#ifdef INTEL_MKL
+    MKLVersion Version;
+
+    mkl_get_version(&Version);
+
+    strange += std::format("<p><b>Version: </b>{:d}.{:d}.{:d}<br>", Version.MajorVersion, Version.MinorVersion, Version.UpdateVersion);
+    strange += std::format("<b>Processor optimization: </b> %s", Version.Processor) + "</p>";
+#endif
+    return strange;
+}
 
 

@@ -1,7 +1,7 @@
 /****************************************************************************
 
     flow5 application
-    Copyright (C) Andre Deperrois
+    Copyright © 2025 André Deperrois
     
     This file is part of flow5.
 
@@ -37,6 +37,8 @@ class Plane;
 class PlaneXfl;
 class PlanePolar;
 class POpp;
+class XFoilTask;
+
 
 namespace globals
 {
@@ -108,6 +110,13 @@ namespace foil
      */
     FL5LIB_EXPORT Polar *createAnalysis(std::string const &foilname);
 
+
+    /**
+     * @brief importAnalysisFromXml reads an xml file containg the description of a 2d analysis
+     * If sucessful, creates a Polar, stores it in the database and retuns a pointer to the object
+     * @param pathname the path to the .xml file,
+     * @return a pointer to the polar if successfully created, nullptr otherwise
+     */
     FL5LIB_EXPORT Polar *importAnalysisFromXml(std::string const &pathname);
 
 }

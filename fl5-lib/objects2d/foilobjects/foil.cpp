@@ -1,7 +1,7 @@
 /****************************************************************************
 
     flow5 application
-    Copyright (C) Andre Deperrois
+    Copyright © 2025 André Deperrois
     
     This file is part of flow5.
 
@@ -103,7 +103,7 @@ void Foil::resetFoil()
     m_LEXHinge    = 0.2;
     m_LEYHinge    = 0.5;
 
-    m_BSfracLE = m_CSfracLE = 0.0;
+    m_CSfracLE = 0.0;
 
 }
 
@@ -526,7 +526,6 @@ void Foil::copy(Foil const &SrcFoil, bool bMeta, bool bForceDeepCopy)
     m_bCamberLine = SrcFoil.m_bCamberLine;
 
     m_CubicSpline = SrcFoil.m_CubicSpline;
-    m_BSfracLE    = SrcFoil.m_BSfracLE;
     m_CSfracLE    = SrcFoil.m_CSfracLE;
 
     m_iLE         = SrcFoil.m_iLE;

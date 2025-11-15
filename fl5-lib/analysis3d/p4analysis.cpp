@@ -1522,7 +1522,7 @@ void P4Analysis::trefftzDrag(int nPanels, double QInf, double alpha, double beta
 
                 //____________________________
                 // Project on wind axes
-                SpanResFF.m_Cl[m]  = stripforce.dot(surfacenormal) /SpanResFF.stripArea(m);
+//                SpanResFF.m_Cl[m]  = stripforce.dot(surfacenormal) /SpanResFF.stripArea(m);
                 SpanResFF.m_ICd[m] = stripforce.dot(winddir) /SpanResFF.stripArea(m);
                 SpanResFF.m_F[m]  += stripforce * qDyn;                        // N, body axes
                 ForceBodyAxes     += stripforce;                            // N/q
@@ -1578,7 +1578,7 @@ void P4Analysis::trefftzDrag(int nPanels, double QInf, double alpha, double beta
                 stripforce *= 2./QInf/QInf; //N/q
                 //____________________________
                 // Project on wind axes
-                SpanResFF.m_Cl[m]  = stripforce.dot(surfacenormal) /SpanResFF.stripArea(m);
+//                SpanResFF.m_Cl[m]  = stripforce.dot(surfacenormal) /SpanResFF.stripArea(m);
                 SpanResFF.m_ICd[m] = stripforce.dot(winddir) /SpanResFF.stripArea(m);
                 SpanResFF.m_F[m]  += stripforce * qDyn;                        // N, body axes
                 ForceBodyAxes     += stripforce;                           // N/q

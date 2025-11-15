@@ -1,0 +1,45 @@
+
+HEADERS += \
+    $$PWD/analysis/analysis2dsettings.h \
+    $$PWD/analysis/xfoilanalysisdlg.h \
+    $$PWD/analysis/xfoilbatchdlg.h \
+    $$PWD/analysis/polarnamemaker.h \
+    $$PWD/controls/analysis2dctrls.h \
+    $$PWD/controls/foiltabledelegate.h \
+    $$PWD/controls/foiltableview.h \
+    $$PWD/controls/foiltreeview.h \
+    $$PWD/controls/lecircledlg.h \
+    $$PWD/controls/oppointctrls.h \
+    $$PWD/graphs/blgraphctrls.h \
+    $$PWD/graphs/xdirectlegendwt.h \
+    $$PWD/menus/xdirectactions.h \
+    $$PWD/menus/xdirectmenus.h \
+    $$PWD/mgt/foilplrlistdlg.h \
+    $$PWD/view2d/dfoillegendwt.h \
+    $$PWD/view2d/dfoilwt.h \
+    $$PWD/view2d/oppointwt.h \
+    $$PWD/xdirect.h \
+
+
+
+SOURCES += \
+    $$PWD/analysis/analysis2dsettings.cpp \
+    $$PWD/analysis/xfoilanalysisdlg.cpp \
+    $$PWD/analysis/xfoilbatchdlg.cpp \
+    $$PWD/analysis/polarnamemaker.cpp \
+    $$PWD/controls/analysis2dctrls.cpp \
+    $$PWD/controls/foiltabledelegate.cpp \
+    $$PWD/controls/foiltableview.cpp \
+    $$PWD/controls/foiltreeview.cpp \
+    $$PWD/controls/lecircledlg.cpp \
+    $$PWD/controls/oppointctrls.cpp \
+    $$PWD/graphs/blgraphctrls.cpp \
+    $$PWD/graphs/xdirectlegendwt.cpp \
+    $$PWD/menus/xdirectactions.cpp \
+    $$PWD/menus/xdirectmenus.cpp \
+    $$PWD/mgt/foilplrlistdlg.cpp \
+    $$PWD/view2d/dfoillegendwt.cpp \
+    $$PWD/view2d/dfoilwt.cpp \
+    $$PWD/view2d/oppointwt.cpp \
+    $$PWD/xdirect.cpp \
+

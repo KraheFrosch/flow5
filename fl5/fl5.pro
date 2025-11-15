@@ -13,7 +13,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 TEMPLATE = app
 TARGET = flow5
 
-VERSION = 7.56
+VERSION = 7.54
 
 QT += opengl widgets xml
 
@@ -52,50 +52,15 @@ linux-g++ {
     DATADIR = $$PREFIX/share/flow5
 
     desktop.path = $$DATADIR
-    desktop.files += meta/linux/$${TARGET}.desktop
+    desktop.files += ../meta/linux/$${TARGET}.desktop
 
     icon128.path = $$DATADIR
-    icon128.files += meta/res/$${TARGET}.png
+    icon128.files += ../meta/res/$${TARGET}.png
 
     target.path = $$BINDIR
 
     # MAKE INSTALL
     INSTALLS += target desktop icon128
-
-
-#comment out to use OpenBLAS
-CONFIG += INTEL_MKL
-
-    INTEL_MKL {
-        #------------ MKL --------------------
-        #    MKL can use the c++ matrices in row major order order
-        DEFINES += INTEL_MKL
-
-        #   Ensure that the paths to the include files and to the binary libraries
-        #   are set either by defining them in the OS environment
-        #   or by setting them explicitely in the following two lines
-        #
-          INCLUDEPATH += /opt/intel/oneapi/mkl/latest/include/
-          LIBS += -L/opt/intel/oneapi/mkl/latest/lib/intel64/
-
-        #   The MKL libs to include may depend on MKL's version;
-        #   Follow Intel's procedure to determine which libs to include
-
-            LIBS += -lmkl_intel_lp64  -lmkl_core -lmkl_gnu_thread
-            LIBS += -lgomp
-        ##    LIBS += -lmkl_intel_thread -lmkl_sequential
-    } else {
-        # ---------------- system LAPACK/LAPACKE + CBLAS/OpenBLAS-----------------------------
-        DEFINES += OPENBLAS
-
-        #    LIBS += -L/etc/alternatives  #distro dependent
-            LIBS += -llapack -llapacke
-
-            #link to either the cblas (slow) or openblas (fast) library
-#            LIBS += -lcblas
-            LIBS += -lopenblas
-
-    }
 
 
 
@@ -138,22 +103,9 @@ win32-msvc {
 #   Prevent duplicate math DEFINES in OCC libs
     DEFINES -= _MATH_DEFINES_DEFINED
 
-    RC_ICONS = meta/win64/flow5.ico
+    RC_ICONS = ../meta/win64/flow5.ico
 
-#----------------------- MKL  ---------------------
-    DEFINES += INTEL_MKL
-    INCLUDEPATH += "C:\Program Files (x86)\Intel\oneAPI\mkl\latest\include"
-
-    LIBS += -L"C:\Program Files (x86)\Intel\oneAPI\mkl\latest\bin"
-    LIBS += -L"C:\Program Files (x86)\Intel\oneAPI\mkl\latest\lib"
-    LIBS += -L"C:\Program Files (x86)\Intel\oneAPI\compiler\latest\bin"
-    LIBS += -L"C:\Program Files (x86)\Intel\oneAPI\compiler\latest\lib"
-    LIBS += -lmkl_intel_lp64_dll
-    LIBS += -lmkl_core_dll
-    LIBS += -lmkl_intel_thread_dll -llibiomp5md  # for multithreading
-    #    LIBS += -lmkl_sequential_dll
-
-
+q
 
 #--------------------- GMSH ------------------------
     INCLUDEPATH += D:\bin\gmsh-4.14.1-Windows64-sdk/include/
@@ -187,8 +139,8 @@ macx {
     # Add variables that will be used to build the info.plist file
     QMAKE_TARGET_BUNDLE_PREFIX = cere-aero.tech
 
-    QMAKE_INFO_PLIST = ./meta/mac/info.plist
-    ICON = ./meta/mac/flow5.icns
+    QMAKE_INFO_PLIST = ../meta/mac/info.plist
+    ICON = ../meta/mac/flow5.icns
 
     DEFINES += GL_SILENCE_DEPRECATION   #Shame
 
@@ -210,10 +162,6 @@ macx {
     LIBS += -L/Users/techwinder/bin/gmsh-4.14.1-MacOSARM-sdk/lib
     LIBS += -lgmsh
 
-    #-------------vecLib -----------------
-    DEFINES += ACCELERATE
-    #    QMAKE_LFLAGS += -framework Accelerate
-    LIBS += -llapack -lcblas
 }
 
 
@@ -223,15 +171,7 @@ macx {
 
 
 
-
-
-DISTFILES += \
-        meta/doc/next_dev.txt \
-        meta/doc/releasenotes.html
-
-
-
-include(fl5/fl5.pri)
+include(fl5.pri)
 
 
 

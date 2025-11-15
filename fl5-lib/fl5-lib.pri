@@ -1,6 +1,7 @@
 
 HEADERS += \
     $$PWD/api/planepolar.h \
+    $$PWD/math/testmatrix.h \
     api/aeroforces.h \
     api/analysisrange.h \
     api/anglecontrol.h \
@@ -161,6 +162,7 @@ HEADERS += \
     api/xmlxsailwriter.h \
 
 SOURCES += \
+    $$PWD/math/testmatrix.cpp \
     $$PWD/objects3d/analysis3d/planepolar.cpp \
     analysis3d/boattask.cpp \
     analysis3d/llttask.cpp \

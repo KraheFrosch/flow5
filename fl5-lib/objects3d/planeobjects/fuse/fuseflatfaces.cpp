@@ -24,7 +24,6 @@
 
 
 
-
 #include <api/fuseflatfaces.h>
 #include <api/geom_global.h>
 

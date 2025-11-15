@@ -45,7 +45,7 @@ linux-g++ {
     INSTALLS += target inc
 
     #comment out to use OpenBLAS
-#    CONFIG += INTEL_MKL
+    CONFIG += INTEL_MKL
 
     INTEL_MKL {
         #------------ MKL --------------------
