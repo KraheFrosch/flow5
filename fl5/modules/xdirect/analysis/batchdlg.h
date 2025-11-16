@@ -2,7 +2,7 @@
 
     flow5 application
     Copyright © 2025 André Deperrois
-    
+
     This file is part of flow5.
 
     flow5 is free software: you can redistribute it and/or modify it
@@ -24,21 +24,24 @@
 
 #pragma once
 
-
-#include <QAbstractButton>
-#include <QCheckBox>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QFrame>
+#include <QSplitter>
 #include <QFile>
-#include <QGroupBox>
-#include <QLabel>
+#include <QSettings>
 #include <QListWidget>
+#include <QLabel>
+
+/*
+#include <QAbstractButton>
+#include <QGroupBox>
 #include <QModelIndex>
 #include <QPushButton>
-#include <QRadioButton>
-#include <QSettings>
-#include <QSplitter>
 #include <QTimer>
+ */
 
 #include <api/enums_objects.h>
 
@@ -55,34 +58,35 @@ class XflDelegate;
 class XFoilTask;
 struct FoilAnalysis;
 
-class XFoilBatchDlg : public QDialog
+class BatchDlg : public QDialog
 {
     Q_OBJECT
 
     public:
-        XFoilBatchDlg(QWidget *pParent=nullptr);
-        ~XFoilBatchDlg();
+        BatchDlg(QWidget *pParent=nullptr);
+        ~BatchDlg();
 
-        void initDialog();
+        virtual void initDialog();
 
         QSize sizeHint() const override {return QSize(1100,900);}
 
         void setFoil(Foil *pFoil) {m_pFoil=pFoil;}
 
-        static void initReList();
-        static void setXDirect(XDirect*pXDirect){s_pXDirect=pXDirect;}
+
         static void loadSettings(QSettings &settings);
         static void saveSettings(QSettings &settings);
 
-    private:
+        static void setXDirect(XDirect*pXDirect){s_pXDirect=pXDirect;}
+
+    protected:
         void cleanUp();
         void customEvent(QEvent *pEvent) override;
-        void setupLayout();
+        void makeCommonWts();
 
         void batchLaunch();
 
-    private slots:
-        void onAnalyze();
+    protected slots:
+        virtual void onAnalyze() = 0;
 
         void onAcl();
         void onButton(QAbstractButton *pButton);
@@ -90,49 +94,25 @@ class XFoilBatchDlg : public QDialog
         void onSpecChanged();
         void onUpdatePolarView();
 
-        void onDelete();
-        void onInsertBefore();
-        void onInsertAfter();
-        void onCellChanged(QModelIndex topLeft, QModelIndex botRight);
-        void onReTableClicked(QModelIndex index);
-
-        void onResizeColumns();
-
-
     protected:
         void keyPressEvent(QKeyEvent  *pEvent) override;
         virtual void showEvent(QShowEvent *pEvent) override;
         virtual void hideEvent(QHideEvent *pEvent) override;
         void reject() override;
-        void resizeEvent(QResizeEvent *pEvent) override;
 
         void connectBaseSignals();
-        void readParams();
+        virtual void readParams();
 
-        void outputReList();
         void setFileHeader();
         void writeString(const QString &strong);
-        void fillReModel();
-        void sortRe();
-        void setRowEnabled(int row, bool bEnabled);
 
-        void readFoils(QVector<Foil *> &foils);
-
-    private:
-        QListWidget *m_plwNameList;
-
-        QFrame *m_pfrPolars;
-        QRadioButton *m_prbT1, *m_prbT2, *m_prbT3;
-
-        QRadioButton *m_prbAlpha, *m_prbCl;
-
-        FloatEdit *m_pdeXTopTr, *m_pdeXBotTr;
-
-        QLabel *m_plabMaType, *m_plabReType;
+    protected:
         QCheckBox *m_pchUpdatePolarView;
         QCheckBox *m_pchStoreOpp;
 
-        QFrame *m_pfrRangeVars;
+        QRadioButton *m_prbAlpha, *m_prbCl;
+
+        QTabWidget *m_pfrRangeVars;
         QFrame *m_pfrOptions;
 
         QDialogButtonBox *m_pButtonBox;
@@ -140,14 +120,11 @@ class XFoilBatchDlg : public QDialog
         PlainTextOutput *m_ppto;
 
         QSplitter *m_pHSplitter;
+        QTabWidget *m_pLeftTabWt;
 
-        CPTableView *m_pcptReTable;
-        ActionItemModel *m_pReModel;
-        XflDelegate *m_pFloatDelegate;
-
-        QAction *m_pInsertBeforeAct, *m_pInsertAfterAct, *m_pDeleteAct;
-
-        AnalysisRangeTable *m_pAnalysisRangeTable;
+        AnalysisRangeTable *m_pT12RangeTable;
+        AnalysisRangeTable *m_pT4RangeTable;
+        AnalysisRangeTable *m_pT6RangeTable;
 
         bool m_bCancel;             /**< true if the user has clicked the cancel button */
         bool m_bIsRunning;          /**< true until all the pairs of (foil, polar) have been calculated */
@@ -156,7 +133,7 @@ class XFoilBatchDlg : public QDialog
 
         Foil *m_pFoil;                  /**< a pointer to the current Foil */
 
-    private:
+    protected:
         int m_nTaskStarted;         /**< the number of started tasks */
         int m_nTaskDone;            /**< the number of finished tasks */
         int m_nAnalysis;            /**< the number of analysis pairs to run */
@@ -165,19 +142,8 @@ class XFoilBatchDlg : public QDialog
         std::vector<XFoilTask*> m_Tasks;
 
 
-    private:
+    protected:
         static bool s_bAlpha;              /**< true if the analysis should be performed for a range of aoa rather than lift coefficient */
-
-        static QVector<bool> s_ActiveList;    /**< the vector list of active Re numbers */
-        static QVector<double> s_ReList;        /**< the user-defined list of Re numbers, used for batch analysis */
-        static QVector<double> s_MachList;      /**< the user-defined list of Mach numbers, used for batch analysis */
-        static QVector<double> s_NCritList;     /**< the user-defined list of NCrit numbers, used for batch analysis */
-
-        static double s_XTop;            /**< the point of forced transition on the upper surface */
-        static double s_XBot;            /**< the point of forced transition on the lower surface */
-
-        static xfl::enumPolarType s_PolarType;  /**< the type of analysis to perform */
-
 
         static QByteArray s_Geometry;
         static XDirect* s_pXDirect;           /**< a void pointer to the unique instance of the QXDirect class */

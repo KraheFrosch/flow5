@@ -79,23 +79,18 @@ linux-g++ {
         LIBS += -L/usr/local/lib/
 
 
-    #   To analyze with gprof - Debug config only
+    #   To analyze with gprof, Debug config only
     #QMAKE_CXXFLAGS+=-pg
     #QMAKE_LFLAGS+=-pg
     # .../build/debug> gprof -pb flow5 gmon.out > ./analysis_flat.txt
     # .../build/debug> gprof -q flow5 gmon.out > ./analysis_callgraph.txt
-
-
-# issues with OpenCascade
-#QMAKE_CXXFLAGS_WARN_ON += -Wno-deprecated-declarations
-
 
 }
 
 
 
 win32-msvc {
-    CONFIG += console
+  CONFIG += console
     CONFIG -= debug_and_release debug_and_release_target
     CONFIG += c++11
     CONFIG += no_batch
@@ -105,7 +100,20 @@ win32-msvc {
 
     RC_ICONS = ../meta/win64/flow5.ico
 
-q
+#----------------------- MKL  ---------------------
+    DEFINES += INTEL_MKL
+    INCLUDEPATH += "C:\Program Files (x86)\Intel\oneAPI\mkl\latest\include"
+
+    LIBS += -L"C:\Program Files (x86)\Intel\oneAPI\mkl\latest\bin"
+    LIBS += -L"C:\Program Files (x86)\Intel\oneAPI\mkl\latest\lib"
+    LIBS += -L"C:\Program Files (x86)\Intel\oneAPI\compiler\latest\bin"
+    LIBS += -L"C:\Program Files (x86)\Intel\oneAPI\compiler\latest\lib"
+    LIBS += -lmkl_intel_lp64_dll
+    LIBS += -lmkl_core_dll
+    LIBS += -lmkl_intel_thread_dll -llibiomp5md  # for multithreading
+    #    LIBS += -lmkl_sequential_dll
+
+
 
 #--------------------- GMSH ------------------------
     INCLUDEPATH += D:\bin\gmsh-4.14.1-Windows64-sdk/include/

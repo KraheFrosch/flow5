@@ -140,10 +140,15 @@ void XDirectActions::makeActions()
     m_pDefinePolarAct->setToolTip("<p>Define a single analysis/polar</p>");
     connect(m_pDefinePolarAct, SIGNAL(triggered()), m_pXDirect, SLOT(onDefineAnalysis()));
 
-    m_pMultiThreadedBatchAct = new QAction("Multi-threaded Batch Analysis", this);
-    m_pMultiThreadedBatchAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F6));
-    m_pMultiThreadedBatchAct->setToolTip("<p>Launches a batch of analysis using all available computer CPU cores</p>");
-    connect(m_pMultiThreadedBatchAct, SIGNAL(triggered()), m_pXDirect, SLOT(onBatchAnalysis()));
+    m_pBatchXFoilAct = new QAction("Batch Analysis (legacy)", this);
+    m_pBatchXFoilAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F6));
+    m_pBatchXFoilAct->setToolTip("<p>Launches a batch of analyses using all available computer CPU cores</p>");
+    connect(m_pBatchXFoilAct, SIGNAL(triggered()), m_pXDirect, SLOT(onBatchAnalysis()));
+
+    m_pBatchAltAct = new QAction("Batch Analysis (new)", this);
+    m_pBatchAltAct->setShortcut(QKeySequence(Qt::ALT | Qt::Key_F6));
+    m_pBatchAltAct->setToolTip("<p>Launches a batch of selected analyses</p>");
+    connect(m_pBatchAltAct, SIGNAL(triggered()), m_pXDirect, SLOT(onBatchAltAnalysis()));
 
     m_pDeletePolar = new QAction("Delete", this);
     m_pDeletePolar->setToolTip("Deletes the currently selected polar");

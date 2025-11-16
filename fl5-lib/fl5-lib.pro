@@ -124,7 +124,6 @@ win32-msvc {
     LIBS += -LD:\bin\OCCT-7_9_2\build\win64\vc14\lib
     LIBS += -LD:\bin\OCCT-7_9_2\build\win64\vc14\bin
 
-
 }
 
 

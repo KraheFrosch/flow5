@@ -147,13 +147,13 @@ class XDirect : public QObject
 
         static bool curOppOnly() {return s_bCurOppOnly;}
 
-        static void setCurFoil(Foil*pFoil);
-        static void setCurPolar(Polar*pPolar);
-        static void setCurOpp(OpPoint* pOpp);
+        static void setCurFoil( Foil*pFoil)     {s_pCurFoil=pFoil;}
+        static void setCurPolar(Polar*pPolar)   {s_pCurPolar=pPolar;}
+        static void setCurOpp(  OpPoint* pOpp)  {s_pCurOpp=pOpp;}
 
-        static Foil *   curFoil();
-        static Polar*   curPolar();
-        static OpPoint* curOpp();
+        static Foil *   curFoil()  {return s_pCurFoil;}
+        static Polar*   curPolar() {return s_pCurPolar;}
+        static OpPoint* curOpp()   {return s_pCurOpp;}
 
     private:
 
@@ -227,6 +227,7 @@ class XDirect : public QObject
         void onImportXFoilPolars();
         void onImportXMLAnalysis();
         void onInterpolateFoils();
+        void onBatchAltAnalysis();
         void onBatchAnalysis();
         void onNacaFoils();
         void onOpenAnalysisWindow();
@@ -318,6 +319,11 @@ class XDirect : public QObject
         static bool s_bAlpha;
         static bool s_bStoreOpp;
 
+        static Foil* s_pCurFoil;
+        static Polar* s_pCurPolar;
+        static OpPoint* s_pCurOpp;
+
+        void testRun();
 
 };
 

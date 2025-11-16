@@ -31,7 +31,7 @@
 #include <api/polar.h>
 #include <api/oppoint.h>
 #include <api/geom_params.h>
-
+#include <api/fl5core.h>
 
 std::vector<std::string> Polar::s_VariableNames = {ALPHAch + " ("+DEGch + ")", THETAch + " ("+DEGch + ")", "Cl", "Cd", "Cdp", "Cm",
                                      "HMom", "Cpmin", "Cl/Cd", "|Cl|^(3/2)/Cd", "1/sqrt(Cl)", "Re", "XCp",
@@ -82,7 +82,7 @@ Polar::Polar(const Polar &polar)
 }
 
 
-void Polar::exportPolar(std::string &outstring, std::string const &versionName, bool bDataOnly, bool bCSV) const
+void Polar::exportToString(std::string &outstring, bool bDataOnly, bool bCSV) const
 {
     std::string strong, Header;
     std::stringstream out;
@@ -90,7 +90,7 @@ void Polar::exportPolar(std::string &outstring, std::string const &versionName, 
 
     if(!bDataOnly)
     {
-        strong = versionName;
+        strong = fl5::versionName(true);
 
         strong += "\n\n";
         out << strong;

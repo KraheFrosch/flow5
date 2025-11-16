@@ -70,7 +70,7 @@ class FL5LIB_EXPORT Polar : public XflObject
         void addPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, double HMom, double Cpmn, double Reynolds, double XCp, double Ctrl,
                       double Xtr1, double Xtr2, double XLSTop, double XLSBot, double XTSTop, double XTSBot);
 
-        void exportPolar(std::string &outstring, std::string const &versionName, bool bDataOnly, bool bCSV) const;
+        void exportToString(std::string &outstring, bool bDataOnly, bool bCSV) const;
         void reset();
 
 

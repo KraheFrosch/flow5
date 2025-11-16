@@ -135,8 +135,8 @@ void XDirectMenus::createPolarMenus()
     m_pXFoilAnalysisMenu = m_pMainFrame->menuBar()->addMenu("&Analysis");
     {
         m_pXFoilAnalysisMenu->addAction(pActions->m_pDefinePolarAct);
-        m_pXFoilAnalysisMenu->addAction(pActions->m_pMultiThreadedBatchAct);
-//        m_pXFoilAnalysisMenu->addAction(pActions->m_pControlPolarAct);
+        m_pXFoilAnalysisMenu->addAction(pActions->m_pBatchXFoilAct);
+        m_pXFoilAnalysisMenu->addAction(pActions->m_pBatchAltAct);
         m_pXFoilAnalysisMenu->addSeparator();
         m_pXFoilAnalysisMenu->addAction(pActions->m_pImportXMLFoilAnalysis);
         m_pXFoilAnalysisMenu->addSeparator();
@@ -218,8 +218,8 @@ void XDirectMenus::createPolarMenus()
         QMenu *pAnalysisMenu = m_pOperPolarCtxMenu->addMenu("Analysis");
         {
             pAnalysisMenu->addAction(pActions->m_pDefinePolarAct);
-            pAnalysisMenu->addAction(pActions->m_pMultiThreadedBatchAct);
-//            pAnalysisMenu->addAction(pActions->m_pControlPolarAct);
+            pAnalysisMenu->addAction(pActions->m_pBatchXFoilAct);
+            pAnalysisMenu->addAction(pActions->m_pBatchAltAct);
         }
         m_pOperPolarCtxMenu->addSeparator();//_______________
         QMenu *pAllPolarsMenu = m_pOperPolarCtxMenu->addMenu("Polars");
@@ -320,10 +320,9 @@ void XDirectMenus::createOtherMenus()
         m_pOperFoilCtxMenu->addSeparator();//_______________
         QMenu *pAnalysisMenu = m_pOperFoilCtxMenu->addMenu("Analysis");
         {
-//            pAnalysisMenu->addAction(pActions->m_pBLBatchAnalysisAct);
             pAnalysisMenu->addAction(pActions->m_pDefinePolarAct);
-            pAnalysisMenu->addAction(pActions->m_pMultiThreadedBatchAct);
-//            pAnalysisMenu->addAction(pActions->m_pControlPolarAct);
+            pAnalysisMenu->addAction(pActions->m_pBatchXFoilAct);
+            pAnalysisMenu->addAction(pActions->m_pBatchAltAct);
         }
         m_pOperFoilCtxMenu->addSeparator();//_______________
         QMenu *pViewMenu = m_pOperFoilCtxMenu->addMenu("View");
@@ -418,7 +417,8 @@ void XDirectMenus::createBLMenus()
         QMenu *pAnalysisMenu = m_pBLCtxMenu->addMenu("Analysis");
         {
             pAnalysisMenu->addAction(pActions->m_pDefinePolarAct);
-            pAnalysisMenu->addAction(pActions->m_pMultiThreadedBatchAct);
+            pAnalysisMenu->addAction(pActions->m_pBatchXFoilAct);
+            pAnalysisMenu->addAction(pActions->m_pBatchAltAct);
         }
         m_pBLCtxMenu->addSeparator();//_______________
         m_pBLCtxMenu->addAction(m_pMainFrame->m_pSaveViewToImageFileAct);

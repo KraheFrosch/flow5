@@ -37,19 +37,27 @@
 
 
 
+#include <api/fl5core.h>
+#include <api/flow5events.h>
 #include <api/llttask.h>
+#include <api/objects3d.h>
 #include <api/panelanalysis.h>
+#include <api/plane.h>
+#include <api/planepolar.h>
 #include <api/planetask.h>
+#include <api/planexfl.h>
 #include <api/task3d.h>
-#include <interfaces/script/xflexecutor.h>
+
 #include <core/displayoptions.h>
 #include <core/fontstruct.h>
+#include <core/qunits.h>
 #include <core/saveoptions.h>
 #include <core/xflcore.h>
 #include <interfaces/controls/analysisrangetable.h>
 #include <interfaces/controls/t8rangetable.h>
 #include <interfaces/editors/analysis3ddef/t123578polardlg.h>
 #include <interfaces/editors/analysis3ddef/t6polardlg.h>
+#include <interfaces/script/xflexecutor.h>
 #include <interfaces/widgets/customdlg/newnamedlg.h>
 #include <interfaces/widgets/customwts/actionitemmodel.h>
 #include <interfaces/widgets/customwts/cptableview.h>
@@ -62,12 +70,6 @@
 #include <interfaces/widgets/mvc/objecttreemodel.h>
 #include <modules/xplane/analysis/analysis3dsettings.h>
 #include <modules/xplane/controls/planetreeview.h>
-#include <api/planepolar.h>
-#include <api/objects3d.h>
-#include <api/plane.h>
-#include <api/planexfl.h>
-#include <api/flow5events.h>
-#include <core/qunits.h>
 
 
 QByteArray BatchPlaneDlg::s_Geometry;
@@ -318,6 +320,7 @@ void BatchPlaneDlg::customEvent(QEvent *pEvent)
     else
         QDialog::customEvent(pEvent);
 }
+
 
 void BatchPlaneDlg::hideEvent(QHideEvent *pEvent)
 {
@@ -616,7 +619,7 @@ void BatchPlaneDlg::onAnalyze()
 
     QString logFileName = SaveOptions::newLogFileName();
     SaveOptions::setLastLogFileName(logFileName);
-    m_pExecutor->setLogFile        (logFileName, xfl::versionName(true));
+    m_pExecutor->setLogFile        (logFileName, QString::fromStdString(fl5::versionName(true)));
     m_pExecutor->setMakePOpps(s_bStorePOpps);
     m_pExecutor->setT12Range(AnalysisRangeTable::t12Range());
     m_pExecutor->setT3Range( AnalysisRangeTable::t3Range());
@@ -640,7 +643,7 @@ void BatchPlaneDlg::onAnalyze()
     PanelAnalysis::setMultiThread(xfl::isMultiThreaded());
     PanelAnalysis::setMaxThreadCount(xfl::maxThreadCount());
 
-    onMessage(xfl::versionName(true) + "\n");
+    onMessage(QString::fromStdString(fl5::versionName(true)) + "\n");
     QDateTime dt = QDateTime::currentDateTime();
     QString str = dt.toString();
     onMessage(str+"\n\n");

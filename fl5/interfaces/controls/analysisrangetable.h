@@ -58,6 +58,7 @@ class AnalysisRangeTable : public CPTableView
         static QVector<AnalysisRange> const &alphaRange() {return s_AlphaRange;}
         static QVector<AnalysisRange> const &ClRange()    {return s_ClRange;}
         static QVector<AnalysisRange> const &ReRange()    {return s_ReRange;}
+        static QVector<AnalysisRange> const &ThetaRange() {return s_ReRange;}
 
         static QVector<AnalysisRange> const &t12Range()  {return s_T12Range;}
         static QVector<AnalysisRange> const &t3Range()   {return s_T3Range;}

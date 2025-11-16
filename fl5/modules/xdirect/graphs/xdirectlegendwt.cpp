@@ -166,7 +166,7 @@ void XDirectLegendWt::makeOppLegendBtns(bool bHighlight)
         {
             OpPoint *pOpp = Objects2d::opPointAt(i);
             bOppVisible = pOpp->isVisible();
-            if(s_pXDirect->curOppOnly()) bOppVisible &= (pOpp==Objects2d::curOpp());
+            if(s_pXDirect->curOppOnly()) bOppVisible &= (pOpp==XDirect::curOpp());
             if(pOpp->foilName().compare(pFoil->name())==0 && bOppVisible)
             {
                 foillist.append(pFoil);
@@ -201,7 +201,7 @@ void XDirectLegendWt::makeOppLegendBtns(bool bHighlight)
         {
             OpPoint *pOpp = Objects2d::opPointAt(i);
             bOppVisible = pOpp->isVisible();
-            if(s_pXDirect->curOppOnly()) bOppVisible &= (pOpp==Objects2d::curOpp());
+            if(s_pXDirect->curOppOnly()) bOppVisible &= (pOpp==XDirect::curOpp());
             if (pOpp->foilName()==pFoil->name() && bOppVisible)
             {
                 LegendBtn *pLegendBtn = new LegendBtn;

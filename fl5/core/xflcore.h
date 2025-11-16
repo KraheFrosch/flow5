@@ -36,9 +36,6 @@
 struct fl5Color;
 struct LineStyle;
 
-#define MAJOR_VERSION    7
-#define MINOR_VERSION    54
-
 
 
 #define PICHAR         QString(QChar(0x03C0))
@@ -76,8 +73,6 @@ namespace xfl
     extern bool g_bDontUseNativeDlg;
     extern bool g_bConfirmDiscard;
 
-
-    QString versionName(bool bFull);
 
     void loadCoreSettings(QSettings &settings);
     void saveCoreSettings(QSettings &settings);

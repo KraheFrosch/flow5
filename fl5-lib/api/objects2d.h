@@ -46,10 +46,6 @@ namespace Objects2d
     extern std::vector <Polar *> s_oaPolar;  /**< The array of void pointers to the Polar objects. */
     extern std::vector <OpPoint *> s_oaOpp;    /**< The array of void pointers to the OpPoint objects. */
 
-    extern Foil *s_pCurFoil;
-    extern Polar *s_pCurPolar;
-    extern OpPoint *s_pCurOpp;
-
 
     FL5LIB_EXPORT  inline std::vector<Foil*>    const & foils()           {return s_oaFoil;}
     FL5LIB_EXPORT  inline std::vector<Polar*>   const & polars()          {return s_oaPolar;}
@@ -126,15 +122,6 @@ namespace Objects2d
     bool makeNaca4(Foil *pFoil, int digits);
     bool makeNaca5(Foil *pFoil, int digits);
     void makeNacaThickness(Foil *pFoil, double t);
-
-    FL5LIB_EXPORT inline Foil*    curFoil()  {return s_pCurFoil;}
-    FL5LIB_EXPORT inline Polar*   curPolar() {return s_pCurPolar;}
-    FL5LIB_EXPORT inline OpPoint* curOpp()   {return s_pCurOpp;}
-
-    FL5LIB_EXPORT inline void setCurFoil(Foil *pFoil) {s_pCurFoil=pFoil;}
-    FL5LIB_EXPORT inline void setCurPolar(Polar *pPolar) {s_pCurPolar=pPolar;}
-    FL5LIB_EXPORT inline void setCurOpp(OpPoint*pOpp) {s_pCurOpp=pOpp;}
-
 
     FL5LIB_EXPORT std::vector<std::string> foilNames();
     FL5LIB_EXPORT std::vector<std::string> polarList(Foil const*pFoil, BL::enumBLMethod method=BL::NOBLMETHOD);

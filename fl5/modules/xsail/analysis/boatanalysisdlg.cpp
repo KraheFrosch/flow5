@@ -40,6 +40,7 @@
 #include <api/boatopp.h>
 #include <api/boatpolar.h>
 #include <api/boattask.h>
+#include <api/fl5core.h>
 #include <api/flow5events.h>
 #include <api/objects3d.h>
 #include <api/panelanalysis.h>
@@ -329,7 +330,7 @@ BoatTask* BoatAnalysisDlg::analyze(Boat *pBoat, BoatPolar *pBoatPolar, std::vect
 
     m_plabTaskInfo->clear();
     m_ppto->clear();
-    onOutputMessage(xfl::versionName(true)+"\n");
+    onOutputMessage(QString::fromStdString(fl5::versionName(true))+"\n");
 
     QDateTime dt = QDateTime::currentDateTime();
     QString str = dt.toString();

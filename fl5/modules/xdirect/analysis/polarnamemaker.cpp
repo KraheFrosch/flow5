@@ -94,16 +94,15 @@ std::string PolarNameMaker::makeName(Polar const*pPolar)
 
     if(s_bReynolds)
     {
+        strong = "-" + ALPHAch;
         if(pPolar->isFixedaoaPolar())
         {
-            strong = "-alpha";
             strong.append(std::format("{0:.2f}°", pPolar->aoaSpec()));
         }
         else if(pPolar->isType123())
             strong = std::format("-Re{0:.3f}", pPolar->Reynolds()/1.0e6);
         else if(pPolar->isType6())
         {
-            strong = "-alpha";
             strong.append(std::format("{0:.2f}°",   pPolar->aoaSpec()));
             strong.append(std::format("-Re{0:.3f}", pPolar->Reynolds()/1.0e6));
         }
@@ -147,10 +146,8 @@ std::string PolarNameMaker::makeName(Polar const*pPolar)
 
     if(!pPolar->isType6() && fabs(pPolar->TEFlapAngle())>ANGLEPRECISION)
     {
-
-//        plrname += "-" + THETACHAR + std::format("{0:.2f}", pPolar->TEFlapAngle()) + DEGCHAR;
-        plrname.append("-theta");
-        plrname.append(std::format("{0:2f}°", pPolar->TEFlapAngle()));
+        plrname.append("-"+THETAch);
+        plrname.append(std::format("{0:.2f}°", pPolar->TEFlapAngle()));
     }
 
 //    plrname.remove(0,1); //remove first '-' character

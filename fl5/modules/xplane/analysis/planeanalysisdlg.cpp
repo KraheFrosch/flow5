@@ -34,22 +34,26 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "planeanalysisdlg.h"
-#include <modules/xplane/xplane.h>
-#include <modules/xplane/analysis/analysis3dsettings.h>
-#include <modules/xplane/glview/gl3dxplaneview.h>
-#include <core/saveoptions.h>
-#include <api/flow5events.h>
-#include <api/panelanalysis.h>
-#include <api/planetask.h>
+
 #include <api/analysisrange.h>
-#include <core/xflcore.h>
-#include <api/utils.h>
-#include <api/xfoiltask.h>
+#include <api/fl5core.h>
+#include <api/flow5events.h>
+#include <api/objects3d.h>
+#include <api/panelanalysis.h>
 #include <api/planeopp.h>
 #include <api/planepolar.h>
-#include <api/objects3d.h>
+#include <api/planetask.h>
 #include <api/planexfl.h>
+#include <api/utils.h>
+#include <api/xfoiltask.h>
+
+#include <core/saveoptions.h>
+#include <core/xflcore.h>
 #include <interfaces/widgets/customwts/plaintextoutput.h>
+#include <modules/xplane/analysis/analysis3dsettings.h>
+#include <modules/xplane/glview/gl3dxplaneview.h>
+#include <modules/xplane/xplane.h>
+
 
 XPlane *PlaneAnalysisDlg::s_pXPlane = nullptr;
 
@@ -361,7 +365,7 @@ PlaneTask* PlaneAnalysisDlg::analyze(Plane *pPlane, PlanePolar *pWPolar, std::ve
     m_ppto->clear();
     m_plabTaskInfo->clear();
 
-    onOutputMessage(xfl::versionName(true) + EOLCHAR);
+    onOutputMessage(QString::fromStdString(fl5::versionName(true)) + EOLCHAR);
 
     QDateTime dt = QDateTime::currentDateTime();
     QString str = dt.toString();

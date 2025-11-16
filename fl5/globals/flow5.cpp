@@ -48,18 +48,24 @@
 #include <QCommandLineParser>
 
 #include "flow5.h"
-#include <globals/mainframe.h>
-#include <options/prefsdlg.h>
-#include <core/displayoptions.h>
-#include <core/xflcore.h>
-#include <core/saveoptions.h>
 
+
+
+#include <api/fl5core.h>
+
+#include <core/displayoptions.h>
+#include <core/saveoptions.h>
 #include <core/trace.h>
 #include <core/xflcore.h>
+#include <core/xflcore.h>
+#include <globals/mainframe.h>
 #include <interfaces/opengl/views/gl3dview.h>
 #include <interfaces/script/xflscriptexec.h>
-#include <interfaces/widgets/customwts/popup.h>
 #include <interfaces/widgets/customdlg/objectpropsdlg.h>
+#include <interfaces/widgets/customwts/popup.h>
+#include <options/prefsdlg.h>
+
+
 
 Flow5App::Flow5App(int &argc, char** argv) : QApplication(argc, argv)
 {
@@ -70,7 +76,7 @@ Flow5App::Flow5App(int &argc, char** argv) : QApplication(argc, argv)
 
     //    QString Version;
     //    Version = QString::asprintf("v%d.%02d", MAJOR_VERSION, MINOR_VERSION);
-    Flow5App::setApplicationVersion(xfl::versionName(false));
+    Flow5App::setApplicationVersion(QString::fromStdString(fl5::versionName(true)));
     setWindowIcon(QIcon(":/icons/f5.png"));
     /** usage
      * flow5 -h (--help)                   : help

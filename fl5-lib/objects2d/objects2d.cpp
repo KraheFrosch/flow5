@@ -38,13 +38,6 @@ std::vector<Polar*>   Objects2d::s_oaPolar;
 std::vector<OpPoint*> Objects2d::s_oaOpp;
 
 
-Foil *   Objects2d::s_pCurFoil(nullptr);
-Polar*   Objects2d::s_pCurPolar(nullptr);
-OpPoint* Objects2d::s_pCurOpp(nullptr);
-
-
-
-
 void Objects2d::deleteObjects()
 {
     for (int i=nFoils()-1; i>=0; i--)
@@ -182,7 +175,6 @@ Foil * Objects2d::deleteFoil(Foil const *pFoil)
         OpPoint *pOpPoint = s_oaOpp.at(j);
         if(pOpPoint->foilName() == pFoil->name())
         {
-            if(pOpPoint==s_pCurOpp) s_pCurOpp = nullptr;
             s_oaOpp.erase(s_oaOpp.begin()+j);
             delete pOpPoint;
         }
@@ -193,7 +185,6 @@ Foil * Objects2d::deleteFoil(Foil const *pFoil)
         Polar* pPolar = s_oaPolar.at(j);
         if(pPolar->foilName() == pFoil->name())
         {
-            if(pPolar==s_pCurPolar) s_pCurPolar=nullptr;
             s_oaPolar.erase(s_oaPolar.begin()+j);
             delete pPolar;
         }
@@ -205,7 +196,6 @@ Foil * Objects2d::deleteFoil(Foil const *pFoil)
         if(s_oaFoil.at(i)==pFoil)
             s_oaFoil.erase(s_oaFoil.begin()+i);
     }
-    if(pFoil==s_pCurFoil) s_pCurFoil=nullptr;
     delete pFoil;
 
     if(!pNewCurFoil && nFoils()>0)

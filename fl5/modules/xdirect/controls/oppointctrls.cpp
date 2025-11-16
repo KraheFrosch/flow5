@@ -256,7 +256,7 @@ void OpPointCtrls::onAnimate(bool bChecked)
 {
     m_pslAnimateSpeed->setEnabled(bChecked);
 
-    if(!Objects2d::curFoil() || !Objects2d::curPolar())
+    if(!XDirect::curFoil() || !XDirect::curPolar())
     {
         m_bAnimate = false;
         return;

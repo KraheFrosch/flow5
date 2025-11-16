@@ -81,9 +81,12 @@ class FoilTreeView : public QWidget
         void addOpps(Polar *pPolar);
 
         void removeOpPoint(OpPoint *pOpp);
+        void removePolarOpps(Polar const*pPolar);
+        void removeFoilPolars(Foil*pFoil);
+
         QString removePolar(Polar *pPolar);
         QString removeFoil(Foil* pFoil);
-        QString removeFoil(QString foilName);
+        QString removeFoil(const QString &foilName);
 
         void selectObjects();
         void setObjectProperties();

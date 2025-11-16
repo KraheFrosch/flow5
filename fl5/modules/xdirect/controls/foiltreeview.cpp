@@ -133,21 +133,21 @@ void FoilTreeView::updateObjectView()
     {
         case XDirect::DESIGNVIEW:
         {
-            selectFoil(Objects2d::curFoil());
+            selectFoil(XDirect::curFoil());
             break;
         }
         case XDirect::BLVIEW:
         case XDirect::OPPVIEW:
         {
             if      (XDirect::curOpp())   selectOpPoint();
-            else if (XDirect::curPolar()) selectPolar(Objects2d::curPolar());
-            else                          selectFoil(Objects2d::curFoil());
+            else if (XDirect::curPolar()) selectPolar(XDirect::curPolar());
+            else                          selectFoil(XDirect::curFoil());
             break;
         }
         case XDirect::POLARVIEW:
         {
-            if (XDirect::curPolar()) selectPolar(Objects2d::curPolar());
-            else                     selectFoil(Objects2d::curFoil());
+            if (XDirect::curPolar()) selectPolar(XDirect::curPolar());
+            else                     selectFoil(XDirect::curFoil());
             break;
         }
     }
@@ -157,8 +157,8 @@ void FoilTreeView::updateObjectView()
 void FoilTreeView::selectObjects()
 {
     if      (XDirect::curOpp())   selectOpPoint();
-    else if (XDirect::curPolar()) selectPolar(Objects2d::curPolar());
-    else                          selectFoil(Objects2d::curFoil());
+    else if (XDirect::curPolar()) selectPolar(XDirect::curPolar());
+    else                          selectFoil(XDirect::curFoil());
 }
 
 
@@ -170,16 +170,16 @@ void FoilTreeView::setObjectProperties()
         //        {NONE, FOIL, POLAR, OPPOINT}
         case FoilTreeView::FOIL:
         {
-            if(Objects2d::curFoil())
+            if(XDirect::curFoil())
             {
-                props = Objects2d::curFoil()->properties(true);
+                props = XDirect::curFoil()->properties(true);
                 break;
             }
             break;
         }
         case FoilTreeView::POLAR:
         {
-            if(Objects2d::curPolar())
+            if(XDirect::curPolar())
             {
                 props = s_pXDirect->curPolar()->properties();
                 break;
@@ -188,9 +188,9 @@ void FoilTreeView::setObjectProperties()
         }
         case FoilTreeView::OPPOINT:
         {
-            if(Objects2d::curOpp())
+            if(XDirect::curOpp())
             {
-                props = Objects2d::curOpp()->properties(SaveOptions::textSeparator().toStdString());
+                props = XDirect::curOpp()->properties(SaveOptions::textSeparator().toStdString());
                 break;
             }
             break;
@@ -370,8 +370,8 @@ void FoilTreeView::setObjectFromIndex(const QModelIndex &index)
     {
         Foil *m_pFoil = Objects2d::foil(pSelectedItem->name().toStdString());
         s_pXDirect->setFoil(m_pFoil);
-        Objects2d::setCurPolar(nullptr);
-        Objects2d::setCurOpp(nullptr);
+        XDirect::setCurPolar(nullptr);
+        XDirect::setCurOpp(nullptr);
         m_Selection = FoilTreeView::FOIL;
     }
     else if(pSelectedItem->level()==2)
@@ -381,7 +381,7 @@ void FoilTreeView::setObjectFromIndex(const QModelIndex &index)
         Polar *m_pPolar = Objects2d::polar(m_pFoil, pSelectedItem->name().toStdString());
         s_pXDirect->setFoil(m_pFoil);
         s_pXDirect->setPolar(m_pPolar);
-        Objects2d::setCurOpp(nullptr);
+        XDirect::setCurOpp(nullptr);
         m_Selection = FoilTreeView::POLAR;
     }
     else if(pSelectedItem->level()==3)
@@ -875,11 +875,10 @@ QString FoilTreeView::removeFoil(Foil* pFoil)
 }
 
 
-QString FoilTreeView::removeFoil(QString foilName)
+QString FoilTreeView::removeFoil(QString const &foilName)
 {
     if(!foilName.length()) return "";
 
-    m_pStruct->selectionModel()->blockSignals(true);
 
     for(int ir = 0; ir<m_pModel->rowCount(); ir++)
     {
@@ -892,16 +891,15 @@ QString FoilTreeView::removeFoil(QString foilName)
             break;
         }
     }
-    m_pStruct->selectionModel()->blockSignals(false);
 
     setOverallCheckStatus();
-    return QString();
+    return QString("");
 }
 
 
 QString FoilTreeView::removePolar(Polar *pPolar)
 {
-    if(!pPolar) return QString();
+    if(!pPolar) return QString("");
 
     m_pStruct->selectionModel()->blockSignals(true);
     for(int ir=0; ir<m_pModel->rowCount(); ir++)
@@ -945,7 +943,6 @@ QString FoilTreeView::removePolar(Polar *pPolar)
 void FoilTreeView::removeOpPoint(OpPoint *pOpp)
 {
     if(!pOpp) return;
-    m_pStruct->selectionModel()->blockSignals(true);
 
     for(int ir=0; ir<m_pModel->rowCount(); ir++)
     {
@@ -959,6 +956,9 @@ void FoilTreeView::removeOpPoint(OpPoint *pOpp)
                 ObjectTreeItem *pPolarItem = pFoilItem->child(jr);
                 if(pPolarItem && pPolarItem->name().toStdString().compare(pOpp->polarName())==0)
                 {
+                    Polar *pPolar = Objects2d::polar(pOpp->foilName(), pOpp->polarName());
+                    if(!pPolar) return; // error, should exist
+
                     //find the POpp item
                     for(int kr=0; kr<pPolarItem->rowCount(); kr++)
                     {
@@ -966,12 +966,32 @@ void FoilTreeView::removeOpPoint(OpPoint *pOpp)
                         ObjectTreeItem *pOppItem = pPolarItem->child(kr);
                         if(pOppItem)
                         {
-                            double aoa = pOppItem->name().toDouble();
-                            if(fabs(aoa-pOpp->aoa())<0.0005)
+                            if(pPolar->isType1() || pPolar->isType2())
                             {
-                                m_pModel->removeRow(kr, polarindex);
-                                m_pStruct->selectionModel()->blockSignals(false);
-                                return;
+                                double aoa = pOppItem->name().toDouble();
+                                if(fabs(aoa-pOpp->aoa())<AOAPRECISION)
+                                {
+                                    m_pModel->removeRow(kr, polarindex);
+                                    return;
+                                }
+                            }
+                            else if(pPolar->isType4())
+                            {
+                                double Re = pOppItem->name().toDouble();
+                                if(fabs(Re-pOpp->Reynolds())<REYNOLDSPRECISION)
+                                {
+                                    m_pModel->removeRow(kr, polarindex);
+                                    return;
+                                }
+                            }
+                            else if(pPolar->isType6())
+                            {
+                                double theta = pOppItem->name().toDouble();
+                                if(fabs(theta-pOpp->theta())<FLAPANGLEPRECISION)
+                                {
+                                    m_pModel->removeRow(kr, polarindex);
+                                    return;
+                                }
                             }
                         }
                     }
@@ -981,7 +1001,66 @@ void FoilTreeView::removeOpPoint(OpPoint *pOpp)
     }
 
     setOverallCheckStatus();
-    m_pStruct->selectionModel()->blockSignals(false);
+}
+
+
+void FoilTreeView::removeFoilPolars(Foil *pFoil)
+{
+    if(!pFoil) return;
+
+    for(int ir = 0; ir<m_pModel->rowCount(); ir++)
+    {
+        ObjectTreeItem *pFoilItem = m_pModel->item(ir);
+
+        if(pFoilItem->name().toStdString().compare(pFoil->name())==0)
+        {
+            // foil found
+            QModelIndex foilindex= m_pModel->index(m_pModel->rootItem(), pFoilItem);
+
+            // remove the children opps - may not be necessary
+            for(int jr=0; jr<pFoilItem->rowCount(); jr++)
+            {
+                ObjectTreeItem *pPolarItem = pFoilItem->child(jr);
+
+                QModelIndex polarindex = m_pModel->index(jr, 0, pFoilItem);
+                // remove the children Opps
+                m_pModel->removeRows(0, pPolarItem->rowCount(), polarindex);
+            }
+            // remove the polars
+            m_pModel->removeRows(0, pFoilItem->rowCount(), foilindex);
+            break;
+        }
+    }
+
+    setOverallCheckStatus();
+}
+
+
+void FoilTreeView::removePolarOpps(Polar const*pPolar)
+{
+    if(!pPolar) return;
+
+    for(int ir=0; ir<m_pModel->rowCount(); ir++)
+    {
+        ObjectTreeItem *pPolarItem = m_pModel->item(ir);
+        // find the polar's parent Plane item
+        if(pPolarItem->name().toStdString().compare(pPolar->foilName())==0)
+        {
+            for(int jr=0; jr<pPolarItem->rowCount(); jr++)
+            {
+                ObjectTreeItem *pPolarItem = pPolarItem->child(jr);
+                if(pPolarItem->name().toStdString().compare(pPolar->name())==0)
+                {
+                    QModelIndex polarindex = m_pModel->index(jr, 0, pPolarItem);
+                    m_pModel->removeRows(0, pPolarItem->rowCount(), polarindex);
+                    break;
+                }
+            }
+        }
+    }
+
+    m_pModel->updateData();
+    setOverallCheckStatus();
 }
 
 

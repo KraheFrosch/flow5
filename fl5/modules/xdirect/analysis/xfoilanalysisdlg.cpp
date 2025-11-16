@@ -38,6 +38,7 @@
 
 #include <api/flow5events.h>
 #include <api/foil.h>
+#include <api/fl5core.h>
 #include <api/objects2d.h>
 #include <api/oppoint.h>
 #include <api/polar.h>
@@ -175,7 +176,7 @@ void XFoilAnalysisDlg::setFileHeader()
     QTextStream out(m_pXFile);
 
     out << "\n";
-    out << xfl::versionName(true);
+    out << QString::fromStdString(fl5::versionName(true));
     out << "\n";
     out << QString::fromStdString(m_pFoil->name());
     out << "\n";
@@ -240,15 +241,17 @@ void XFoilAnalysisDlg::onTaskFinished()
     else if (!m_pXFoilTask->hasErrors())
         strong = "Analysis completed successfully\n\n";
     else if (m_pXFoilTask->hasErrors())
-        strong = "Analysis completed ... Errors encountered\n\n";
+        strong = "Analysis completed ...errors encountered\n\n";
     m_ppto->onAppendQText(strong);
 
     // retrieve and store the operating points before deleting the task
     bool bStoreOpps = XDirect::bStoreOpps();
+    m_pLastOpp = nullptr;
     for(OpPoint *pOpp : m_pXFoilTask->operatingPoints())
     {
         Objects2d::addOpPoint(pOpp, bStoreOpps);
         if(!bStoreOpps) delete pOpp;
+        else m_pLastOpp = pOpp;
     }
     m_pXFoilTask->clearOpps(); // you never know
 
@@ -256,10 +259,6 @@ void XFoilAnalysisDlg::onTaskFinished()
     m_ppbCancel->setText("Close");
 
     m_bErrors = m_pXFoilTask->hasErrors();
-    if(m_bErrors)
-    {
-        m_ppto->onAppendQText(" ...some points are unconverged\n\n");
-    }
 
     if(m_pXFile)
     {

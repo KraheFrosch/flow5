@@ -44,6 +44,7 @@
 #include <api/boatpolar.h>
 #include <api/boattask.h>
 #include <api/fileio.h>
+#include <api/fl5core.h>
 #include <api/foil.h>
 #include <api/objects2d.h>
 #include <api/objects2d_globals.h>
@@ -726,7 +727,7 @@ bool XflScriptExec::runScript(QString const &scriptpath)
 
     QFileInfo fi(m_pScriptReader->projectFileName());
     QString logfilename(m_OutputPath + QDir::separator() + fi.baseName() + ".log");
-    if(!setLogFile(logfilename,  xfl::versionName(true))) return false;
+    if(!setLogFile(logfilename,  QString::fromStdString(fl5::versionName(true)))) return false;
 
     preLoadProject();
     if(isCancelled()) return false;

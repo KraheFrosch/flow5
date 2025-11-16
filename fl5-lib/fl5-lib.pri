@@ -1,5 +1,6 @@
 
 HEADERS += \
+    $$PWD/api/fl5core.h \
     $$PWD/api/planepolar.h \
     $$PWD/math/testmatrix.h \
     api/aeroforces.h \
@@ -164,6 +165,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/math/testmatrix.cpp \
     $$PWD/objects3d/analysis3d/planepolar.cpp \
+    $$PWD/utils/fl5core.cpp \
     analysis3d/boattask.cpp \
     analysis3d/llttask.cpp \
     analysis3d/p3analysis.cpp \

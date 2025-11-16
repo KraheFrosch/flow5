@@ -465,6 +465,17 @@ bool XFoilTask::thetaSequence()
 {
     std::string str;
 
+    if(!m_pFoil->hasTEFlap())
+    {
+        str = "The foil "+m_pFoil->name() + " has no T.E. flap\n"
+              "     ...Skipping the T6 polar " + m_pPolar->name() + EOLch;
+        traceLog(str);
+
+        m_bErrors = true;
+        return false;
+    }
+
+
     double SpMin(0), SpMax(0), SpInc(0);
     double alphadeg = m_pPolar->aoaSpec();
 

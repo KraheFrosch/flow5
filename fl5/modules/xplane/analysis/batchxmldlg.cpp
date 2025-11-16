@@ -34,36 +34,39 @@
 #include <QFileDialog>
 #include <QFileSystemModel>
 
-#include <modules/xplane/analysis/batchxmldlg.h>
 
-#include <interfaces/controls/analysisrangetable.h>
-#include <interfaces/controls/t8rangetable.h>
-#include <core/displayoptions.h>
-#include <modules/xplane/analysis/analysis3dsettings.h>
-#include <modules/xplane/xplane.h>
-#include <api/llttask.h>
-#include <api/planetask.h>
-#include <api/task3d.h>
+
+#include <api/fl5core.h>
 #include <api/flow5events.h>
-#include <core/saveoptions.h>
-#include <core/qunits.h>
-#include <core/xflcore.h>
-#include <api/planepolar.h>
-#include <interfaces/editors/analysis3ddef/t6polardlg.h>
-#include <interfaces/editors/analysis3ddef/t123578polardlg.h>
+#include <api/llttask.h>
 #include <api/objects3d.h>
 #include <api/plane.h>
+#include <api/planepolar.h>
+#include <api/planetask.h>
 #include <api/planexfl.h>
-#include <interfaces/script/xflexecutor.h>
+#include <api/task3d.h>
 #include <api/xmlwpolarreader.h>
 #include <api/xmlwpolarwriter.h>
+
+#include <core/displayoptions.h>
+#include <core/qunits.h>
+#include <core/saveoptions.h>
+#include <core/xflcore.h>
+#include <interfaces/controls/analysisrangetable.h>
+#include <interfaces/controls/t8rangetable.h>
+#include <interfaces/editors/analysis3ddef/t123578polardlg.h>
+#include <interfaces/editors/analysis3ddef/t6polardlg.h>
+#include <interfaces/script/xflexecutor.h>
 #include <interfaces/widgets/customdlg/newnamedlg.h>
-#include <interfaces/widgets/customwts/xfldelegate.h>
 #include <interfaces/widgets/customwts/actionitemmodel.h>
 #include <interfaces/widgets/customwts/cptableview.h>
 #include <interfaces/widgets/customwts/floatedit.h>
 #include <interfaces/widgets/customwts/intedit.h>
 #include <interfaces/widgets/customwts/plaintextoutput.h>
+#include <interfaces/widgets/customwts/xfldelegate.h>
+#include <modules/xplane/analysis/analysis3dsettings.h>
+#include <modules/xplane/analysis/batchxmldlg.h>
+#include <modules/xplane/xplane.h>
 
 
 XPlane *BatchXmlDlg::s_pXPlane = nullptr;
@@ -1223,7 +1226,7 @@ void BatchXmlDlg::onAnalyze()
 
     QString logFileName = SaveOptions::newLogFileName();
     SaveOptions::setLastLogFileName(logFileName);
-    m_pExecutor->setLogFile(logFileName, xfl::versionName(true));
+    m_pExecutor->setLogFile(logFileName, QString::fromStdString(fl5::versionName(true)));
     m_pExecutor->setMakePOpps(s_bStorePOpps);
     m_pExecutor->setT12Range(AnalysisRangeTable::t12Range());
     m_pExecutor->setT3Range( AnalysisRangeTable::t3Range());
@@ -1244,7 +1247,7 @@ void BatchXmlDlg::onAnalyze()
     Task3d::setCancelled(false);
     TriMesh::setCancelled(false);
 
-    onMessage(xfl::versionName(true) + "\n");
+    onMessage(QString::fromStdString(fl5::versionName(true)) + "\n");
     QDateTime dt = QDateTime::currentDateTime();
     QString str = dt.toString();
     onMessage(str+"\n\n");

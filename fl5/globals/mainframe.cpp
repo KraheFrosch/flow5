@@ -47,6 +47,7 @@
 
 
 #include <core/displayoptions.h>
+#include <core/qunits.h>
 #include <core/saveoptions.h>
 #include <core/trace.h>
 #include <core/xflcore.h>
@@ -126,7 +127,6 @@
 #include <interfaces/widgets/mvc/expandabletreeview.h>
 #include <interfaces/widgets/mvc/objecttreedelegate.h>
 #include <interfaces/widgets/view/section2doptions.h>
-#include <modules/xobjects.h>
 #include <modules/xdirect/controls/analysis2dctrls.h>
 #include <modules/xdirect/controls/foiltableview.h>
 #include <modules/xdirect/controls/foiltreeview.h>
@@ -140,6 +140,7 @@
 #include <modules/xdirect/view2d/dfoilwt.h>
 #include <modules/xdirect/view2d/oppointwt.h>
 #include <modules/xdirect/xdirect.h>
+#include <modules/xobjects.h>
 #include <modules/xplane/analysis/analysis3dsettings.h>
 #include <modules/xplane/analysis/planeanalysisdlg.h>
 #include <modules/xplane/controls/analysis3dctrls.h>
@@ -181,33 +182,33 @@
 #include <test/tests/threadtestdlg.h>
 #include <test/tests/vortontestdlg.h>
 
-#include <api/quad3d.h>
-#include <api/geom_global.h>
-#include <api/foil.h>
-#include <api/oppoint.h>
-#include <api/polar.h>
-#include <api/splinefoil.h>
-#include <api/objects2d_globals.h>
-#include <api/objects2d.h>
+#include <api/boat.h>
 #include <api/boatopp.h>
 #include <api/boatpolar.h>
-#include <api/planeopp.h>
-#include <api/planepolar.h>
-#include <api/objects_global.h>
+#include <api/fileio.h>
+#include <api/fl5core.h>
+#include <api/foil.h>
+#include <api/geom_global.h>
+#include <api/objects2d.h>
+#include <api/objects2d_globals.h>
 #include <api/objects3d.h>
-#include <api/planestl.h>
-#include <api/planexfl.h>
-#include <api/wingxfl.h>
-#include <api/boat.h>
-#include <api/sailobjects.h>
-#include <api/sail.h>
-#include <api/sailwing.h>
+#include <api/objects_global.h>
+#include <api/oppoint.h>
 #include <api/panel3.h>
 #include <api/panel4.h>
+#include <api/planeopp.h>
+#include <api/planepolar.h>
+#include <api/planestl.h>
+#include <api/planexfl.h>
+#include <api/polar.h>
+#include <api/quad3d.h>
+#include <api/sail.h>
+#include <api/sailobjects.h>
+#include <api/sailwing.h>
+#include <api/splinefoil.h>
 #include <api/testpanels.h>
-#include <api/fileio.h>
-#include <core/qunits.h>
 #include <api/utils.h>
+#include <api/wingxfl.h>
 
 xfl::enumApp MainFrame::s_iApp=xfl::NOAPP;
 
@@ -219,7 +220,7 @@ bool MainFrame::s_bSaved = true;
 MainFrame::MainFrame(QWidget *parent) : QMainWindow(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(xfl::versionName(true));
+    setWindowTitle(QString::fromStdString(fl5::versionName(true)));
 
     uint t = QTime::currentTime().msec();
     std::srand(t);
@@ -1182,9 +1183,9 @@ void MainFrame::deleteProject()
     // make sure that the pointers are set to null before deleting the objects
     // to avoid incorrect memory reads
     displayMessage("   Deleting 2d objects\n", false);
-    Objects2d::setCurFoil(nullptr);
-    Objects2d::setCurPolar(nullptr);
-    Objects2d::setCurOpp(nullptr);
+    XDirect::setCurFoil(nullptr);
+    XDirect::setCurPolar(nullptr);
+    XDirect::setCurOpp(nullptr);
     Objects2d::deleteObjects();
 
     m_pXDirect->setFoil(nullptr);
@@ -1589,7 +1590,7 @@ void MainFrame::onLoadFoilFile()
     if(s_iApp==xfl::XDIRECT)
     {
         m_pXDirect->updateFoilExplorers();
-        m_pXDirect->m_pFoilTreeView->selectFoil(Objects2d::curFoil());
+        m_pXDirect->m_pFoilTreeView->selectFoil(XDirect::curFoil());
         m_pXDirect->setControls();
     }
 
@@ -1654,7 +1655,7 @@ void MainFrame::onLoadPlrFile()
     if(s_iApp==xfl::XDIRECT)
     {
         m_pXDirect->updateFoilExplorers();
-        m_pXDirect->m_pFoilTreeView->selectFoil(Objects2d::curFoil());
+        m_pXDirect->m_pFoilTreeView->selectFoil(XDirect::curFoil());
         m_pXDirect->setControls();
     }
 
@@ -3646,7 +3647,7 @@ bool MainFrame::exportAllPolars(QString const &pathname, xfl::enumTextFileType f
         if (XFile.open(QIODevice::WriteOnly | QIODevice::Text))
         {
             std::string str;
-            pPolar->exportPolar(str, xfl::versionName(true).toStdString(), false, bCSV);
+            pPolar->exportToString(str, false, bCSV);
             out << QString::fromStdString(str);
             XFile.close();
         }

@@ -45,7 +45,7 @@ class XDirectActions : QObject
         QAction *m_pDesignAct, *m_pBLAct, *m_pPolarsAct, *m_pOpPointsAct;
         QAction *m_pDefinePolarAct;
         QAction *m_pEditCurPolar, *m_pEditCurPolarPts;
-        QAction *m_pMultiThreadedBatchAct;
+        QAction *m_pBatchXFoilAct, *m_pBatchAltAct;
         QAction *m_pExportCurPolar, *m_pDeletePolar, *m_pResetCurPolar, *m_pCopyCurPolarData;
         QAction *m_pHideFoilPolars, *m_pShowFoilPolars, *m_pShowFoilPolarsOnly, *m_pSaveFoilPolars,*m_pDeleteFoilPolars;
         QAction *m_pShowAllPolars, *m_pHideAllPolars;

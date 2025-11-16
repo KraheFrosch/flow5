@@ -48,7 +48,7 @@ struct FoilAnalysis
 {
     Foil *pFoil{nullptr};            /**< a pointer to the Foil object to be analyzed by the thread */
     Polar *pPolar{nullptr};          /**< a pointer to the Polar object to be analyzed by the thread */
-    std::vector<AnalysisRange> range;
+    std::vector<AnalysisRange> range = std::vector<AnalysisRange>();
 };
 
 

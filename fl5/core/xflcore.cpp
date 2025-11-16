@@ -48,13 +48,6 @@ bool xfl::g_bConfirmDiscard(true);
 
 bool xfl::g_bLocalize = false;
 
-QString xfl::versionName(bool bFull)
-{
-    QString vname;
-    vname = QString::asprintf("v%d.%02d", MAJOR_VERSION, MINOR_VERSION);
-    if(bFull) vname = "flow5 "+vname;
-    return vname;
-}
 
 
 /**

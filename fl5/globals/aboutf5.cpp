@@ -31,6 +31,7 @@
 
 #include "aboutf5.h"
 
+#include <api/fl5core.h>
 #include <core/xflcore.h>
 
 AboutFlow5::AboutFlow5(QWidget *pParent) : QDialog(pParent)
@@ -48,7 +49,7 @@ void AboutFlow5::setupLayout()
         plabIconF5->setObjectName("flow5");
         plabIconF5->setPixmap(QPixmap(QString::fromUtf8(":/images/flow5_1287x429.png")).scaled(QSize(500,300), Qt::KeepAspectRatio));
         plabIconF5->setAlignment(Qt::AlignCenter);
-        QLabel *plab1  = new QLabel(xfl::versionName(true));
+        QLabel *plab1  = new QLabel(QString::fromStdString(fl5::versionName(true)));
         plab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
         QLabel *pFlow5Link = new QLabel;
         pFlow5Link->setText("<a href=https://flow5.tech>https://flow5.tech</a>");
