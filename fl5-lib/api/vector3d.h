@@ -212,6 +212,11 @@ class FL5LIB_EXPORT Vector3d
             return Vector3d(x+tx, y+ty, z+tz);
         }
 
+        Vector3d translated(Vector3d const T) const
+        {
+            return *this + T;
+        }
+
         void reverse()
         {
             x=-x;

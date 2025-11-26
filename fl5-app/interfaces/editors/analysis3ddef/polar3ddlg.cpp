@@ -352,13 +352,13 @@ void Polar3dDlg::makeBaseCommonControls()
                     m_plabVPWBufferWakeUnit = new QLabel("x reference chord");
                     m_plabVPWBufferWakeUnit->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
                     m_plabVPWBufferWakeUnit->setFont(fixedfnt);
-                    m_pdeVPWBufferWake = new FloatEdit;
+                    m_pfeVPWBufferWake = new FloatEdit;
                     QString tip("<p>The buffer wake sheet has two purposes. The first is to provide a well defined potential jump "
                                 "at the trailing edge. The second is to satisfy the Kutta condition (D.J. Willis 2005) "
                                 "The length of the buffer wake should typically be a fraction of the M.A.C, although "
                                 "this does not seem to have a great impact on the results.<br>"
                                 "<b>Recommentation:</b> 0.2-1.0 (x MAC)</p>");
-                    m_pdeVPWBufferWake->setToolTip(tip);
+                    m_pfeVPWBufferWake->setToolTip(tip);
 
                     QLabel *plab1 = new QLabel("Streamwise step:");
                     plab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -372,11 +372,11 @@ void Polar3dDlg::makeBaseCommonControls()
 
                     QLabel *pLab5 = new QLabel("Vorton core size:");
                     pLab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                    m_pdeVortonCoreSize = new FloatEdit;
+                    m_pfeVortonCoreSize = new FloatEdit;
                     tip = QString("<p>The core size is the equivalent for the vorton of the vortex's core radius. "
                                   "It is used to calculate a mollification (damping) factor to apply to the potential velocity.<br>"
                                   "<b>Recommendation:</b> the core size should not be less than the distance between two vortons.</p>");
-                    m_pdeVortonCoreSize->setToolTip(tip);
+                    m_pfeVortonCoreSize->setToolTip(tip);
                     m_plabVtnCoreUnit = new QLabel("x reference chord");
                     m_plabVtnCoreUnit->setFont(fixedfnt);
 
@@ -386,7 +386,7 @@ void Polar3dDlg::makeBaseCommonControls()
                     m_plabVPWDiscard->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
                     m_plabVPWDiscard->setFont(fixedfnt);
 
-                    m_pdeVPWLength = new FloatEdit;
+                    m_pfeVPWLength = new FloatEdit;
                     tip = "<p>To ensure that a steady-state solution is reached and to increase the speed of the analysis, "
                           "vortons far downstream can be discarded when their influence is no longer felt by the plane. "
                           "This is also a way to remove the initial rows of vortons from the analysis.<br>"
@@ -394,7 +394,7 @@ void Polar3dDlg::makeBaseCommonControls()
                           "   - ensure that the number of iterations is sufficient for the vortons to exceed this distance.<br>"
                           "   - check visually that the end vortons are indeed discarded."
                           "</p>";
-                    m_pdeVPWLength->setToolTip(tip);
+                    m_pfeVPWLength->setToolTip(tip);
 
                     QLabel *pLab8 = new QLabel("Number of iterations:");
                     tip = "<p>The number of iterations should be sufficient for the VPW to extend at least"
@@ -412,11 +412,11 @@ void Polar3dDlg::makeBaseCommonControls()
                     pFlow5Link->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
 
                     pWakeIterationsLayout->addWidget(pLab5,                    2,1);
-                    pWakeIterationsLayout->addWidget(m_pdeVortonCoreSize,      2,2);
+                    pWakeIterationsLayout->addWidget(m_pfeVortonCoreSize,      2,2);
                     pWakeIterationsLayout->addWidget(m_plabVtnCoreUnit,        2,3);
 
                     pWakeIterationsLayout->addWidget(pLab0,                    1,1);
-                    pWakeIterationsLayout->addWidget(m_pdeVPWBufferWake,       1,2);
+                    pWakeIterationsLayout->addWidget(m_pfeVPWBufferWake,       1,2);
                     pWakeIterationsLayout->addWidget(m_plabVPWBufferWakeUnit,  1,3);
 
                     pWakeIterationsLayout->addWidget(new QLabel("Streamwise wake development:"), 3, 1,1,3);
@@ -430,7 +430,7 @@ void Polar3dDlg::makeBaseCommonControls()
                     pWakeIterationsLayout->addWidget(m_plabVPWMaxLength,       5,3);
 
                     pWakeIterationsLayout->addWidget(pLab7,                    6,1);
-                    pWakeIterationsLayout->addWidget(m_pdeVPWLength,           6,2);
+                    pWakeIterationsLayout->addWidget(m_pfeVPWLength,           6,2);
                     pWakeIterationsLayout->addWidget(m_plabVPWDiscard,         6,3);
 
                     pWakeIterationsLayout->addWidget(pFlow5Link,               7,1,1,3, Qt::AlignVCenter | Qt::AlignLeft);
@@ -539,10 +539,10 @@ void Polar3dDlg::connectBaseSignals()
     connect(m_prbPanelWake,        SIGNAL(clicked()),              SLOT(onVortonWake()));
     connect(m_prbVortonWake,       SIGNAL(clicked()),              SLOT(onVortonWake()));
 
-    connect(m_pdeVPWBufferWake,    SIGNAL(floatChanged(float)),    SLOT(onEditingFinished()));
+    connect(m_pfeVPWBufferWake,    SIGNAL(floatChanged(float)),    SLOT(onEditingFinished()));
     connect(m_pfeVortonL0,         SIGNAL(floatChanged(float)),    SLOT(onEditingFinished()));
-    connect(m_pdeVortonCoreSize,   SIGNAL(floatChanged(float)),    SLOT(onEditingFinished()));
-    connect(m_pdeVPWLength,        SIGNAL(floatChanged(float)),    SLOT(onEditingFinished()));
+    connect(m_pfeVortonCoreSize,   SIGNAL(floatChanged(float)),    SLOT(onEditingFinished()));
+    connect(m_pfeVPWLength,        SIGNAL(floatChanged(float)),    SLOT(onEditingFinished()));
     connect(m_pieVPWIterations,    SIGNAL(intChanged(int)),        SLOT(onEditingFinished()));
 }
 
@@ -578,10 +578,10 @@ void Polar3dDlg::readWakeData(Polar3d &polar3d) const
     polar3d.setTotalWakeLengthFactor(m_pfeWakeLength->value());
     polar3d.setWakePanelFactor(      m_pfeWakePanelFactor->value());
 
-    polar3d.setBufferWakeFactor(m_pdeVPWBufferWake->value());
+    polar3d.setBufferWakeFactor(m_pfeVPWBufferWake->value());
     polar3d.setVortonL0(        m_pfeVortonL0->value());
-    polar3d.setVPWMaxLength(    m_pdeVPWLength->value());
-    polar3d.setVortonCoreSize(  m_pdeVortonCoreSize->value());
+    polar3d.setVPWMaxLength(    m_pfeVPWLength->value());
+    polar3d.setVortonCoreSize(  m_pfeVortonCoreSize->value());
     polar3d.setVPWIterations(   m_pieVPWIterations->value());
 }
 

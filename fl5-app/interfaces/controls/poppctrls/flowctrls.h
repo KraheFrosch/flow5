@@ -96,7 +96,7 @@ class FlowCtrls : public QWidget
         FloatEdit *m_pfeLeft, *m_pfeRight;
 
         IntEdit *m_pieNGroups;
-        FloatEdit *m_pdeDt;
+        FloatEdit *m_pfeDt;
 
         QRadioButton *m_prbRK1, *m_prbRK2, *m_prbRK4;
 

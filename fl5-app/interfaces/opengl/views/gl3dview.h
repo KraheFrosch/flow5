@@ -37,12 +37,13 @@
 
 #include <QTimer>
 
-#include <core/fontstruct.h>
+#include <api/linestyle.h>
 #include <api/vector2d.h>
+#include <api/node.h>
+#include <core/fontstruct.h>
 #include <interfaces/opengl/controls/arcball.h>
 #include <interfaces/opengl/views/light.h>
 #include <interfaces/opengl/views/shadloc.h>
-#include <api/linestyle.h>
 
 
 #define DEPTHFACTOR 0.0f
@@ -84,6 +85,8 @@ class gl3dView : public QOpenGLWidget, protected QOpenGLExtraFunctions
 
         void setDebugPoints(std::vector<Vector3d> const &pts, std::vector<Vector3d> const &vecs);
         void setDebugPoints(std::vector<Vector3d> const &pts);
+        void setDebugNodes(std::vector<Node> const &nodes);
+        void setDebugNodes(std::vector<Node> const &nodes, std::vector<Vector3d> const &vecs);
 
         void showAxes(bool bShow) {m_bAxes=bShow;}
         bool bAxes() const {return m_bAxes;}

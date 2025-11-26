@@ -123,8 +123,8 @@ void PlaneTreeView::setObjectProperties()
                 {
                     props = pPlane->description() + "\n\n";
                 }
-                if(s_pXPlane->m_pCurWPolar)
-                    props += pPlane->planeData(s_pXPlane->m_pCurWPolar->bIncludeOtherWingAreas());
+                if(s_pXPlane->m_pCurPlPolar)
+                    props += pPlane->planeData(s_pXPlane->m_pCurPlPolar->bIncludeOtherWingAreas());
                 else
                     props += pPlane->planeData(false);
             }
@@ -132,9 +132,9 @@ void PlaneTreeView::setObjectProperties()
         }
         case PlaneTreeView::WPOLAR:
         {
-            if(s_pXPlane->m_pCurWPolar && pPlane)
+            if(s_pXPlane->m_pCurPlPolar && pPlane)
             {
-                s_pXPlane->m_pCurWPolar->getProperties(props, pPlane);
+                s_pXPlane->m_pCurPlPolar->getProperties(props, pPlane);
                 break;
             }
             break;
@@ -143,7 +143,7 @@ void PlaneTreeView::setObjectProperties()
         {
             if(s_pXPlane->m_pCurPOpp)
             {
-                s_pXPlane->m_pCurPOpp->getProperties(pPlane, s_pXPlane->m_pCurWPolar, props);
+                s_pXPlane->m_pCurPOpp->getProperties(pPlane, s_pXPlane->m_pCurPlPolar, props);
                 break;
             }
             break;
@@ -333,7 +333,7 @@ void PlaneTreeView::onCurrentRowChanged(QModelIndex currentfilteredidx)
 void PlaneTreeView::onItemClicked(const QModelIndex &index)
 {
     PlaneOpp *pPOpp   = s_pXPlane->m_pCurPOpp;
-    PlanePolar   *pWPolar = s_pXPlane->m_pCurWPolar;
+    PlanePolar   *pWPolar = s_pXPlane->m_pCurPlPolar;
     Plane    *pPlane  = s_pXPlane->m_pCurPlane;
 
     if(index.column()==1)
@@ -493,7 +493,7 @@ void PlaneTreeView::setObjectFromIndex(QModelIndex index)
     if(pSelectedItem->level()==1)
     {
         s_pXPlane->setPlane(pSelectedItem->name());
-        s_pXPlane->m_pCurWPolar = nullptr;
+        s_pXPlane->m_pCurPlPolar = nullptr;
         s_pXPlane->m_pCurPOpp = nullptr;
         m_Selection = PlaneTreeView::PLANE;
     }
@@ -524,7 +524,7 @@ void PlaneTreeView::setObjectFromIndex(QModelIndex index)
             s_pXPlane->setPlane(pPlane);
             s_pXPlane->setPolar(pWPolar);
         }
-        else if(pWPolar != s_pXPlane->m_pCurWPolar) s_pXPlane->setPolar(pWPolar);
+        else if(pWPolar != s_pXPlane->m_pCurPlPolar) s_pXPlane->setPolar(pWPolar);
         if(pPOpp)
         {
             s_pXPlane->setPlaneOpp(pPOpp);
@@ -1021,7 +1021,7 @@ void PlaneTreeView::contextMenuEvent(QContextMenuEvent *pEvent)
     ObjectTreeItem *pItem = m_pModel->itemFromIndex(index);
 
     PlaneOpp *m_pPOpp = s_pXPlane->m_pCurPOpp;
-    PlanePolar *m_pWPolar = s_pXPlane->m_pCurWPolar;
+    PlanePolar *m_pWPolar = s_pXPlane->m_pCurPlPolar;
     Plane* m_pPlane = s_pXPlane->m_pCurPlane;
 
     QString strong;
@@ -1070,7 +1070,7 @@ void PlaneTreeView::contextMenuEvent(QContextMenuEvent *pEvent)
 void PlaneTreeView::keyPressEvent(QKeyEvent *pEvent)
 {
     PlaneOpp *m_pPOpp = s_pXPlane->m_pCurPOpp;
-    PlanePolar *m_pWPolar = s_pXPlane->m_pCurWPolar;
+    PlanePolar *m_pWPolar = s_pXPlane->m_pCurPlPolar;
     Plane* m_pPlane = s_pXPlane->m_pCurPlane;
 
     switch (pEvent->key())
@@ -1123,12 +1123,12 @@ void PlaneTreeView::selectCurrentObject()
     if(s_pXPlane->isPOppView() || s_pXPlane->m_eView==XPlane::CPVIEW)
     {
         if     (s_pXPlane->m_pCurPOpp)   selectPlaneOpp(s_pXPlane->m_pCurPOpp);
-        else if(s_pXPlane->m_pCurWPolar) selectWPolar(s_pXPlane->m_pCurWPolar, false);
+        else if(s_pXPlane->m_pCurPlPolar) selectWPolar(s_pXPlane->m_pCurPlPolar, false);
         else if(s_pXPlane->m_pCurPlane)  selectPlane(s_pXPlane->m_pCurPlane);
     }
     else if(s_pXPlane->m_eView==XPlane::WPOLARVIEW || s_pXPlane->m_eView==XPlane::STABPOLARVIEW)
     {
-        if     (s_pXPlane->m_pCurWPolar) selectWPolar(s_pXPlane->m_pCurWPolar, false);
+        if     (s_pXPlane->m_pCurPlPolar) selectWPolar(s_pXPlane->m_pCurPlPolar, false);
         else if(s_pXPlane->m_pCurPlane)  selectPlane(s_pXPlane->m_pCurPlane);
     }
     else if (s_pXPlane->is3dView() || s_pXPlane->m_eView==XPlane::OTHERVIEW)

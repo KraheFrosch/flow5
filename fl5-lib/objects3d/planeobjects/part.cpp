@@ -178,15 +178,15 @@ bool Part::serializePartFl5(QDataStream &ar, bool bIsStoring)
             ar >> m_GmshTessParams.m_MaxSize;
             ar >> m_GmshTessParams.m_nCurvature;
 
-            if(m_GmshTessParams.m_MinSize<0.001) m_GmshTessParams.m_MinSize = 0.001; // avoid excessively long tessellations
-            if(m_GmshTessParams.m_MaxSize<0.001) m_GmshTessParams.m_MaxSize = 1000.0; // cleaning past errors
+            if(m_GmshTessParams.m_MinSize<0.0005) m_GmshTessParams.m_MinSize = 0.0005; // avoid excessively long tessellations
+            if(m_GmshTessParams.m_MaxSize<0.001) m_GmshTessParams.m_MaxSize = 10.0; // cleaning past errors
             if(m_GmshTessParams.m_nCurvature<=0) m_GmshTessParams.m_nCurvature= 20; // cleaning past errors
 
             ar >> m_GmshParams.m_MinSize;
             ar >> m_GmshParams.m_MaxSize;
             ar >> m_GmshParams.m_nCurvature;
-            if(m_GmshParams.m_MinSize<0.0005) m_GmshParams.m_MinSize = 0.001; // avoid excessively long meshing times
-            if(m_GmshParams.m_MaxSize<0.001)  m_GmshParams.m_MaxSize = 1000.0; // cleaning past errors
+//            if(m_GmshParams.m_MinSize<0.0001) m_GmshParams.m_MinSize = 0.0001; // avoid excessively long meshing times
+            if(m_GmshParams.m_MaxSize<0.001)  m_GmshParams.m_MaxSize = 10.0; // cleaning past errors
             if(m_GmshParams.m_nCurvature<=0)  m_GmshParams.m_nCurvature= 20; // cleaning past errors
         }
 

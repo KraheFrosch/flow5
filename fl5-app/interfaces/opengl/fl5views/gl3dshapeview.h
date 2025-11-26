@@ -28,12 +28,14 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
 
+#include <api/gmshparams.h>
 #include <api/occmeshparams.h>
 #include <api/triangle3d.h>
 #include <interfaces/mesh/slg3d.h>
 #include <interfaces/opengl/fl5views/gl3dxflview.h>
 
 
+class Fuse;
 
 class gl3dShapeView : public gl3dXflView
 {
@@ -42,7 +44,7 @@ class gl3dShapeView : public gl3dXflView
         ~gl3dShapeView();
 
         void clearShape() {m_pShape=nullptr;}
-        void setShape(TopoDS_Shape const &shape, OccMeshParams const& params);
+        void setFuse(Fuse *pFuse);
 
         void setTriangles(std::vector<Triangle3d> const &triangles, QVector<int> const &high) {m_Triangles=triangles; m_HighlightList=high;}
         void setPSLG(SLG3d const &pslg) {m_SLG=pslg;}
@@ -69,6 +71,7 @@ class gl3dShapeView : public gl3dXflView
         bool m_bResetglGeom;
 
         TopoDS_Shape const *m_pShape;
+        Fuse *m_pFuse;
 
         QOpenGLBuffer m_vboFaces;
         QVector<QOpenGLBuffer> m_vboWires;
@@ -83,6 +86,7 @@ class gl3dShapeView : public gl3dXflView
 
         QVector<int> m_HighlightList;
 
-        OccMeshParams m_OccMeshParams;
+        OccMeshParams m_OccTessParams;
+        GmshParams m_GmshTessParams;
 };
 

@@ -330,7 +330,7 @@ void PlanePolarDlg::makeCommonControls()
 
             m_prbCustomFuseDrag = new QRadioButton("Manual input");
             QLabel *plabCus = new QLabel("Cf=");
-            m_pdeCustomFF = new FloatEdit;
+            m_pfeCustomFF = new FloatEdit;
 
             QLabel *plabPS = new QLabel();
             if(DisplayOptions::isDarkMode())
@@ -350,7 +350,7 @@ void PlanePolarDlg::makeCommonControls()
             pFuseDragLayout->addWidget(plabPS,                  7,4,1,2, Qt::AlignCenter);
             pFuseDragLayout->addWidget(m_prbCustomFuseDrag,     8,1);
             pFuseDragLayout->addWidget(plabCus,                 8,4, Qt::AlignRight);
-            pFuseDragLayout->addWidget(m_pdeCustomFF,           8,5);
+            pFuseDragLayout->addWidget(m_pfeCustomFF,           8,5);
 
             pFuseDragLayout->setRowStretch(5,5);
             pFuseDragLayout->setRowStretch(8,5);
@@ -637,9 +637,9 @@ void PlanePolarDlg::initPolar3dDlg(const Plane *pPlane, PlanePolar const *pWPola
     m_pfeWakeLength->setValue(s_WPolar.totalWakeLengthFactor());
     m_pfeWakePanelFactor->setValue(s_WPolar.wakePanelFactor());
 
-    m_pdeVPWBufferWake->setValue(s_WPolar.bufferWakeFactor());
-    m_pdeVPWLength->setValue(s_WPolar.VPWMaxLength());
-    m_pdeVortonCoreSize->setValue(s_WPolar.vortonCoreSize());
+    m_pfeVPWBufferWake->setValue(s_WPolar.bufferWakeFactor());
+    m_pfeVPWLength->setValue(s_WPolar.VPWMaxLength());
+    m_pfeVortonCoreSize->setValue(s_WPolar.vortonCoreSize());
     m_pfeVortonL0->setValue(s_WPolar.vortonL0());
     m_pieVPWIterations->setValue(s_WPolar.VPWIterations());
     setVPWUnits(s_WPolar);
@@ -656,8 +656,8 @@ void PlanePolarDlg::initPolar3dDlg(const Plane *pPlane, PlanePolar const *pWPola
         m_prbPSDrag->setEnabled(             s_WPolar.hasFuseDrag());
         m_prbKSDrag->setEnabled(             s_WPolar.hasFuseDrag());
         m_prbCustomFuseDrag->setEnabled(     s_WPolar.hasFuseDrag());
-        m_pdeCustomFF->setEnabled(           s_WPolar.hasFuseDrag() && m_prbCustomFuseDrag->isChecked());
-        m_pdeCustomFF->setValue(             s_WPolar.customFuseCf());
+        m_pfeCustomFF->setEnabled(           s_WPolar.hasFuseDrag() && m_prbCustomFuseDrag->isChecked());
+        m_pfeCustomFF->setValue(             s_WPolar.customFuseCf());
 
         m_plabFuseWettedArea->setEnabled(s_WPolar.hasFuseDrag());
 
@@ -1003,7 +1003,7 @@ void PlanePolarDlg::readFuseDragData()
         else if(m_prbCustomFuseDrag->isChecked())
         {
             s_WPolar.setFuseDragMethod(PlanePolar::MANUALFUSECF);
-            s_WPolar.setCustomFuseCf(m_pdeCustomFF->value());
+            s_WPolar.setCustomFuseCf(m_pfeCustomFF->value());
         }
     }
     else
@@ -1114,7 +1114,7 @@ void PlanePolarDlg::onFuseDrag()
     m_prbKSDrag->setEnabled(m_pchFuseDrag->isChecked());
     m_prbPSDrag->setEnabled(m_pchFuseDrag->isChecked());
     m_prbCustomFuseDrag->setEnabled(m_pchFuseDrag->isChecked());
-    m_pdeCustomFF->setEnabled(m_pchFuseDrag->isChecked() && m_prbCustomFuseDrag->isChecked());
+    m_pfeCustomFF->setEnabled(m_pchFuseDrag->isChecked() && m_prbCustomFuseDrag->isChecked());
 
     setPolar3dName();
 }

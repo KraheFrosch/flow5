@@ -79,7 +79,7 @@ void POppGraphCtrls::onAnimateWOpp(bool bAnimate)
         return;
     }
 
-    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurWPolar || !s_pXPlane->isPOppView())
+    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurPlPolar || !s_pXPlane->isPOppView())
     {
         m_bAnimateWOpp = false;
         return;
@@ -93,7 +93,7 @@ void POppGraphCtrls::onAnimateWOpp(bool bAnimate)
             PlaneOpp const*pPOpp = Objects3d::POppAt(l);
 
             if (pPOpp &&
-                pPOpp->polarName() == s_pXPlane->m_pCurWPolar->name() &&
+                pPOpp->polarName() == s_pXPlane->m_pCurPlPolar->name() &&
                 pPOpp->planeName() == s_pXPlane->m_pCurPlane->name())
             {
                 if(fabs(s_pXPlane->m_pCurPOpp->alpha() - pPOpp->alpha())<AOAPRECISION)
@@ -122,7 +122,7 @@ void POppGraphCtrls::onAnimateWOppSingle()
     int size=0;
 
     if(!s_pXPlane->isPOppView()) return; //nothing to animate
-    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurWPolar) return;
+    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurPlPolar) return;
 
     size = Objects3d::nPOpps();
     if(size<=1) return;
@@ -139,7 +139,7 @@ void POppGraphCtrls::onAnimateWOppSingle()
         pPOpp = Objects3d::POppAt(m_posAnimateWOpp);
         if(!pPOpp) return;
 
-        bIsValid =(pPOpp->polarName()==s_pXPlane->m_pCurWPolar->name()  &&  pPOpp->planeName()==s_pXPlane->m_pCurPlane->name());
+        bIsValid =(pPOpp->polarName()==s_pXPlane->m_pCurPlPolar->name()  &&  pPOpp->planeName()==s_pXPlane->m_pCurPlane->name());
 
         if (bIsValid && !bSkipOne)
         {

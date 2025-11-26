@@ -391,7 +391,7 @@ int WingXfl::nYPanels() const
     {
         double panelLength = fabs(yPosition(is)-yPosition(is+1));
 
-        if (panelLength < MinPanelSize ||  panelLength<planformSpan()/1000.0/2.0)
+        if (panelLength < MinPanelSize || panelLength<planformSpan()/1000.0/2.0)
         {
         }
         else
@@ -423,7 +423,7 @@ void WingXfl::createSurfaces(Vector3d const &Toffset, double XTilt, double YTilt
     VNormal[0].set(0.0, 0.0, 1.0);
     VNSide[0].set(0.0, 0.0, 1.0);
 
-    for(int is=0; is<nSections()-1;is++)
+    for(int is=0; is<nSections()-1; is++)
     {
         double panelLength = fabs(yPosition(is)-yPosition(is+1));
 
@@ -2500,56 +2500,22 @@ int WingXfl::uniformizeXPanelNumber()
 }
 
 
-void WingXfl::exportWingToAVL(std::string &avlstring, int index, double y, double Thetay, double lengthunit) const
+void WingXfl::exportToAVL(std::string &avlstring, int index, Vector3d const &T, double ry, double lengthunit) const
 {
     QString strong, str;
     QString strange;
     QTextStream out(&strange);
 
-    out << ("#========TODO: REMOVE OR MODIFY MANUALLY DUPLICATE SECTIONS IN SURFACE DEFINITION=========\n");
-    out << ("SURFACE                      | (keyword)\n");
-    out << QString::fromStdString(m_Name);
-    out << ("\n");
-    out << ("#Nchord    Cspace   [ Nspan Sspace ]\n");
+    out << EOLch;
 
-    strong = QString::asprintf("%d        %3.1f\n", nXPanels(0), 1.0);
-    out << (strong);
+    str = "#================" +   QString::fromStdString(m_Name) + "================\n";
+    strong.fill('=', str.length()-2);
+    strong = "#"+strong + EOLch;
 
-    out << ("\n");
-    out << ("COMPONENT                        | (keyword)\n");
-    strong = QString::asprintf("%4d                         | Lcomp\n",index);
-    out << (strong);
+    out << strong;
+    out << str + EOLch;
 
-    if(!isFin())
-    {
-        out << ("\n");
-        out << ("YDUPLICATE\n");
-        out << ("0.0\n");
-    }
-    else if(isTwoSided())
-    {
-        out << ("\n");
-        out << ("YDUPLICATE\n");
-        strong = QString::asprintf("%9.4f\n", y);
-        out << (strong);
-    }
-
-    out << ("\n");
-    out << ("SCALE\n");
-    out << ("1.0  1.0  1.0\n");
-
-    out << ("\n");
-    out << ("TRANSLATE\n");
-    out << ("0.0  0.0  0.0\n");
-
-    out << ("\n");
-    out << ("ANGLE\n");
-    strong = QString::asprintf("%8.3f                         | dAinc\n", Thetay);
-    out << (strong);
-
-    out << ("\n\n");
-
-    //write only right wing surfaces since we have provided YDUPLICATE
+    //write only right wing surfaces since we provide YDUPLICATE
     Surface aSurface;
     int iFlap = 1;
 
@@ -2557,25 +2523,43 @@ void WingXfl::exportWingToAVL(std::string &avlstring, int index, double y, doubl
 
     int startIndex = (isFin()? 0 : int(NSurfaces/2));
 
-    //write the first section
+    out << "#_______________________________________\n";
+    out << "SURFACE\n";
+    out << QString::fromStdString(m_Name);
+    out << EOLch;
+    out << "#Nchord    Cspace   [ Nspan Sspace ]\n";
+    out << QString::asprintf("%d        %3.1f\n", nXPanels(0), 1.0);
 
+    out << EOLch;
+    out << "ANGLE\n";
+    out << QString::asprintf("%9.3f                        | dAinc\n", ry);
+
+    out << EOLch;
+    out << "TRANSLATE\n";
+    out << QString::asprintf("%9.3f    %9.3f     %9.3f\n", T.x*lengthunit, T.y*lengthunit, T.z*lengthunit);
+
+    if(!isFin())
+    {
+        out << EOLch;
+        out << "YDUPLICATE\n";
+        out << "0.0\n";
+    }
+    else if(isTwoSided())
+    {
+        out << EOLch;
+        out << "YDUPLICATE\n";
+        out << "0.0\n";
+    }
+
+    out << EOLch;
+    out << "COMPONENT\n";
+    out << QString::asprintf("%4d                         | Lcomp\n",index);
 
     for(int j=startIndex; j<NSurfaces; j++)
     {
-        out << ("#____PANEL ")<<j-startIndex+1<<"_______\n";
         aSurface.copy(m_Surface.at(j));
 
-        //Remove the twist, since AVL processes it as a mod of the angle of attack thru the dAInc command
-        aSurface.m_TwistA = aSurface.m_TwistB = 0.0;
-        aSurface.setTwist(true);
-        double mean_angle = 0.0;
-        if(aSurface.m_bTEFlap)
-        {
-            if(aSurface.foilA() && aSurface.foilB())
-                mean_angle = (aSurface.foilA()->TEFlapAngle() + aSurface.foilB()->TEFlapAngle())/2.0;
-        }
-
-        out << ("#______________\nSECTION                                                     |  (keyword)\n");
+        out << "#______________\nSECTION\n";
 
         strong = QString::asprintf("%9.4f %9.4f %9.4f %9.4f  %7.3f  %3d  %3d   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n",
                 aSurface.m_LA.x       *lengthunit,
@@ -2585,18 +2569,17 @@ void WingXfl::exportWingToAVL(std::string &avlstring, int index, double y, doubl
                 aSurface.m_TwistA,
                 aSurface.NYPanels(),
                 objects::AVLSpacing(aSurface.yDistType()));
-        out << (strong);
-        out << ("\n");
-        out << ("AFIL 0.0 1.0\n");
+        out << strong;
+        out << "\n";
+        out << "AFIL 0.0 1.0\n";
         if(aSurface.foilA())  out << QString::fromStdString(aSurface.foilA()->name()) +".dat\n";
-        out << ("\n");
+        out << EOLch;
         if(aSurface.hasTEFlap())
         {
-            out << ("CONTROL                                                     |  (keyword)\n");
+            out << "CONTROL\n";
             strong = QString::asprintf("Flap_%d  ", iFlap);
 
-            if(fabs(mean_angle)>PRECISION) str = QString::asprintf("%5.2f  ", 1.0/mean_angle);
-            else                           str = "1.0   ";
+            str = "1.0   ";
             strong += str;
 
             assert(aSurface.foilA());
@@ -2609,51 +2592,51 @@ void WingXfl::exportWingToAVL(std::string &avlstring, int index, double y, doubl
             out << (strong);
         }
 
-        //write the end section of the surface
-        out << ("\n#______________\nSECTION                                                     |  (keyword)\n");
 
-        strong = QString::asprintf("%9.4f  %9.4f  %9.4f  %9.4f  %7.3f   %3d  %3d   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n",
-                aSurface.m_LB.x       *lengthunit,
-                aSurface.m_LB.y       *lengthunit,
-                aSurface.m_LB.z       *lengthunit,
-                aSurface.chord(1.0)   *lengthunit,
-                m_Surface.at(j).m_TwistB,
-                aSurface.NYPanels(),
-                objects::AVLSpacing(aSurface.yDistType()));
-        out << (strong);
-        out << ("\n");
-        out << ("AFIL 0.0 1.0\n");
-        if(aSurface.foilB())  out << QString::fromStdString(aSurface.foilB()->name()) +".dat\n";
-        out << ("\n");
-
-        if(aSurface.hasTEFlap())
-        {
-            out << ("CONTROL                                                     |  (keyword)\n");
-            strong = QString::asprintf("Flap_%d  ", iFlap);
-
-            if(fabs(mean_angle)>PRECISION) str = QString::asprintf("%5.2f  ", 1.0/mean_angle);
-            else                           str = "1.0   ";
-            strong += str;
-
-            assert(aSurface.foilB());
-            str = QString::asprintf("%5.3f  %9.4f  %9.4f   %9.4f   -1.0  ",
-                              aSurface.foilB()->TEXHinge(),
-                              aSurface.hingeVector().x,
-                              aSurface.hingeVector().y,
-                              aSurface.hingeVector().z);
-            strong +=str + "| name, gain,  Xhinge,  XYZhvec,  SgnDup\n";
-            out << (strong);
-            out << ("\n");
-
-            iFlap++;
-        }
         out << ("\n");
 
     }
 
-    out << ("\n\n");
+    //write the last section
+    out << ("\n#______________\nSECTION\n");
 
-    avlstring = strange.toStdString();
+    strong = QString::asprintf("%9.4f  %9.4f  %9.4f  %9.4f  %7.3f   %3d  %3d   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n",
+            aSurface.m_LB.x       *lengthunit,
+            aSurface.m_LB.y       *lengthunit,
+            aSurface.m_LB.z       *lengthunit,
+            aSurface.chord(1.0)   *lengthunit,
+            aSurface.m_TwistB,
+            aSurface.NYPanels(),
+            objects::AVLSpacing(aSurface.yDistType()));
+    out << strong;
+    out << EOLch;
+    out << "AFIL 0.0 1.0\n";
+    if(aSurface.foilB())  out << QString::fromStdString(aSurface.foilB()->name()) +".dat\n";
+    out << EOLch;
+
+    if(aSurface.hasTEFlap())
+    {
+        out << "CONTROL\n";
+        strong = QString::asprintf("Flap_%d  ", iFlap);
+
+        str = "1.0   ";
+        strong += str;
+
+        assert(aSurface.foilB());
+        str = QString::asprintf("%5.3f  %9.4f  %9.4f   %9.4f   -1.0  ",
+                          aSurface.foilB()->TEXHinge(),
+                          aSurface.hingeVector().x,
+                          aSurface.hingeVector().y,
+                          aSurface.hingeVector().z);
+        strong +=str + "| name, gain,  Xhinge,  XYZhvec,  SgnDup\n";
+        out << strong;
+        out << EOLch;
+
+        iFlap++;
+    }
+    out << EOLch << EOLch;
+
+    avlstring.append(strange.toStdString());
 }
 
 
@@ -3042,4 +3025,41 @@ double WingXfl::taperRatio() const
     else
         return 0.0;
 }
+
+
+Surface const &WingXfl::rootLeftSurface() const
+{
+    int NSurfaces = nSurfaces();
+    int leftroot = int(NSurfaces/2);
+
+    if(isTwoSided())
+        return m_Surface.at(leftroot-1);
+    else
+        return m_Surface.back();
+}
+
+
+Surface const &WingXfl::rootRightSurface() const
+{
+    int NSurfaces = nSurfaces();
+    int rightroot = int(NSurfaces/2);
+
+    return isTwoSided() ? m_Surface.at(rightroot) : m_Surface.front();
+}
+
+
+void WingXfl::makeMidWires(std::vector<std::vector<Node>> &midwires) const
+{
+    for(int jsurf=0; jsurf<nSurfaces(); jsurf++)
+    {
+        Surface const &surf = surfaceAt(jsurf);
+        midwires.push_back(surf.m_SideA);
+    }
+    midwires.push_back(lastSurface().m_SideB);
+}
+
+
+
+
+
 

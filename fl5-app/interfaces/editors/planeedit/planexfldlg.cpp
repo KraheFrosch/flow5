@@ -34,11 +34,13 @@
 #include <QButtonGroup>
 #include <QFileDialog>
 
-#include <BRepPrimAPI_MakeSphere.hxx>
-#include <BRepPrimAPI_MakeCylinder.hxx>
-#include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
+#include <BRepAlgoAPI_Splitter.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
+#include <BRepOffsetAPI_ThruSections.hxx>
+#include <BRepPrimAPI_MakeBox.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
+#include <BRepPrimAPI_MakeSphere.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 
@@ -103,8 +105,7 @@
 #include <interfaces/widgets/customwts/plaintextoutput.h>
 #include <modules/xobjects.h>
 
-
-bool PlaneXflDlg::s_bParallelCut = true;
+bool PlaneXflDlg::s_bThickSurfAssy(true);
 
 int PlaneXflDlg::s_iActivePage = 1;
 
@@ -164,19 +165,24 @@ void PlaneXflDlg::connectSignals()
     connect(m_pExportMeshSTL,         SIGNAL(triggered(bool)), SLOT(onExportMeshToSTLFile()));
     connect(m_pScalePlane,            SIGNAL(triggered(bool)), SLOT(onScalePlane()));
 
-    connect(m_plwWingListWt,          SIGNAL(clicked(QModelIndex)), SLOT(onPartListClicked(QModelIndex)));
-    connect(m_plwFuseListWt,          SIGNAL(clicked(QModelIndex)), SLOT(onListClick()));
+    connect(m_plwThinWings,           SIGNAL(clicked(QModelIndex)), SLOT(onThinListClick()));
+
+    connect(m_plwThickWings,          SIGNAL(clicked(QModelIndex)), SLOT(onPartListClicked(QModelIndex)));
+    connect(m_plwFuseListWt,          SIGNAL(clicked(QModelIndex)), SLOT(onThickListClick()));
     connect(m_plwFuseListWt,          SIGNAL(clicked(QModelIndex)), SLOT(onPartListClicked(QModelIndex)));
 
-    QItemSelectionModel *pSelModel = m_plwWingListWt->selectionModel();
-    connect(pSelModel,                SIGNAL(selectionChanged(QItemSelection,QItemSelection)), SLOT(onListClick()));
+    QItemSelectionModel *pSelModel = m_plwThickWings->selectionModel();
+    connect(pSelModel,                SIGNAL(selectionChanged(QItemSelection,QItemSelection)), SLOT(onThickListClick()));
 
-    connect(m_ppbCutFuse,             SIGNAL(clicked(bool)),  SLOT(onCutFuse()));
+    connect(m_ppbCutFuse,             SIGNAL(clicked(bool)),                                     SLOT(onCutFuse()));
 
-    connect(m_pResetFuse,             SIGNAL(triggered()),    SLOT(onResetFuse()));
-    connect(m_pTessellation,          SIGNAL(triggered()),    SLOT(onTessellation()));
+    connect(m_pResetFuse,             SIGNAL(triggered()),                                       SLOT(onResetFuse()));
+    connect(m_pTessellation,          SIGNAL(triggered()),                                       SLOT(onTessellation()));
 
-    connect(m_pLeftTabWidget,         SIGNAL(currentChanged(int)), SLOT(onTabChanged(int)));
+    connect(m_prbThin,                SIGNAL(clicked(bool)),                                     SLOT(onThinThick()));
+    connect(m_prbThick,               SIGNAL(clicked(bool)),                                     SLOT(onThinThick()));
+
+    connect(m_pLeftTabWidget,         SIGNAL(currentChanged(int)),                               SLOT(onTabChanged(int)));
 
     connect(m_pcptParts,              SIGNAL(clicked(QModelIndex)),                              SLOT(onPartItemClicked(QModelIndex)));
     connect(m_pcptParts,              SIGNAL(dataPasted()),                                      SLOT(onPartDataChanged()));
@@ -185,10 +191,10 @@ void PlaneXflDlg::connectSignals()
     connect(m_pchHighlightSel,        SIGNAL(clicked(bool)),                                     SLOT(onHighlightSel(bool)));
 
 
-    connect(m_pMoveUp,                SIGNAL(triggered(bool)), SLOT(onMovePartUp()));
-    connect(m_pMoveDown,              SIGNAL(triggered(bool)), SLOT(onMovePartDown()));
-    connect(m_pPartInertia,           SIGNAL(triggered(bool)), SLOT(onPartInertia()));
-    connect(m_pPartScale,             SIGNAL(triggered(bool)), SLOT(onScalePart()));
+    connect(m_pMoveUp,                SIGNAL(triggered(bool)),                                   SLOT(onMovePartUp()));
+    connect(m_pMoveDown,              SIGNAL(triggered(bool)),                                   SLOT(onMovePartDown()));
+    connect(m_pPartInertia,           SIGNAL(triggered(bool)),                                   SLOT(onPartInertia()));
+    connect(m_pPartScale,             SIGNAL(triggered(bool)),                                   SLOT(onScalePart()));
 
     connect(m_pHSplitter,             SIGNAL(splitterMoved(int,int)), SLOT(onSplitterMoved(int,int)));
 
@@ -235,6 +241,7 @@ void PlaneXflDlg::setupLayout()
             {
                 m_pPartSplitter = new QSplitter(Qt::Vertical);
                 {
+                    m_pPartSplitter->setChildrenCollapsible(false);
                     m_pLeftTabWidget = new QTabWidget;
                     {
                         QFrame *pMetaFrame = new QFrame;
@@ -249,7 +256,7 @@ void PlaneXflDlg::setupLayout()
                             pMetaFrame->setLayout(pDefinitionLayout);
                         }
 
-                        QFrame *pPartFrame = new QFrame;
+                        QFrame *pfrParts = new QFrame;
                         {
                             QVBoxLayout *pPartLayout = new QVBoxLayout;
                             {
@@ -312,102 +319,140 @@ void PlaneXflDlg::setupLayout()
                                 pPartLayout->addWidget(m_pcptParts);
                                 pPartLayout->addLayout(pEditCmdLayout);
                             }
-                            pPartFrame->setLayout(pPartLayout);
+                            pfrParts->setLayout(pPartLayout);
                         }
 
-                        QFrame *pTablesFrame = new QFrame;
+                        QFrame *pfrThinThick = new QFrame;
                         {
-                            QVBoxLayout *pTablesLayout = new QVBoxLayout;
+                            QVBoxLayout *pThinThickLayout = new QVBoxLayout;
                             {
-                                QHBoxLayout *pObjectsLayout = new QHBoxLayout;
+                                QHBoxLayout *pSelLayout = new QHBoxLayout;
                                 {
-                                    QGroupBox * pCuttingWingsBox = new QGroupBox("Cutting wings");
+                                    QButtonGroup *pGroup = new QButtonGroup;
                                     {
-                                        QVBoxLayout *pCuttingWingsLayout = new QVBoxLayout;
-                                        {
-                                            m_plwWingListWt = new QListWidget;
-                                            m_plwWingListWt->setSelectionMode(QAbstractItemView::MultiSelection);
-
-                                            QGridLayout *pAssyParamLayout = new QGridLayout;
-                                            {
-                                                QString sewtip = "<p>OpenCascade documentation: "
-                                                                 "Sewing allows creation of connected topology (shells and wires) "
-                                                                 "from a set of separate topological elements (faces and edges). ";
-                                                sewtip += "Working tolerance defines the maximal distance between topological elements "
-                                                          "which can be sewn. It is not ultimate that such elements will be actually "
-                                                          "sewn as many other criteria are applied to make the final decision. "
-                                                          "Minimal tolerance defines the size of the smallest element (edge) in "
-                                                          "the resulting shape. It is declared that no edges with size less than this "
-                                                          "value are created after sewing. If encountered, such topology becomes degenerated.  ";
-
-                                                sewtip +="The following recommendations can be proposed for tuning-up the sewing process: "
-                                                         "<ul>"
-                                                         "<li> Use as small working tolerance as possible. This will reduce the sewing time and, "
-                                                         "  consequently, the number of incorrectly sewn edges for shells with free boundaries.</li>"
-                                                         "<li> Use as large minimal tolerance as possible. This will reduce the number of small "
-                                                         "  geometry in the shape, both original and appearing after cutting.</li>"
-                                                         "<li> If it is expected to obtain a shell with holes (free boundaries) as a result "
-                                                         "  of sewing, the working tolerance should be set to a value not greater than the "
-                                                         "  size of the smallest element (edge) or smallest distance between elements of such "
-                                                         "  free boundary. Otherwise the free boundary may be sewn only partially.</li>"
-                                                         "<li> It should be mentioned that the Sewing algorithm is unable to understand which "
-                                                         "  small (less than working tolerance) free boundary should be kept and which should "
-                                                         "  be sewn.</li>"
-                                                         "</ul>"
-                                                         "</p>";
-
-                                                QLabel *pLabSewPrecision = new QLabel("Sewing precision:");
-                                                pLabSewPrecision->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-                                                QLabel *pLabLength1 = new QLabel(Units::lengthUnitQLabel());
-                                                pLabLength1->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
-                                                m_pfeStitchPrecision = new FloatEdit(0.001f);
-                                                m_pfeStitchPrecision->setToolTip(sewtip);
-
-                                                pAssyParamLayout->addWidget(pLabSewPrecision,       1,1);
-                                                pAssyParamLayout->addWidget(m_pfeStitchPrecision, 1,2);
-                                                pAssyParamLayout->addWidget(pLabLength1,            1,3);
-                                            }
-
-                                            pCuttingWingsLayout->addWidget(m_plwWingListWt);
-                                            pCuttingWingsLayout->addLayout(pAssyParamLayout);
-                                        }
-                                        pCuttingWingsBox->setLayout(pCuttingWingsLayout);
+                                        m_prbThin  = new QRadioButton("Thin  surfaces");
+                                        m_prbThick = new QRadioButton("Thick surfaces");
+                                        pGroup->addButton(m_prbThin);
+                                        pGroup->addButton(m_prbThick);
                                     }
-
-                                    QGroupBox *pFuseToCutBox = new QGroupBox("Fuselage to cut");
-                                    {
-                                        QVBoxLayout *pFuseToCutLayout = new QVBoxLayout;
-                                        {
-                                            m_plwFuseListWt = new QListWidget;
-                                            m_ppbFuseMenuButton = new QPushButton("Fuselage actions");
-                                            {
-                                                QMenu *pFuseMenu = new QMenu("Fuselage actions", this);
-                                                {
-                                                    pFuseMenu->addAction(m_pResetFuse);
-                                                    pFuseMenu->addAction(m_pTessellation);
-                                                    pFuseMenu->addAction(m_pFlipNormals);
-                                                }
-                                                m_ppbFuseMenuButton->setMenu(pFuseMenu);
-                                            }
-
-                                            pFuseToCutLayout->addWidget(m_plwFuseListWt);
-                                            pFuseToCutLayout->addWidget(m_ppbFuseMenuButton);
-                                        }
-                                        pFuseToCutBox->setLayout(pFuseToCutLayout);
-                                    }
-                                    pObjectsLayout->addWidget(pCuttingWingsBox);
-                                    pObjectsLayout->addWidget(pFuseToCutBox);
+                                    pSelLayout->addStretch();
+                                    pSelLayout->addWidget(m_prbThin);
+                                    pSelLayout->addStretch();
+                                    pSelLayout->addWidget(m_prbThick);
+                                    pSelLayout->addStretch();
                                 }
 
-                                m_pchCutParallel = new QCheckBox("Multithreaded cut operation");
-                                m_ppbCutFuse = new QPushButton("Cut fuselage");
-                                pTablesLayout->addLayout(pObjectsLayout);
-                                pTablesLayout->addWidget(m_pchCutParallel);
-                                pTablesLayout->addWidget(m_ppbCutFuse);
-                            }
-                            pTablesFrame->setLayout(pTablesLayout);
-                        }
+                                m_pswThinThick = new QStackedWidget;
+                                {
+                                    QFrame *pfrThin = new QFrame;
+                                    {
+                                        QVBoxLayout *pThinLayout = new QVBoxLayout;
+                                        {
+                                            QLabel *plabThinNote = new QLabel("<p>Assemble the fuselage and wings for THIN surface analyses;<br>"
+                                                                              "The fuselage mesh will conform to the mid-camber line of the selected wings."
+                                                                              "</p>");
+                                            plabThinNote->setWordWrap(true);
+                                            m_plwThinWings = new QListWidget;
+                                            m_plwThinWings->setSelectionMode(QAbstractItemView::MultiSelection);
 
+                                            pThinLayout->addWidget(plabThinNote);
+                                            pThinLayout->addWidget(m_plwThinWings);
+                                        }
+                                        pfrThin->setLayout(pThinLayout);
+                                    }
+
+                                    QFrame *pfrThick = new QFrame;
+                                    {
+                                QVBoxLayout *pThickLayout = new QVBoxLayout;
+                                {
+                                    QLabel *plabThickNote = new QLabel("<p>Assemble the fuselage and wings for THICK surface analyses</p>");
+                                    plabThickNote->setWordWrap(true);
+                                    QHBoxLayout *pObjectsLayout = new QHBoxLayout;
+                                    {
+                                        QGroupBox * pCuttingWingsBox = new QGroupBox("Cutting wings");
+                                        {
+                                            QVBoxLayout *pCuttingWingsLayout = new QVBoxLayout;
+                                            {
+                                                m_plwThickWings = new QListWidget;
+                                                m_plwThickWings->setSelectionMode(QAbstractItemView::MultiSelection);
+
+                                                QGridLayout *pAssyParamLayout = new QGridLayout;
+                                                {
+                                                    QString sewtip = "<p>OpenCascade documentation: "
+                                                                     "Sewing allows creation of connected topology (shells and wires) "
+                                                                     "from a set of separate topological elements (faces and edges). ";
+                                                    sewtip += "Working tolerance defines the maximal distance between topological elements "
+                                                              "which can be sewn. It is not ultimate that such elements will be actually "
+                                                              "sewn as many other criteria are applied to make the final decision. "
+                                                              "Minimal tolerance defines the size of the smallest element (edge) in "
+                                                              "the resulting shape. It is declared that no edges with size less than this "
+                                                              "value are created after sewing. If encountered, such topology becomes degenerated.  ";
+
+                                                    sewtip +="The following recommendations can be proposed for tuning-up the sewing process: "
+                                                             "<ul>"
+                                                             "<li> Use as small working tolerance as possible. This will reduce the sewing time and, "
+                                                             "  consequently, the number of incorrectly sewn edges for shells with free boundaries.</li>"
+                                                             "<li> Use as large minimal tolerance as possible. This will reduce the number of small "
+                                                             "  geometry in the shape, both original and appearing after cutting.</li>"
+                                                             "<li> If it is expected to obtain a shell with holes (free boundaries) as a result "
+                                                             "  of sewing, the working tolerance should be set to a value not greater than the "
+                                                             "  size of the smallest element (edge) or smallest distance between elements of such "
+                                                             "  free boundary. Otherwise the free boundary may be sewn only partially.</li>"
+                                                             "<li> It should be mentioned that the Sewing algorithm is unable to understand which "
+                                                             "  small (less than working tolerance) free boundary should be kept and which should "
+                                                             "  be sewn.</li>"
+                                                             "</ul>"
+                                                             "</p>";
+
+                                                    QLabel *pLabSewPrecision = new QLabel("Sewing precision:");
+                                                    pLabSewPrecision->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+                                                    QLabel *pLabLength1 = new QLabel(Units::lengthUnitQLabel());
+                                                    pLabLength1->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+                                                    m_pfeStitchPrecision = new FloatEdit(0.001f);
+                                                    m_pfeStitchPrecision->setToolTip(sewtip);
+
+                                                    pAssyParamLayout->addWidget(pLabSewPrecision,       1,1);
+                                                    pAssyParamLayout->addWidget(m_pfeStitchPrecision, 1,2);
+                                                    pAssyParamLayout->addWidget(pLabLength1,            1,3);
+                                                }
+
+                                                pCuttingWingsLayout->addWidget(m_plwThickWings);
+                                                pCuttingWingsLayout->addLayout(pAssyParamLayout);
+                                            }
+                                            pCuttingWingsBox->setLayout(pCuttingWingsLayout);
+                                        }
+
+                                        QGroupBox *pFuseToCutBox = new QGroupBox("Fuselage to cut");
+                                        {
+                                            QVBoxLayout *pFuseToCutLayout = new QVBoxLayout;
+                                            {
+                                                m_plwFuseListWt = new QListWidget;
+                                                pFuseToCutLayout->addWidget(m_plwFuseListWt);
+                                            }
+                                            pFuseToCutBox->setLayout(pFuseToCutLayout);
+                                        }
+
+                                        pObjectsLayout->addWidget(pCuttingWingsBox);
+                                        pObjectsLayout->addWidget(pFuseToCutBox);
+                                    }
+
+                                    m_ppbCutFuse = new QPushButton("Cut fuselage");
+
+                                    pThickLayout->addWidget(plabThickNote);
+                                    pThickLayout->addLayout(pObjectsLayout);
+                                    pThickLayout->addWidget(m_ppbCutFuse);
+                                }
+                                pfrThick->setLayout(pThickLayout);
+                            }
+
+                                    m_pswThinThick->addWidget(pfrThin);
+                                    m_pswThinThick->addWidget(pfrThick);
+                                }
+                                pThinThickLayout->addLayout(pSelLayout);
+                                pThinThickLayout->addWidget(m_pswThinThick);
+                            }
+                            pfrThinThick->setLayout(pThinThickLayout);
+                        }
                         QFrame *pfrFreeMesh = new QFrame;
                         {
                             QVBoxLayout *pMeshLayout = new QVBoxLayout;
@@ -444,7 +489,6 @@ void PlaneXflDlg::setupLayout()
                             }
                             pfrFreeMesh->setLayout(pMeshLayout);
                         }
-
 
                         m_pMeshCorrectionsFrame = new QFrame;
                         {
@@ -539,8 +583,8 @@ void PlaneXflDlg::setupLayout()
                         }
 
                         m_pLeftTabWidget->addTab(pMetaFrame,               "Meta");
-                        m_pLeftTabWidget->addTab(pPartFrame,               "Parts");
-                        m_pLeftTabWidget->addTab(pTablesFrame,             "Assembly");
+                        m_pLeftTabWidget->addTab(pfrParts,                 "Parts");
+                        m_pLeftTabWidget->addTab(pfrThinThick,             "Assembly");
                         m_pLeftTabWidget->addTab(pfrFreeMesh,              "Fuselage mesh");
                         m_pLeftTabWidget->addTab(m_pMeshCorrectionsFrame , "Mesh connections");
 
@@ -696,7 +740,7 @@ void PlaneXflDlg::initDialog(Plane *pPlane, bool bAcceptName)
     else
     {
         if(m_pPlaneXfl->hasFuse())  m_pglPlaneView->setReferenceLength(m_pPlaneXfl->fuse(0)->length()*2);
-        else                     m_pglPlaneView->setReferenceLength(1.0);
+        else                        m_pglPlaneView->setReferenceLength(1.0);
     }
     m_pglPlaneView->reset3dScale();
 
@@ -704,7 +748,7 @@ void PlaneXflDlg::initDialog(Plane *pPlane, bool bAcceptName)
     for(int ifuse=0; ifuse<pPlaneXfl->nFuse(); ifuse++) pPlaneXfl->fuse(ifuse)->setVisible(true);
 
 
-    onUpdatePlaneProps();
+    onUpdatePlane();
 
     setControls();
 
@@ -719,7 +763,10 @@ void PlaneXflDlg::setControls()
     gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
     m_pchHighlightSel->setChecked(pglPlaneXflView->isHighlightingPart());
     m_pfeStitchPrecision->setValue(s_StitchPrecision*Units::mtoUnit());
-    m_pchCutParallel->setChecked(s_bParallelCut);
+
+    m_prbThick->setChecked(s_bThickSurfAssy);
+    m_prbThin->setChecked(!s_bThickSurfAssy);
+    m_pswThinThick->setCurrentIndex(s_bThickSurfAssy ? 1 : 0);
 }
 
 
@@ -770,6 +817,7 @@ void PlaneXflDlg::makeActions()
         m_pPartMenu->addAction(m_pPartInertia);
         m_pPartMenu->addAction(m_pPartScale);
         m_pPartMenu->addSeparator();
+        m_pPartMenu->addAction(m_pResetFuse);
         m_pPartMenu->addAction(m_pTessellation);
         m_pPartMenu->addAction(m_pFlipNormals);
         m_pPartMenu->addSeparator();
@@ -1003,7 +1051,6 @@ void PlaneXflDlg::readParams()
 {
     if(!m_pPlane) return;
     s_StitchPrecision  = m_pfeStitchPrecision->value()/Units::mtoUnit();
-    s_bParallelCut = m_pchCutParallel->isChecked();
 }
 
 
@@ -1021,7 +1068,7 @@ void PlaneXflDlg::onOK(int iExitCode)
 
     m_pPlaneXfl->setDescription(m_pleDescription->toPlainText().toStdString());
 
-    m_pPlaneXfl->makeTriMesh(true);
+    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
 
     done(iExitCode);
 }
@@ -1706,14 +1753,15 @@ void PlaneXflDlg::onUpdatePlane()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-    m_pPlaneXfl->makePlane(true, false, true);
+    m_pPlaneXfl->makePlane(s_bThickSurfAssy, false, true);
 
     onUpdatePlaneProps();
 
     m_pglPlaneView->setPlaneReferenceLength(m_pPlane);
 
     m_pglPlaneView->updatePartFrame(m_pPlane);
-    gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
+
+    gl3dPlaneXflView *pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
     pglPlaneXflView->resetgl3dPlane();
     m_pglPlaneView->update();
 
@@ -1726,7 +1774,7 @@ void PlaneXflDlg::onUpdateMesh()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     onClearHighlighted();
 
-    m_pPlaneXfl->makeTriMesh(true);
+    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
     m_bChanged = true;
 
     m_pglPlaneView->resetgl3dMesh();
@@ -1939,6 +1987,14 @@ void PlaneXflDlg::onNamesChanged()
 }
 
 
+void PlaneXflDlg::onThinThick()
+{
+    s_bThickSurfAssy = m_prbThick->isChecked();
+    m_pswThinThick->setCurrentIndex(s_bThickSurfAssy ? 1 : 0);
+    onUpdatePlane();
+}
+
+
 void PlaneXflDlg::onTabChanged(int iNewTab)
 {
     onClearHighlighted();
@@ -1957,34 +2013,71 @@ void PlaneXflDlg::onTabChanged(int iNewTab)
         }
         case 2:
         {
-            //fill the tables
-            m_plwWingListWt->clear();
+            QVector<WingXfl*> thinwings = thinWingList(); // current selection
+            QStringList wingnames;
+            for(WingXfl const*pWing : thinwings)  wingnames.push_back(QString::fromStdString(pWing->name()));
+
+            //fill the wing list for thin assembly - parts may have changed
+            m_plwThinWings->clear();
+            for(int iw=0; iw<m_pPlaneXfl->nWings(); iw++)
+            {
+                m_plwThinWings->addItem(QString::fromStdString(m_pPlaneXfl->wing(iw)->name()));
+            }
+
+            //restore the existing selection
+            for(int row=0; row<m_plwThinWings->count();row++)
+            {
+                QListWidgetItem *pItem = m_plwThinWings->item(row);
+                if(pItem && wingnames.contains(pItem->text()))
+                {
+                    pItem->setSelected(true);
+                }
+            }
+
+            //fill the tables for thick assembly
+            m_plwThickWings->clear();
             m_plwFuseListWt->clear();
             for(int iw=0; iw<m_pPlaneXfl->nWings(); iw++)
             {
-                m_plwWingListWt->addItem(QString::fromStdString(m_pPlaneXfl->wing(iw)->name()));
+                m_plwThickWings->addItem(QString::fromStdString(m_pPlaneXfl->wing(iw)->name()));
             }
             for(int ifuse=0; ifuse<m_pPlaneXfl->nFuse(); ifuse++)
             {
                 m_plwFuseListWt->addItem(QString::fromStdString(m_pPlaneXfl->fuse(ifuse)->name()));
             }
-            onListClick();
+            onThickListClick();
             break;
         }
         case 3:
-        {
+        {            
             // initialize the flow5 mesher
             Fuse *pFuse =nullptr;
-            // get the fuse name currently selected in the assembly table, if any
-            QListWidgetItem *pItem = m_plwFuseListWt->currentItem();
-            if(pItem)
+            QVector<WingXfl*> thinwings = thinWingList(); // current selection
+
+            if(!s_bThickSurfAssy)
             {
-                QString fusename = pItem->text();
-                pFuse = m_pPlaneXfl->fuse(fusename.toStdString());
+                m_ppto->onAppendQText("Conforming fuselage mesh to mid-camber lines of:\n");
+                for(WingXfl const*pWing : thinwings)
+                {
+                    m_ppto->onAppendQText("   " + QString::fromStdString(pWing->name()) + EOLch);
+                }
+                m_ppto->appendEOL(2);
+                m_pGMesherWt->setWings(thinwings);
             }
+            else
+            {
+                // get the fuse name currently selected in the assembly table, if any
+                QListWidgetItem *pItem = m_plwFuseListWt->currentItem();
+                if(pItem)
+                {
+                    QString fusename = pItem->text();
+                    pFuse = m_pPlaneXfl->fuse(fusename.toStdString());
+                }
+            }
+
             if(!pFuse)
             {
-                // get the firtst fuse, if any
+                // get the first fuse, if any
                 pFuse = m_pPlaneXfl->fuse(0);
             }
 
@@ -2050,9 +2143,33 @@ void PlaneXflDlg::onSelMesher()
 }
 
 
-void PlaneXflDlg::onListClick()
+QVector<WingXfl*> PlaneXflDlg::thinWingList() const
 {
-    QList<QListWidgetItem*> selectedtools = m_plwWingListWt->selectedItems();
+    QVector<WingXfl*> winglist;
+
+    for(int row=0; row<m_plwThinWings->count(); row++)
+    {
+        QListWidgetItem *pItem = m_plwThinWings->item(row);
+        if(pItem && pItem->isSelected())
+        {
+            WingXfl *pWing = m_pPlaneXfl->wing(row);
+            if(pWing) winglist.push_back(pWing);
+        }
+    }
+
+    return winglist;
+}
+
+
+void PlaneXflDlg::onThinListClick()
+{
+    m_pGMesherWt->setWings(thinWingList());
+}
+
+
+void PlaneXflDlg::onThickListClick()
+{
+    QList<QListWidgetItem*> selectedtools = m_plwThickWings->selectedItems();
 //    QList<QListWidgetItem*> selectedfuse = m_plwFuseListWt->selectedItems();
 
     Fuse *pFuse = nullptr;
@@ -2067,16 +2184,15 @@ void PlaneXflDlg::onListClick()
     }
 
     m_ppbCutFuse->setEnabled(pFuse && selectedtools.size()>0);
-    m_ppbFuseMenuButton->setEnabled(pFuse);
 }
 
 
 void PlaneXflDlg::onPartListClicked(QModelIndex)
 {
     m_pglPlaneView->clearSelectedParts();
-    for(int iw=0; iw<m_plwWingListWt->count(); iw++)
+    for(int iw=0; iw<m_plwThickWings->count(); iw++)
     {
-        QListWidgetItem *pItem = m_plwWingListWt->item(iw);
+        QListWidgetItem *pItem = m_plwThickWings->item(iw);
         if(pItem && pItem->isSelected())
         {
             WingXfl *pWing = m_pPlaneXfl->wing(iw);
@@ -2096,11 +2212,101 @@ void PlaneXflDlg::onPartListClicked(QModelIndex)
 }
 
 
+void PlaneXflDlg::makeIntersection_0()
+{
+    if(!m_pPlaneXfl->hasMainWing()) return;
+
+    readParams();
+
+    // reset the shells
+    Fuse *pFuse = nullptr;
+    Vector3d fusepos;
+    for(int ifuse=0; ifuse<m_plwFuseListWt->count(); ifuse++)
+    {
+        QListWidgetItem *pItem = m_plwFuseListWt->item(ifuse);
+        if(pItem && pItem->isSelected())
+        {
+            pFuse = m_pPlaneXfl->fuse(ifuse);
+            fusepos = m_pPlaneXfl->fusePos(ifuse);
+            break;
+        }
+    }
+    if(!pFuse)
+    {
+        updateOutput("No fuse selected.\n\n");
+        return;
+    }
+
+    //restore the shells before attempting to cut
+    if(pFuse->isXflType())
+    {
+        std::string str;
+        FuseXfl *pFuseXfl = dynamic_cast<FuseXfl*>(pFuse);
+        pFuseXfl->makeShape(str); // will build both the shapes and the shells
+    }
+    else
+        pFuse->makeShellsFromShapes();
+
+    std::vector<std::vector<Node>> I(m_pPlaneXfl->nWings());
+    std::vector<Node> dbg;
+
+    for(int iw=0; iw<m_pPlaneXfl->nWings(); iw++)
+    {
+
+        WingXfl const *pWing = m_pPlaneXfl->wingAt(iw);
+        Surface const &surf = pWing->rootRightSurface();
+
+        m_pglPlaneView->setDebugNodes(surf.m_SideA);
+
+        //translate the nodes by -fusepos
+        if(pWing->isTwoSided())
+        {
+            for(Node nd : surf.m_SideA)
+            {
+                I[iw].push_back(nd.translated(-fusepos.x, -fusepos.y, -fusepos.z));
+                dbg.push_back(nd);
+            }
+        }
+        else
+        {
+            // because fins are defined on the left side
+            for(Node nd : surf.m_SideB)
+            {
+                I[iw].push_back(nd.translated(-fusepos.x, -fusepos.y, -fusepos.z));
+                dbg.push_back(nd);
+            }
+        }
+        break;
+    }
+
+    m_pglPlaneView->setDebugNodes(dbg);
+
+    m_pGMesherWt->setExtraNodes(I);
+
+/*
+    gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
+    pglPlaneXflView->resetgl3dFuse(); */
+    m_pglPlaneView->update();
+    m_bChanged = true;
+}
+
 /**
  * Cuts the left and right shells with each of the wings and updates the two half shells.
  */
 void PlaneXflDlg::onCutFuse()
 {
+/*    s_bThickSurfAssy = m_pchThickSurfAssy->isChecked();
+    if(!s_bThickSurfAssy)
+    {
+//        makeFragments();
+//        m_pGMesherWt->setWings({m_pPlaneXfl->mainWing()});
+//        m_pGMesherWt->setWings({m_pPlaneXfl->stab()});
+//        m_pGMesherWt->setWings({m_pPlaneXfl->mainWing(), m_pPlaneXfl->stab()});
+        m_pGMesherWt->setWings({m_pPlaneXfl->mainWing(), m_pPlaneXfl->stab(), m_pPlaneXfl->fin()});
+
+        return;
+    }*/
+
     QString strange;
 
     readParams();
@@ -2134,9 +2340,9 @@ void PlaneXflDlg::onCutFuse()
     WingShapeList.Clear();
 
     TopoDS_Shape WingShape;
-    for(int iw=0; iw<m_plwWingListWt->count(); iw++)
+    for(int iw=0; iw<m_plwThickWings->count(); iw++)
     {
-        QListWidgetItem *pItem = m_plwWingListWt->item(iw);
+        QListWidgetItem *pItem = m_plwThickWings->item(iw);
         if(pItem && pItem->isSelected())
         {
             std::string logmsg;
@@ -2234,12 +2440,146 @@ void PlaneXflDlg::onCutFuse()
     std::string str;
     pFuse->makeDefaultTriMesh(str, ""); // just for xfl and stl
 
-    m_pPlaneXfl->makeTriMesh(true);
+    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
 
     gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
     pglPlaneXflView->resetgl3dFuse();
     m_pglPlaneView->update();
     m_bChanged = true;
+}
+
+
+bool PlaneXflDlg::makeFragments()
+{
+    if(!m_pPlaneXfl->hasMainWing()) return false;
+    if(!m_pPlaneXfl->hasFuse()) return false;
+
+    // build thin surface on wing mid-line
+    WingXfl const &wing = *m_pPlaneXfl->mainWing();
+
+    //Make the tools
+    std::string logmsg;
+
+    TopoDS_Shape SweptShape;
+    if(!occ::makeWingSweepMidSection(&wing, SweptShape, logmsg))
+        return false;
+
+    TopTools_ListOfShape tools;
+    tools.Append(SweptShape);
+
+
+    // Time to fragment
+    QString strong, strange;
+    Fuse *pFuse = m_pPlaneXfl->fuse(0);
+
+    if(pFuse->shapeCount()<=0)
+    {
+        updateOutput("   Fuse has no topology shapes to cut.\n");
+        return false;
+    }
+    pFuse->makeShellsFromShapes();  /** @todo no need? */
+    strange.clear();
+    int iShell = 0;
+    for(TopTools_ListIteratorOfListOfShape shellit(pFuse->shells()); shellit.More(); shellit.Next())
+    {
+        strange += QString::asprintf("   Shell %d:\n", iShell);
+        std::string str;
+        occ::listShapeContent(shellit.Value(), str, "      ");
+        strange += QString::fromStdString(str);
+        iShell++;
+    }
+//    updateOutput(strange+"\n");
+qDebug("%s",strange.toStdString().c_str());
+
+
+qDebug()<<"nshells="<<pFuse->shells().Extent();
+qDebug()<<"nshapes="<<pFuse->shapes().Extent();
+
+    updateOutput("Fragmenting body shape with selected wings...\n");
+
+    // translate the wings by -fusepos
+    if(fabs(pFuse->position().x)>LENGTHPRECISION || fabs(pFuse->position().y)>LENGTHPRECISION || fabs(pFuse->position().z)>LENGTHPRECISION)
+    {
+        gp_Trsf Translation;
+        Translation.SetTranslation(gp_Vec(-pFuse->position().x, -pFuse->position().y, -pFuse->position().z));
+        BRepBuilderAPI_Transform thetranslator(Translation);
+
+        for(TopTools_ListIteratorOfListOfShape shapeit(tools); shapeit.More(); shapeit.Next())
+        {
+            thetranslator.Perform(shapeit.Value(), Standard_True);
+            shapeit.Value() = thetranslator.Shape();
+        }
+    }
+
+//    pFuse->clearShells();
+
+    TopoDS_ListOfShape newShapes;
+    for(TopTools_ListIteratorOfListOfShape shellit(pFuse->shapes()); shellit.More(); shellit.Next())
+    {
+        TopoDS_ListOfShape faces;
+        TopExp_Explorer shellexplorer;
+        for (shellexplorer.Init(shellit.Value(), TopAbs_SHELL); shellexplorer.More(); shellexplorer.Next())
+        {
+            faces.Append(shellexplorer.Current());
+        }
+
+
+        BRepAlgoAPI_Splitter aSplitter;
+        aSplitter.SetArguments(faces);
+        aSplitter.SetTools(tools); // or the shells maybe?
+        aSplitter.SetRunParallel(true);
+        aSplitter.Build();
+
+        if (!aSplitter.IsDone())
+        {
+            return false;
+        }
+
+        TopoDS_Shape compound = aSplitter.Shape();
+
+        newShapes.Append(compound);
+
+std::string str;
+occ::listShapeContent(compound, str, "", true);
+qDebug("%s", str.c_str());
+
+        TopExp_Explorer compexplorer;
+        int iShell=0;
+
+        for (compexplorer.Init(compound, TopAbs_SHELL); compexplorer.More(); compexplorer.Next())
+        {
+            strange = QString::asprintf("   Cutting shell %d\n", iShell+1);
+            updateOutput(strange);
+
+            if(compexplorer.Current().Orientation()==TopAbs_REVERSED)
+                pFuse->appendShell(compexplorer.Current().Reversed());
+            else
+                pFuse->appendShell(compexplorer.Current());
+
+            iShell++;
+        }
+    }
+
+    // save the fragmented shapes
+    pFuse->clearShapes();
+    for(TopTools_ListIteratorOfListOfShape shapeit(newShapes); shapeit.More(); shapeit.Next())
+    {
+        pFuse->appendShape(shapeit.Value());
+    }
+
+
+    pFuse->clearTriangles();
+    pFuse->clearTriangleNodes();
+
+
+    QString logg;
+    gmesh::makeFuseTriangulation(pFuse, logg, "   ");
+    updateOutput(logg);
+
+    strong = QString::asprintf("   New triangulation has %d elements\n", pFuse->nTriangles());
+    updateOutput(strong+"\n\n");
+
+    return true;
 }
 
 
@@ -2251,13 +2591,12 @@ void PlaneXflDlg::cutFuseShapes(Fuse *pFuse, Vector3d const &fusepos, TopoDS_Lis
         updateOutput("   Fuse has no topology shapes to cut.\n");
         return;
     }
-    pFuse->makeShellsFromShapes();
+    pFuse->makeShellsFromShapes();  /** @todo no need? */
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
     updateOutput("Cutting body shape with selected wings...\n");
 
     // make cutting list
-   TopTools_ListIteratorOfListOfShape itwing;
 
     // translate the wings by -fusepos
     if(fabs(fusepos.x)>LENGTHPRECISION || fabs(fusepos.y)>LENGTHPRECISION || fabs(fusepos.z)>LENGTHPRECISION)
@@ -2292,7 +2631,7 @@ void PlaneXflDlg::cutFuseShapes(Fuse *pFuse, Vector3d const &fusepos, TopoDS_Lis
         BRepAlgoAPI_Cut theKnife;
         theKnife.SetArguments(faces);
         theKnife.SetTools(tools);
-        theKnife.SetRunParallel(s_bParallelCut);
+        theKnife.SetRunParallel(true);
 //        theKnife.SetFuzzyValue(1.e-4);
         strange = QString::asprintf("   Using fuzzy value %g", theKnife.FuzzyValue()*Units::mtoUnit());
         strange += Units::lengthUnitQLabel() + "\n";
@@ -2420,7 +2759,7 @@ void PlaneXflDlg::cutFuseXflRightShapes(Fuse *pFuse, Vector3d const &fusepos, To
 
 
     BRepAlgoAPI_Cut theKnife;
-    theKnife.SetRunParallel(s_bParallelCut);
+    theKnife.SetRunParallel(true);
 
 //    double fuzz = theKnife.FuzzyValue();
 //    theKnife.SetFuzzyValue(1.e-4);
@@ -2487,9 +2826,9 @@ void PlaneXflDlg::loadSettings(QSettings &settings)
         s_HSplitterSizes    = settings.value("HSplitterSizes").toByteArray();
         s_PartSplitterSizes = settings.value("VSplitterSizes").toByteArray();
 
+        s_bThickSurfAssy    = settings.value("ThickSurfAssy",     s_bThickSurfAssy).toBool();
         s_StitchPrecision   = settings.value("StitchPrecision",   s_StitchPrecision  ).toDouble();
         s_NodeMergeDistance = settings.value("NodeMergeDistance", s_NodeMergeDistance).toDouble();
-        s_bParallelCut      = settings.value("ParallelCut",       s_bParallelCut).toBool();
 
     }
     settings.endGroup();
@@ -2505,9 +2844,9 @@ void PlaneXflDlg::saveSettings(QSettings &settings)
         settings.setValue("HSplitterSizes",    s_HSplitterSizes);
         settings.setValue("VSplitterSizes",    s_PartSplitterSizes);
 
+        settings.setValue("ThickSurfAssy",     s_bThickSurfAssy);
         settings.setValue("StitchPrecision",   s_StitchPrecision);
         settings.setValue("NodeMergeDistance", s_NodeMergeDistance);
-        settings.setValue("ParallelCut",       s_bParallelCut);
 
     }
     settings.endGroup();
@@ -2650,25 +2989,23 @@ void PlaneXflDlg::onEditPart()
 void PlaneXflDlg::onResetFuse()
 {
     std::string strange;
-
-    updateOutput("\n");
-
     Fuse *pFuse = nullptr;
-    Vector3d fusepos;
-    for(int ifuse=0; ifuse<m_plwFuseListWt->count(); ifuse++)
+
+    int row = selectedPart();
+
+    if(row<m_pPlaneXfl->nWings())
     {
-        QListWidgetItem *pItem = m_plwFuseListWt->item(ifuse);
-        if(pItem && pItem->isSelected())
-        {
-            pFuse = m_pPlaneXfl->fuse(ifuse);
-            fusepos = m_pPlaneXfl->fusePos(ifuse);
-            break;
-        }
+        // not applicable
+    }
+    else if(row>=m_pPlaneXfl->nWings())
+    {
+        int iFuse = row-m_pPlaneXfl->nWings();
+        pFuse = m_pPlaneXfl->fuse(iFuse);
     }
 
     if(!pFuse)
     {
-        updateOutput("No fuse selected, no reset possible.\n\n");
+        updateOutput("_nNo fuse selected, no reset possible.\n\n");
         return;
     }
 
@@ -2685,7 +3022,7 @@ void PlaneXflDlg::onResetFuse()
     pFuse->makeFuseGeometry();
 
     pFuse->makeDefaultTriMesh(strange, "");
-    m_pPlaneXfl->makeTriMesh(true);
+    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
     gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
     pglPlaneXflView->resetgl3dFuse();
 
@@ -2857,6 +3194,7 @@ void PlaneXflDlg::onPartItemClicked(QModelIndex index)
             QRect itemrect = m_pcptParts->visualRect(index);
             QPoint menupos = m_pcptParts->mapToGlobal(itemrect.topLeft());
             m_pPartMenu->setEnabled(index.row()>=0);
+            m_pResetFuse->setEnabled(index.row()>=m_pPlaneXfl->nWings());
             m_pFlipNormals->setEnabled(index.row()>=m_pPlaneXfl->nWings());
             m_pTessellation->setEnabled(index.row()>=m_pPlaneXfl->nWings());
             m_pPartMenu->exec(menupos, m_pEditPartDef);
@@ -2874,7 +3212,7 @@ void PlaneXflDlg::onSelectPart(Part *pPart)
             if(m_pPlaneXfl->wing(iw)==pPart)
             {
                 m_pcptParts->selectRow(iw);
-                m_plwWingListWt->setCurrentRow(iw);
+                m_plwThickWings->setCurrentRow(iw);
             }
         }
     }
@@ -3033,7 +3371,7 @@ void PlaneXflDlg::onResetFuseMesh()
     m_pPlaneXfl->fuse(0)->makeDefaultTriMesh(logmsg, "   ");
     updateStdOutput(logmsg);
 
-    m_pPlaneXfl->makeTriMesh(true);
+    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
 
     QString strange;
     strange = QString::asprintf("\nTriangle count=%d\n", m_pPlaneXfl->nPanel3());
@@ -3064,7 +3402,7 @@ void PlaneXflDlg::onFuseMeshDlg()
         return;
     }
 
-    m_pPlaneXfl->makeTriMesh(true);
+    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
 
     QString strange;
     strange = QString::asprintf("\nTriangle count=%d\n", m_pPlaneXfl->nPanel3());

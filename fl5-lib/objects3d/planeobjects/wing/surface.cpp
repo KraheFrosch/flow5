@@ -2075,8 +2075,11 @@ bool Surface::makeSectionSplines(BSpline3d &leftspline, BSpline3d &rightspline) 
 }
 
 
-bool Surface::makeSectionHalfSpline(bool bTop, bool bLeft, int degree, int nCtrlPoints, int nOutPoints, BSpline3d &spline) const
+bool Surface::makeSectionHalfSpline(xfl::enumSurfacePosition pos, bool bLeft, int degree, int nCtrlPoints, int nOutPoints, BSpline3d &spline) const
 {
+    if(pos!=xfl::TOPSURFACE && pos!=xfl::BOTSURFACE && pos!=xfl::MIDSURFACE)
+        return false;
+
 //    int degree = 3;
 //    int nCtrlPoints = 11;
 //    int nPoints = 2*nCtrlPoints; // minimum to get a good approximation
@@ -2085,18 +2088,7 @@ bool Surface::makeSectionHalfSpline(bool bTop, bool bLeft, int degree, int nCtrl
     std::vector<double> xdistrib;
     xfl::getPointDistribution(xdistrib, nOutPoints-1, xfl::COSINE); // ensures good resolution at LE and TE
 
-    if(bTop)
-    {
-        getSidePoints_2(xfl::TOPSURFACE, nullptr, PtA, PtB, NA, NB, xdistrib, xdistrib);
-//        std::reverse(PtA.begin(), PtA.end());
-//        std::reverse(PtB.begin(), PtB.end());
-    }
-    else
-    {
-        getSidePoints_2(xfl::BOTSURFACE, nullptr, PtA, PtB, NA, NB, xdistrib, xdistrib);
-//        std::reverse(PtA.begin(), PtA.end());
-//        std::reverse(PtB.begin(), PtB.end());
-    }
+    getSidePoints_2(pos, nullptr, PtA, PtB, NA, NB, xdistrib, xdistrib);
 
     if(bLeft)
     {

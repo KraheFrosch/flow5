@@ -293,7 +293,7 @@ void gl3dFuseView::glMake3dObjects()
             gl::makeTrianglesOutline(m_pFuse->triangles(), Vector3d(), m_vboTess);
 
             int nPts = pXflFuse->isSplineType() ? 30 : 1;
-            glMakeShellOutline(m_pFuse->shells(), Vector3d(), m_vboOutline, nPts);
+            gl::glMakeShellOutline(m_pFuse->shells(), Vector3d(), m_vboOutline, nPts);
 
             if(pXflFuse->isSplineType())
             {
@@ -305,11 +305,11 @@ void gl3dFuseView::glMake3dObjects()
                 gl::makeFuseXflSections(pFuseSections, Vector3d(), W3dPrefs::bodyAxialRes(), W3dPrefs::bodyHoopRes(), m_vboFrames);
             }
         }
-        else if(m_pFuse->isOccType())
+        else if(m_pFuse->isXflType() || m_pFuse->isOccType())
         {
             gl::makeTriangulation3Vtx(m_pFuse->triangulation(), Vector3d(), m_vboSurface, false);
             gl::makeTrianglesOutline(m_pFuse->triangles(), Vector3d(), m_vboTess);
-            glMakeShellOutline(m_pFuse->shells(), Vector3d(), m_vboOutline);
+            gl::glMakeShellOutline(m_pFuse->shells(), Vector3d(), m_vboOutline);
         }
         else if(m_pFuse->isStlType())
         {

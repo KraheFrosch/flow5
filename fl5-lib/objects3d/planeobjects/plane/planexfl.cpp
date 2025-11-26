@@ -1398,11 +1398,6 @@ void PlaneXfl::makeTriMesh(bool bThickSurfaces)
         wing.makeTriPanels(m_RefTriMesh.nPanels(), m_RefTriMesh.nNodes(), bThickSurfaces);
         m_RefTriMesh.appendMesh(wing.triMesh());
         if(wing.isFin()) m_RefTriMesh.lastPanel().m_iPD = -1; // because there is no right tip patch
-
-//        int i0 = wing.firstPanel3Index();
-//        int n0 = wing.nPanel3();
-        // sets hanging nodes on Xfl::NOSURFACE  for node normal display purposes
-//        m_RefTriMesh.makeConnectionsFromNodeIndexes(i0,n0,i0,n0);
     }
 
     for(int in=0; in<m_RefTriMesh.nodeCount(); in++) m_RefTriMesh.node(in).setIndex(in);
@@ -1459,15 +1454,10 @@ void PlaneXfl::makeTriMesh(bool bThickSurfaces)
     m_TriMesh = m_RefTriMesh;
 }
 
-#include <QElapsedTimer>
-#include <QDebug>
 
 /** Potentially lengthy task, so on-demand only */
-bool PlaneXfl::connectTriMesh(bool bConnectTE, bool bThickSurfaces, bool )
+bool PlaneXfl::connectTriMesh(bool bConnectTE, bool, bool )
 {
-    QElapsedTimer t; t.start();
-
-
     m_RefTriMesh.makeConnectionsFromNodePosition(false, true);
 
     /*
@@ -1479,8 +1469,6 @@ bool PlaneXfl::connectTriMesh(bool bConnectTE, bool bThickSurfaces, bool )
         int n1 = pFuse->nPanel3();
         m_RefTriMesh.makeConnectionsFromNodePosition(i1, n1, LENGTHPRECISION, true);
     }
-
-
 
     // make internal wing connections
     for(int iw=0; iw<nWings(); iw++)
@@ -1521,9 +1509,6 @@ bool PlaneXfl::connectTriMesh(bool bConnectTE, bool bThickSurfaces, bool )
         }
     }
 */
-
-    QString strange = QString::asprintf("   Time to connect: %.3f s\n\n", double(t.elapsed())/1000.0);
-    qDebug()<<strange;
 
 
     m_RefTriMesh.connectNodes();

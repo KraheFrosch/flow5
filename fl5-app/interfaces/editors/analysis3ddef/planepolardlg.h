@@ -103,7 +103,7 @@ class PlanePolarDlg : public Polar3dDlg
         QCheckBox *m_pchFuseDrag;
         QRadioButton *m_prbPSDrag, *m_prbKSDrag, *m_prbCustomFuseDrag;
         QLabel *m_plabFuseFormFactor, *m_plabFuseWettedArea, *m_plabFuseDragFormula;
-        FloatEdit *m_pdeCustomFF;
+        FloatEdit *m_pfeCustomFF;
 
         QFrame *m_pfrViscosity;
         QCheckBox *m_pchViscAnalysis;

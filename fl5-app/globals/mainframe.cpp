@@ -1199,7 +1199,7 @@ void MainFrame::deleteProject()
     displayMessage("   Deleting plane objects\n", false);
     m_pXPlane->m_pCurPlane  = nullptr;
     m_pXPlane->m_pCurPOpp   = nullptr;
-    m_pXPlane->m_pCurWPolar = nullptr;
+    m_pXPlane->m_pCurPlPolar = nullptr;
     Objects3d::deleteObjects();
     m_pXPlane->resetCurves();
     m_pXPlane->setPlane(nullptr);
@@ -4340,7 +4340,7 @@ void MainFrame::onExecuteScript()
     XDirect::setCurOpp(nullptr);
 
     m_pXPlane->m_pCurPlane  = nullptr;
-    m_pXPlane->m_pCurWPolar = nullptr;
+    m_pXPlane->m_pCurPlPolar = nullptr;
     m_pXPlane->m_pCurPOpp   = nullptr;
 
     m_pLogWt->show();

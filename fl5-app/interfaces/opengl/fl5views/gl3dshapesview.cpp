@@ -258,8 +258,8 @@ void gl3dShapesView::glMake3dObjects()
             {
                 BRepTools::Clean(m_pShapes->value(iShape));
 
-                glMakeShapeTriangles(m_pShapes->value(iShape), m_OccMeshParams, m_vboShapes[iShape]);
-                glMakeEdges(m_pShapes->value(iShape), m_vboEdges[iShape], m_EdgeLabelPts);
+                gl::glMakeShapeTriangles(m_pShapes->value(iShape), m_OccMeshParams, m_vboShapes[iShape]);
+                gl::glMakeEdges(m_pShapes->value(iShape), m_vboEdges[iShape], m_EdgeLabelPts);
             }
         }
     }
@@ -288,7 +288,7 @@ void gl3dShapesView::setHighlightedEdge(TopoDS_Edge const &Edge)
 {
     if(Edge.IsNull())  m_vboHighEdge.destroy();
     else
-        glMakeEdge(Edge, m_vboHighEdge);
+        gl::glMakeEdge(Edge, m_vboHighEdge);
 }
 
 
@@ -555,7 +555,7 @@ void gl3dShapesView::mouseReleaseEvent(QMouseEvent *pEvent)
                             {
                                 TopoDS_Edge const &edge = TopoDS::Edge(EdgeExplorer.Current());
                                 if(edge.IsNull()) m_vboPickedEdge.destroy();
-                                else              glMakeEdge(edge, m_vboPickedEdge);
+                                else              gl::glMakeEdge(edge, m_vboPickedEdge);
 
                                 break;                            }
                             iEdge++;

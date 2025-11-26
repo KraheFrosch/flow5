@@ -1252,7 +1252,7 @@ void occ::makeWingShape(WingXfl const *pWing, double stitchprecision, TopoDS_Sha
 }
 
 
-void occ::makeFoilWires(Surface const &aSurf,
+bool occ::makeFoilWires(Surface const &aSurf,
                         TopoDS_Wire &TLWire, TopoDS_Wire & BLWire, TopoDS_Wire &TRWire, TopoDS_Wire &BRWire,
                         std::string &logmsg)
 {
@@ -1274,7 +1274,7 @@ void occ::makeFoilWires(Surface const &aSurf,
     if(!TLPolyMaker.IsDone() || TLWire.IsNull())
     {
         logmsg += "   error making topLeftWire\n";
-        return;
+        return false;
     }
 
     //BOT Wire
@@ -1287,7 +1287,7 @@ void occ::makeFoilWires(Surface const &aSurf,
     if(!BLPolyMaker.IsDone() || BLWire.IsNull())
     {
         logmsg += "   error making botLeftwire\n";
-        return;
+        return false;
     }
 
 
@@ -1303,7 +1303,7 @@ void occ::makeFoilWires(Surface const &aSurf,
     if(!TRPolyMaker.IsDone() || TRWire.IsNull())
     {
         logmsg += "error making topRightWire\n";
-        return;
+        return false;
     }
 
     // BOT wire
@@ -1317,8 +1317,90 @@ void occ::makeFoilWires(Surface const &aSurf,
     if(!BRPolyMaker.IsDone() || BRWire.IsNull())
     {
         logmsg += "error making botRightWire\n";
-        return;
+        return false;
     }
+
+    return true;
+}
+
+
+
+bool occ::makeFoilMidWires(Surface const &aSurf,TopoDS_Wire & LeftWire, TopoDS_Wire &RightWire, std::string &logmsg)
+{
+    int nPoints = int(aSurf.xDistribA().size());
+    std::vector<Vector3d>  PtA(nPoints), PtB(nPoints);
+    std::vector<Vector3d> NA(nPoints), NB(nPoints);
+
+    aSurf.getSidePoints_2(xfl::MIDSURFACE, nullptr, PtA, PtB, NA, NB, aSurf.xDistribA(), aSurf.xDistribB());
+
+    // LEFT FOIL
+    if(!makePolyLineWire(PtA, LeftWire, logmsg))
+    {
+        logmsg += "   error making left wire\n";
+        return false;
+    }
+
+    // RIGHT FOIL
+    if(!makePolyLineWire(PtB, RightWire, logmsg))
+    {
+        logmsg += "   error making right wire\n";
+        return false;
+    }
+    return true;
+}
+
+
+bool occ::makePolyLineWire(std::vector<Vector3d> const &Pt, TopoDS_Wire &theWire, std::string &logmsg)
+{
+    BRepBuilderAPI_MakeWire PolyLineMaker;
+    for(uint i=0; i<Pt.size()-1; i++)
+    {
+        Vector3d const P0 = Pt.at(i);
+        Vector3d const P1 = Pt.at(i+1);
+        if(!P0.isSame(P1))
+        {
+            TopoDS_Edge anEdge = BRepBuilderAPI_MakeEdge(gp_Pnt(P0.x, P0.y, P0.z),
+                                                         gp_Pnt(P1.x, P1.y, P1.z));
+            PolyLineMaker.Add(anEdge);
+        }
+
+    }
+    theWire = PolyLineMaker.Wire();
+
+
+    if(!PolyLineMaker.IsDone() || theWire.IsNull())
+    {
+        logmsg += "   error making polyline wire\n";
+        return false;
+    }
+    return true;
+}
+
+
+bool occ::makePolyLineWire(std::vector<Node> const &nd, TopoDS_Wire &theWire, std::string &logmsg)
+{
+    BRepBuilderAPI_MakeWire PolyLineMaker;
+    for(uint i=0; i<nd.size()-1; i++)
+    {
+        Vector3d const P0 = nd.at(i);
+        Vector3d const P1 = nd.at(i+1);
+        if(!P0.isSame(P1))
+        {
+            TopoDS_Edge anEdge = BRepBuilderAPI_MakeEdge(gp_Pnt(P0.x, P0.y, P0.z),
+                                                         gp_Pnt(P1.x, P1.y, P1.z));
+            PolyLineMaker.Add(anEdge);
+        }
+
+    }
+    theWire = PolyLineMaker.Wire();
+
+
+    if(!PolyLineMaker.IsDone() || theWire.IsNull())
+    {
+        logmsg += "   error making polyline wire\n";
+        return false;
+    }
+    return true;
 }
 
 
@@ -2641,8 +2723,8 @@ bool occ::makeWing2NurbsShape(WingXfl const *pWing, double stitchprecision, int 
         if(surf.isTipLeft())
         {
             BRepBuilderAPI_MakeWire WireMaker;
-            surf.makeSectionHalfSpline(true,  true, degree, nCtrlPoints, nOutPoints, b3dtop);
-            surf.makeSectionHalfSpline(false, true, degree, nCtrlPoints, nOutPoints, b3dbot);
+            surf.makeSectionHalfSpline(xfl::TOPSURFACE, true, degree, nCtrlPoints, nOutPoints, b3dtop);
+            surf.makeSectionHalfSpline(xfl::BOTSURFACE, true, degree, nCtrlPoints, nOutPoints, b3dbot);
             makeSplineWire(b3dtop, TopWire, str);
             logg += QString::fromStdString(str);
             makeSplineWire(b3dbot, BotWire, str);
@@ -2691,8 +2773,8 @@ qDebug()<<"occspliness"<<HBotCurve->Degree()<<HBotCurve->NbPoles()<<HTopCurve->D
         //RIGHT TIP PATCH
         if(surf.isTipRight())
         {
-            surf.makeSectionHalfSpline(true,  false, degree, nCtrlPoints, nOutPoints, b3dtop);
-            surf.makeSectionHalfSpline(false, false, degree, nCtrlPoints, nOutPoints, b3dbot);
+            surf.makeSectionHalfSpline(xfl::TOPSURFACE, false, degree, nCtrlPoints, nOutPoints, b3dtop);
+            surf.makeSectionHalfSpline(xfl::BOTSURFACE, false, degree, nCtrlPoints, nOutPoints, b3dbot);
             makeSplineWire(b3dtop, TopWire, str);
             logg += QString::fromStdString(str);
 
@@ -2728,7 +2810,7 @@ qDebug()<<"occspliness"<<HBotCurve->Degree()<<HBotCurve->NbPoles()<<HTopCurve->D
 
         // make a degree 1 nurbs between the  left and top right splines.
         BSpline3d b3dleft, b3dright;
-        bool bSide[] = {true, false}; // top, bottom
+        xfl::enumSurfacePosition bSide[] = {xfl::TOPSURFACE, xfl::BOTSURFACE}; // top, bottom
         for(int iside=0; iside<2; iside++)
         {
             surf.makeSectionHalfSpline(bSide[iside], true,  degree, nCtrlPoints, nOutPoints, b3dleft);
@@ -2881,7 +2963,7 @@ bool occ::makeWingSplineSweep(WingXfl const *pWing, double stitchprecision, int 
     {
         Surface const &surf = pWing->surfaceAt(iSurf);
 
-        if(!surf.makeSectionHalfSpline(true,  true, degree, nCtrlPoints, nOutPoints, b3dtopleft) ||
+        if(!surf.makeSectionHalfSpline(xfl::TOPSURFACE,  true, degree, nCtrlPoints, nOutPoints, b3dtopleft) ||
            !makeSplineWire(b3dtopleft, TopLeftWire, str))
         {
             logg += QString::fromStdString(str);
@@ -2889,7 +2971,7 @@ bool occ::makeWingSplineSweep(WingXfl const *pWing, double stitchprecision, int 
             return false;
         }
 
-        if(!surf.makeSectionHalfSpline(false, true, degree, nCtrlPoints, nOutPoints, b3dbotleft) ||
+        if(!surf.makeSectionHalfSpline(xfl::BOTSURFACE, true, degree, nCtrlPoints, nOutPoints, b3dbotleft) ||
            !makeSplineWire(b3dbotleft, BotLeftWire, str))
         {
             logg += QString::fromStdString(str);
@@ -2897,7 +2979,7 @@ bool occ::makeWingSplineSweep(WingXfl const *pWing, double stitchprecision, int 
             return false;
         }
 
-        if(!surf.makeSectionHalfSpline(true,  false, degree, nCtrlPoints, nOutPoints, b3dtopright) ||
+        if(!surf.makeSectionHalfSpline(xfl::TOPSURFACE,  false, degree, nCtrlPoints, nOutPoints, b3dtopright) ||
            !makeSplineWire(b3dtopright, TopRightWire, str))
         {
             logg += QString::fromStdString(str);
@@ -2905,7 +2987,7 @@ bool occ::makeWingSplineSweep(WingXfl const *pWing, double stitchprecision, int 
             return false;
         }
 
-        if(!surf.makeSectionHalfSpline(false, false, degree, nCtrlPoints, nOutPoints, b3dbotright) ||
+        if(!surf.makeSectionHalfSpline(xfl::BOTSURFACE, false, degree, nCtrlPoints, nOutPoints, b3dbotright) ||
            !makeSplineWire(b3dbotright, BotRightWire, str))
         {
             logg += QString::fromStdString(str);
@@ -3063,8 +3145,97 @@ bool occ::makeWingSplineSweep(WingXfl const *pWing, double stitchprecision, int 
 }
 
 
+bool occ::makeWingSweepMidSection(WingXfl const *pWing, TopoDS_Shape &midshape, std::string &logmsg)
+{
+    // Sweep the mid section
+    BRepOffsetAPI_ThruSections Sweeper(false, false, 1.0e-4);
+/*        Sweeper.CheckCompatibility(true);
+        Sweeper.SetSmoothing(false);
+        Sweeper.SetParType(Approx_IsoParametric);
+        Sweeper.SetContinuity(GeomAbs_C0); */
+    for(int jsurf=0; jsurf<pWing->nSurfaces(); jsurf++)
+    {
+        Surface const &surf = pWing->surfaceAt(jsurf);
+        TopoDS_Wire midwire;
+        if(!occ::makePolyLineWire(surf.m_SideA, midwire, logmsg))
+            return false;
+        Sweeper.AddWire(midwire);
+    }
+
+    midshape = Sweeper.Shape();
+    if(!Sweeper.IsDone() || midshape.IsNull())
+    {
+        logmsg += "   Swept shape is invalid.\n";
+        return false;
+    }
+    return true;
+}
+
+
+bool occ::makeWingSplineSweepMidSection(WingXfl const *pWing, int degree, int nCtrlPoints, int nOutPoints,
+                                        TopoDS_Shape &wingshape, std::string &logmsg)
+{
+    if(!pWing)
+    {
+        logmsg += "No wing to process\n";
+        return false;
+    }
+
+    std::string strong = "Processing wing "+ pWing->name() + "\n";
+    logmsg += strong;
+
+    BRepOffsetAPI_ThruSections MidSweeper(false, false);
+
+
+    BSpline3d b3dmid;
+    TopoDS_Wire MidWire;
+
+    for(int iSurf=0; iSurf<pWing->nSurfaces(); iSurf++)
+    {
+        Surface const &surf = pWing->surfaceAt(iSurf);
+
+        surf.makeSectionHalfSpline(xfl::MIDSURFACE, true, degree, nCtrlPoints, nOutPoints, b3dmid);
+        makeSplineWire(b3dmid, MidWire, logmsg);
+
+        Handle(Geom_BSplineCurve) botspline;
+        makeOCCSplineFromBSpline3d(b3dmid, botspline, logmsg);
+
+        MidSweeper.AddWire(MidWire);
+    }
+
+    try
+    {
+        MidSweeper.Build();
+        if(!MidSweeper.IsDone())
+        {
+            logmsg += "     Error sweeping bottom section wires\n";
+            return false;
+        }
+
+        wingshape = MidSweeper.Shape();
+    }
+    catch(Standard_DomainError const &)
+    {
+        logmsg += "     Standard_DomainError sweeping wires\n";
+    }
+    catch (StdFail_NotDone const &)
+    {
+        logmsg += "   StdFail_NotDone sweeping wires\n";
+        return false;
+    }
+    catch (...)
+    {
+        logmsg += "   Unknown error sweeping section wires\n";
+        return false;
+    }
+
+    logmsg += "\n";
+    return !wingshape.IsNull();
+}
+
+
 bool occ::makeWingSplineSweepMultiSections(WingXfl const *pWing, double stitchprecision, int degree, int nCtrlPoints, int nOutPoints,
-                                      TopoDS_Shape &wingshape, std::string &logmsg)
+                                           TopoDS_Shape &wingshape, std::string &logmsg)
 {
     if(!pWing)
     {
@@ -3094,8 +3265,8 @@ bool occ::makeWingSplineSweepMultiSections(WingXfl const *pWing, double stitchpr
     {
         Surface const &surf = pWing->surfaceAt(iSurf);
 
-        surf.makeSectionHalfSpline(true,  true, degree, nCtrlPoints, nOutPoints, b3dtop);
-        surf.makeSectionHalfSpline(false, true, degree, nCtrlPoints, nOutPoints, b3dbot);
+        surf.makeSectionHalfSpline(xfl::TOPSURFACE, true, degree, nCtrlPoints, nOutPoints, b3dtop);
+        surf.makeSectionHalfSpline(xfl::BOTSURFACE, true, degree, nCtrlPoints, nOutPoints, b3dbot);
         makeSplineWire(b3dtop, TopWire, logmsg);
         makeSplineWire(b3dbot, BotWire, logmsg);
 
@@ -3138,8 +3309,8 @@ bool occ::makeWingSplineSweepMultiSections(WingXfl const *pWing, double stitchpr
         //RIGHT TIP PATCH
         if(surf.isTipRight())
         {
-            surf.makeSectionHalfSpline(true,  false, degree, nCtrlPoints, nOutPoints, b3dtop);
-            surf.makeSectionHalfSpline(false, false, degree, nCtrlPoints, nOutPoints, b3dbot);
+            surf.makeSectionHalfSpline(xfl::TOPSURFACE,  false, degree, nCtrlPoints, nOutPoints, b3dtop);
+            surf.makeSectionHalfSpline(xfl::BOTSURFACE, false, degree, nCtrlPoints, nOutPoints, b3dbot);
             makeSplineWire(b3dtop, TopWire, logmsg);
             makeSplineWire(b3dbot, BotWire, logmsg);
 
@@ -3273,8 +3444,8 @@ bool occ::makeWingSplineSweepSolid(WingXfl const *pWing, double , int degree, in
     {
         Surface const &surf = pWing->surfaceAt(iSurf);
 
-        surf.makeSectionHalfSpline(true,  true, degree, nCtrlPoints, nOutPoints, b3dtop);
-        surf.makeSectionHalfSpline(false, true, degree, nCtrlPoints, nOutPoints, b3dbot);
+        surf.makeSectionHalfSpline(xfl::TOPSURFACE, true, degree, nCtrlPoints, nOutPoints, b3dtop);
+        surf.makeSectionHalfSpline(xfl::BOTSURFACE, true, degree, nCtrlPoints, nOutPoints, b3dbot);
 
         Handle(Geom_BSplineCurve) topspline, botspline;
         makeOCCSplineFromBSpline3d(b3dtop, topspline, logmsg);
@@ -3298,8 +3469,8 @@ bool occ::makeWingSplineSweepSolid(WingXfl const *pWing, double , int degree, in
         //RIGHT TIP PATCH
         if(surf.isTipRight())
         {
-            surf.makeSectionHalfSpline(true,  false, degree, nCtrlPoints, nOutPoints, b3dtop);
-            surf.makeSectionHalfSpline(false, false, degree, nCtrlPoints, nOutPoints, b3dbot);
+            surf.makeSectionHalfSpline(xfl::TOPSURFACE, false, degree, nCtrlPoints, nOutPoints, b3dtop);
+            surf.makeSectionHalfSpline(xfl::BOTSURFACE, false, degree, nCtrlPoints, nOutPoints, b3dbot);
 
             Handle(Geom_BSplineCurve) topspline, botspline;
             makeOCCSplineFromBSpline3d(b3dtop, topspline, logmsg);

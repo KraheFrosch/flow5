@@ -1538,7 +1538,7 @@ void gl3dXPlaneView::mouseReleaseEvent(QMouseEvent *pEvent)
         return;
     }
 
-    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurWPolar)
+    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurPlPolar)
     {
         m_NodePair = {-1,-1};
         return;
@@ -1711,7 +1711,7 @@ bool gl3dXPlaneView::pickTriUniPanel(QPoint const &point)
     m_PickedPanelIndex = -1;
 
     Plane const *pPlane = s_pXPlane->m_pCurPlane;
-    PlanePolar const *pWPolar = s_pXPlane->m_pCurWPolar;
+    PlanePolar const *pWPolar = s_pXPlane->m_pCurPlPolar;
     PlaneOpp const *pPOpp = s_pXPlane->m_pCurPOpp;
 
     float zmax = +1.e10;
@@ -1827,7 +1827,7 @@ bool gl3dXPlaneView::pickQuadPanel(QPoint const &point)
     else
     {
         // pick a panel;
-        if(s_pXPlane->m_pCurWPolar->isQuadMethod() && s_pXPlane->curPlane()->isXflType())
+        if(s_pXPlane->m_pCurPlPolar->isQuadMethod() && s_pXPlane->curPlane()->isXflType())
         {
             PlaneXfl const * pPlaneXfl = dynamic_cast<PlaneXfl const*>(s_pXPlane->curPlane());
 
@@ -1894,7 +1894,7 @@ void gl3dXPlaneView::glMake3dObjects()
                                             pTranslatedXflFuse->isFlatFaceType());
 //                    glMakeNodeNormals(pTranslatedXflFuse->triangulation().nodes(), Vector3d(), 0.05f, m_pglXPlaneBuffers->m_vboTessNormals);
                     int nPts = pFuse->isSplineType() ? 30 : 1;
-                    glMakeShellOutline(pFuse->shells(), pPlaneXfl->fusePos(ifuse), m_pglXPlaneBuffers->m_vboBodyOutline[ifuse], nPts);
+                    gl::glMakeShellOutline(pFuse->shells(), pPlaneXfl->fusePos(ifuse), m_pglXPlaneBuffers->m_vboBodyOutline[ifuse], nPts);
                     if(pFuse->isSplineType())
                         gl::makeFuseXflFrames(pTranslatedXflFuse, pTranslatedXflFuse->position(), W3dPrefs::bodyAxialRes(), W3dPrefs::bodyHoopRes(), m_pglXPlaneBuffers->m_vboFrames);
                     else if(pFuse->isSectionType())
@@ -1908,7 +1908,7 @@ void gl3dXPlaneView::glMake3dObjects()
                 {
                     gl::makeTriangulation3Vtx(pFuse->triangulation(), pPlaneXfl->fusePos(ifuse),
                                             m_pglXPlaneBuffers->m_vboFuseTriangulation[ifuse], false);
-                    glMakeShellOutline(pFuse->shells(), pPlaneXfl->fusePos(ifuse), m_pglXPlaneBuffers->m_vboBodyOutline[ifuse]);
+                    gl::glMakeShellOutline(pFuse->shells(), pPlaneXfl->fusePos(ifuse), m_pglXPlaneBuffers->m_vboBodyOutline[ifuse]);
                 }
                 else if(pFuse->isStlType())
                 {
@@ -2112,7 +2112,7 @@ void gl3dXPlaneView::glMake3dObjects()
 void gl3dXPlaneView::glMakeOppBuffers()
 {
     Plane    const *pPlane  = s_pXPlane->m_pCurPlane;
-    PlanePolar   const *pWPolar = s_pXPlane->m_pCurWPolar;
+    PlanePolar   const *pWPolar = s_pXPlane->m_pCurPlPolar;
     PlaneOpp       *pPOpp   = s_pXPlane->m_pCurPOpp; // not const to make node values on the fly
 
     if(!pPlane || !pWPolar) return;
@@ -3271,7 +3271,7 @@ void gl3dXPlaneView::paintOverlay()
 void gl3dXPlaneView::glMakeFlowBuffers()
 {
     Plane    const *pPlane  = s_pXPlane->m_pCurPlane;
-    PlanePolar   const *pWPolar = s_pXPlane->m_pCurWPolar;
+    PlanePolar   const *pWPolar = s_pXPlane->m_pCurPlPolar;
     PlaneOpp const *pPOpp   = s_pXPlane->m_pCurPOpp;
 
     if(!m_pPOpp3dControls->isFlowActive() || !pPlane || !pWPolar ||!pPOpp || !pPOpp->isTriUniformMethod())

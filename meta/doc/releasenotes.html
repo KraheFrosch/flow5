@@ -26,14 +26,16 @@
                     <li>General
                         <ul>
                             <li>linked flow5 to the Gmsh SDK</li>
-                            <li>Refactored the code to isolate modeler and solver classes into a library</li>
+                            <li>refactored the code to isolate modeler and solver classes into a library</li>
                         </ul>
                     </li>
                     <li>Modelling/Meshing
                         <ul>
                             <li>all meshing interfaces modified to use the Gmsh library in addition to the built-in custom mesher</li>
-                            <li>removed IGES import and export options due to OCC library symbol names changing</li>
+                            <li>added an option to build fuse meshes conforming to the wings mid-camber line</li>
+                            <li>removed IGES import and export options due to changes of symbol names in the OCC library</li>
                             <li>changed the evaluation of inertia properties in the case of an xfl-type fuselage to use OCC instead of the built-in custom evaluator; minor impact on evaluations</li>
+                            <li>minor improvements to the export of wings to AVL</li>
                         </ul>
                     </li>
                     <li>Analysis
@@ -51,7 +53,7 @@
                     </li>
                     <li>Other
                         <ul>
-                            <li>removed number format localization for code clarity and for compatibility with code refactoring into solver and UI modules</li>
+                            <li>removed number format localization in the fl5-lib module</li>
                             <li>code cleaning</li>
                         </ul>
                     </li>

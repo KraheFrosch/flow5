@@ -1248,7 +1248,7 @@ void gl3dView::paintGL()
     glMake3dObjects();
 
 
-    QOpenGLPaintDevice device(size() * devicePixelRatio()); //"The context is captured upon construction."
+//    QOpenGLPaintDevice device(size() * devicePixelRatio()); //"The context is captured upon construction."
 //    QPainter painter(&device);
     QPainter painter(this);
 
@@ -4041,3 +4041,28 @@ void gl3dView::setDebugPoints(std::vector<Vector3d> const &pts)
 
     m_DebugVecs.clear();
 }
+
+
+void gl3dView::setDebugNodes(std::vector<Node> const &nodes)
+{
+    m_DebugPts.clear();
+    for(Vector3d const &nd : nodes)  m_DebugPts.push_back(nd);
+
+    m_DebugVecs.clear();
+}
+
+
+void gl3dView::setDebugNodes(std::vector<Node> const &nodes, std::vector<Vector3d> const &vecs)
+{
+    m_DebugPts.clear();
+    m_DebugVecs.clear();
+    for(Vector3d const &nd : nodes) m_DebugPts.push_back(nd);
+    for(Vector3d const &vec : vecs) m_DebugVecs.push_back(vec);
+}
+
+
+
+
+
+
+

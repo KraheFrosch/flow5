@@ -186,7 +186,7 @@ void gl3dSailView::glMake3dObjects()
         SailOcc const *pOccSail = dynamic_cast<SailOcc const *>(m_pSail);
         if(m_bResetglSail)
         {
-            glMakeShellOutline(pOccSail->shapes(), Vector3d(), m_vboSailOutline);
+            gl::glMakeShellOutline(pOccSail->shapes(), Vector3d(), m_vboSailOutline);
         }
     }
     else if(m_pSail->isStlSail())
@@ -496,7 +496,7 @@ void gl3dSailView::setHighlightedEdge(TopoDS_Edge const &Edge)
 {
     if(Edge.IsNull())  m_vboHighEdge.destroy();
     else
-        glMakeEdge(Edge, m_vboHighEdge);
+        gl::glMakeEdge(Edge, m_vboHighEdge);
 }
 
 
@@ -790,7 +790,7 @@ void gl3dSailView::mouseReleaseEvent(QMouseEvent *pEvent)
                                 {
                                     TopoDS_Edge const &edge = TopoDS::Edge(EdgeExplorer.Current());
                                     if(edge.IsNull()) m_vboPickedEdge.destroy();
-                                    else              glMakeEdge(edge, m_vboPickedEdge);
+                                    else              gl::glMakeEdge(edge, m_vboPickedEdge);
 
                                     break;                            }
                                 iEdge++;

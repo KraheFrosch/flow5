@@ -48,6 +48,7 @@ class PlainTextOutput : public QPlainTextEdit
 
     protected:
         QSize sizeHint() const override;
+        QSize minimumSizeHint() const override {return QSize(100,50);}
         void showEvent(QShowEvent *pEvent) override;
         void keyPressEvent(QKeyEvent *pEvent) override;
 

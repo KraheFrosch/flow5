@@ -44,6 +44,8 @@
 #include <api/fusestl.h>
 #include <api/fusexfl.h>
 #include <api/planexfl.h>
+#include <api/occ_globals.h>
+
 
 bool gl3dPlaneXflView::s_bHighlightSelectedPart = false;
 
@@ -59,7 +61,6 @@ gl3dPlaneXflView::gl3dPlaneXflView(QWidget *pParent) : gl3dXflView(pParent)
     m_SelectedParts.clear();
 
     m_bP3Select = false;
-    m_bThickWings = true;
 
     m_iP3Node[0] = m_iP3Node[1] = m_iP3Node[2] = -1;
     m_iStrip = 0;
@@ -103,7 +104,6 @@ void gl3dPlaneXflView::setPlane(PlaneXfl *pPlane)
 void gl3dPlaneXflView::glMake3dObjects()
 {
     if(!m_pPlaneXfl) return;
-//    QApplication::setOverrideCursor(Qt::WaitCursor);
 
     //make fuse geometry
     if(m_bResetglFuse || m_bResetglPlane)
@@ -122,8 +122,20 @@ void gl3dPlaneXflView::glMake3dObjects()
 
                 gl::makeTriangulation3Vtx(pTranslatedFxfl->triangulation(), m_pPlaneXfl->fusePos(ifuse),
                                     m_vboFuseTriangulation[ifuse], pTranslatedFxfl->isFlatFaceType());
-                int nPts = pFuse->isSplineType() ? 30 : 1;
-                glMakeShellOutline(pTranslatedFxfl->shells(), m_pPlaneXfl->fusePos(ifuse), m_vboBodyOutline[ifuse], nPts);
+//                int nPts = pFuse->isSplineType() ? 30 : 1;
+//                gl::glMakeShellOutline(pTranslatedFxfl->shells(), m_pPlaneXfl->fusePos(ifuse), m_vboBodyOutline[ifuse], nPts);
+
+                std::string strange;
+                TopoDS_ListOfShape theEdges;
+                TopoDS_ListIteratorOfListOfShape iterator;
+                for (iterator.Initialize(pFuse->shapes()); iterator.More(); iterator.Next())
+                {
+                   occ::findEdges(iterator.Value(), theEdges, strange);
+                }
+
+                QVector<Vector3d> labelpoints;
+                gl::glMakeEdges(theEdges, m_pPlaneXfl->fusePos(ifuse), m_vboBodyOutline[ifuse], labelpoints);
+
                 if(pFuse->isSplineType())
                     gl::makeFuseXflFrames(pTranslatedFxfl, pTranslatedFxfl->position(), W3dPrefs::bodyAxialRes(), W3dPrefs::bodyHoopRes(), m_vboFrames);
                 else if(pFuse->isSectionType())
@@ -137,7 +149,7 @@ void gl3dPlaneXflView::glMake3dObjects()
             {
                 FuseOcc const* pTranslatedFocc = dynamic_cast<FuseOcc const*>(pFuse);
                 gl::makeTriangulation3Vtx(pTranslatedFocc->triangulation(), m_pPlaneXfl->fusePos(ifuse), m_vboFuseTriangulation[ifuse], false);
-                glMakeShellOutline(pTranslatedFocc->shells(), m_pPlaneXfl->fusePos(ifuse), m_vboBodyOutline[ifuse]);
+                gl::glMakeShellOutline(pTranslatedFocc->shells(), m_pPlaneXfl->fusePos(ifuse), m_vboBodyOutline[ifuse]);
             }
             else if(m_pPlaneXfl->fuseAt(ifuse)->isStlType())
             {
@@ -203,15 +215,15 @@ void gl3dPlaneXflView::glMake3dObjects()
         m_vboTriMesh.resize(nvbo);
         m_vboTriEdges.resize(nvbo);
 
-        int nPanels = 0;
+//        int nPanels = 0;
 
         for(int iw=0; iw<m_pPlaneXfl->nWings(); iw++)
         {
             // make a duplicate wing to avoid messing up surface panel indexes
             WingXfl awing(*m_pPlaneXfl->wingAt(iw));
 
-            awing.makeTriPanels(nPanels, 0, m_bThickWings);
-            nPanels += awing.nPanel3();
+ //           awing.makeTriPanels(nPanels, 0, m_bThickWings);
+ //           nPanels += awing.nPanel3();
 
             gl::makeTriPanels(awing.triMesh().panels(), Vector3d(), m_vboTriMesh[iw]);
             gl::makeTriEdges(awing.triMesh().panels(), Vector3d(), m_vboTriEdges[iw]);
@@ -385,7 +397,7 @@ void gl3dPlaneXflView::paintMeshPanels()
             WingXfl const *pWing = m_pPlaneXfl->wingAt(iw);
             if(pWing->isVisible() && iw<m_vboTriMesh.size() && !m_bSurfaces)
             {
-                paintTriPanels(m_vboTriMesh[iw], false);
+                paintTriPanels(m_vboTriMesh[iw], true);
                 paintSegments(m_vboTriEdges[iw], W3dPrefs::s_PanelStyle);
             }
         }

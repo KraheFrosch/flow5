@@ -24,6 +24,7 @@
 
 #define _MATH_DEFINES_DEFINED
 
+#include <algorithm>
 
 #include <QGridLayout>
 #include <QMessageBox>
@@ -42,7 +43,6 @@
 #include <api/fuse.h>
 #include <api/fuseocc.h>
 #include <api/fusexfl.h>
-#include <interfaces/mesh/gmesh_globals.h>
 #include <api/nurbssurface.h>
 #include <api/occ_globals.h>
 #include <api/sail.h>
@@ -53,8 +53,11 @@
 #include <api/sailwing.h>
 #include <api/units.h>
 #include <api/utils.h>
+#include <api/wingxfl.h>
+
 
 #include <core/xflcore.h>
+#include <interfaces/mesh/gmesh_globals.h>
 #include <interfaces/mesh/gmesher.h>
 #include <interfaces/mesh/meshevent.h>
 #include <interfaces/opengl/globals/gl_globals.h>
@@ -80,14 +83,17 @@ GMesherWt::GMesherWt(QWidget *pParent) : QFrame{pParent}
 
     m_pWorker = new GMesher;
     m_pWorker->moveToThread(&m_MeshThread);
-    connect(&m_MeshThread, &QThread::finished, m_pWorker, &QObject::deleteLater);
-    connect(this, &GMesherWt::meshCurrent, m_pWorker, &GMesher::onMeshCurrentModel);
-    connect(m_pWorker, &GMesher::displayMessage, m_pptoGmsh, &PlainTextOutput::onAppendQText, Qt::BlockingQueuedConnection);
-    connect(m_pWorker, &GMesher::meshDone, this, &GMesherWt::onHandleMeshResults);
+    connect(&m_MeshThread, &QThread::finished,          m_pWorker,  &QObject::deleteLater);
+    connect(this,          &GMesherWt::meshCurrent,     m_pWorker,  &GMesher::onMeshCurrentModel);
+    connect(m_pWorker,     &GMesher::displayMessage,    m_pptoGmsh, &PlainTextOutput::onAppendQText, Qt::BlockingQueuedConnection);
+    connect(m_pWorker,     &GMesher::meshDone,          this,       &GMesherWt::onHandleMeshResults);
 
     m_MeshThread.start();
 
     connect(&m_LogTimer, SIGNAL(timeout()), SLOT(onCheckLogger()));
+
+
+    gmsh::option::setNumber("General.NumThreads", 16);
 
     std::string list;
     gmesh::listMainOptions(list);
@@ -118,6 +124,9 @@ void GMesherWt::setupLayout()
             m_pfeMinSize->setToolTip("<p>The minimum acceptable size of the triangles. "
                                      "This value should be stricly positive to prevent "
                                      "excessively fine meshes, high number of elements. and long meshing times."
+                                     "</p>"
+                                     "<p>"
+                                     "Recommendation: start with a large value and reduce progressively."
                                      "</p>"
                                      "<p>"
                                      "Min.acceptable value= 0.1 mm"
@@ -186,6 +195,7 @@ void GMesherWt::setupLayout()
 
             m_ppbMesh = new QPushButton("Mesh");
             connect(m_ppbMesh, SIGNAL(clicked()), SLOT(onMesh()));
+
 
             pMeshOptionLayout->addWidget(plabMinSize,        1, 1);
             pMeshOptionLayout->addWidget(m_pfeMinSize,       1, 2);
@@ -417,7 +427,6 @@ void GMesherWt::convertTriangles(std::vector<std::size_t>const&elementTags, QVec
         maxsize = std::max(maxsize, t3d.maxEdgeLength());
     }
 
-//    m_Triangles.append(Triangles);
     m_Triangles = triangles;
 
     emit outputMsg(QString::asprintf("Min. element size = %g\n", minsize));
@@ -425,50 +434,15 @@ void GMesherWt::convertTriangles(std::vector<std::size_t>const&elementTags, QVec
 }
 
 
-void GMesherWt::makeModelCurves()
-{
-    const int RES = 20;
-    std::vector<double> param(RES+1);
-    std::vector<double> coord;
-    for(uint i=0; i<=RES; i++) param[i] = double(i)/double(RES);
-
-    gmsh::model::occ::synchronize();
-    gmsh::vectorpair modelenditiesdimTags;
-    gmsh::model::getEntities(modelenditiesdimTags);
-
-    m_Curves.clear();
-
-    for(uint k=0; k<modelenditiesdimTags.size(); k++)
-    {
-        std::pair<int, int> const &entity = modelenditiesdimTags.at(k);
-//        gmsh::model::getEntityType(entity.first, entity.second, entityType);
-//        emit outputMsg("   entity dim=%d, tag=%d, name="+QString::fromStdString(entityType)+EOLCHAR);
-        if(entity.first==1) // lines
-        {
-            gmsh::model::getValue(entity.first, entity.second, param, coord);
-
-            m_Curves.push_back(QVector<Vector3d>(RES+1));
-            QVector<Vector3d>& Curve = m_Curves.back();
-
-            for(uint l=0; l<param.size(); l++)
-            {
-                Vector3d &pt = Curve[l];
-                pt.x = coord[3*l];
-                pt.y = coord[3*l+1];
-                pt.z = coord[3*l+2];
-            }
-        }
-    }
-}
-
-
 void GMesherWt::onHandleMeshResults(bool bError)
 {
-    QApplication::restoreOverrideCursor();
+    while(QApplication::overrideCursor()!=nullptr)
+        QApplication::restoreOverrideCursor();
+
     QApplication::setOverrideCursor(Qt::BusyCursor);
     m_LogTimer.stop();
     emit outputMsg("Handling mesh results...\n");
-    if(bError) emit outputMsg(" ...GMsh error reported...\n");
+    if(bError) emit outputMsg(" ...Gmsh error reported...\n");
 
     std::string error;
     gmsh::logger::getLastError(error);
@@ -487,10 +461,15 @@ void GMesherWt::onHandleMeshResults(bool bError)
 
     if(bError)
     {
-        QString strange("\n\n***********mesh error*********\n\n");
-        emit outputMsg(strange);
+        strange = "\n\n***********mesh error*********\n\n";
         emit outputMsg(strange);
     }
+
+    double nT3d(0), nNodes(0);
+    gmsh::option::getNumber("Mesh.NbTriangles", nT3d);
+    gmsh::option::getNumber("Mesh.NbNodes", nNodes);
+    strange = QString::asprintf("Gmsh count: %.0f triangles and %.0f nodes\n", nT3d, nNodes);
+    emit outputMsg(strange);
 
     if(m_bMakexzSymmetric)
     {
@@ -517,29 +496,6 @@ void GMesherWt::onHandleMeshResults(bool bError)
     m_ppbMesh->setText("Make mesh");
     QApplication::restoreOverrideCursor();
     setEnabled(true);
-}
-
-
-void GMesherWt::onMesh()
-{
-    if(!readMeshSize()) return;
-
-    setEnabled(false);
-    if(m_pFuse)
-    {
-        meshFuseShells();
-    }
-    else if(m_pSail)
-    {
-        m_pSail->clearTEIndexes();
-        m_pSail->clearRefTriangles();
-
-        if     (m_pSail->isNURBSSail())  meshNURBSSail();
-        else if(m_pSail->isSplineSail()) meshSplineSail();
-        else if(m_pSail->isOccSail())    meshOccSail();
-    }
-    else
-        setEnabled(true);
 }
 
 
@@ -721,6 +677,7 @@ void GMesherWt::meshOccSail()
     gmsh::clear();
     gmsh::model::mesh::clear();
 
+
     gmsh::model::add("Occ Surfaces");
 
     gmsh::option::setNumber("Mesh.Algorithm", meshAlgo());
@@ -740,16 +697,82 @@ void GMesherWt::meshOccSail()
 }
 
 
+// experimental
+void GMesherWt::embedPoints()
+{
+
+    /*
+        try
+        {
+            std::vector<int> linetags;
+            for(std::vector<Node> nodes : m_Nodes)
+            {
+                if(nodes.empty()) continue;
+
+                std::vector<int> nodetags;
+                for(Node nd : nodes)
+                {
+                    nodetags.push_back(gmsh::model::occ::addPoint(nd.x, nd.y, nd.z, 0.01));
+                }
+
+                for(uint i=0; i<nodetags.size()-1; i++)
+                {
+                    linetags.push_back(gmsh::model::occ::addLine(nodetags.at(i), nodetags.at(i+1)));
+                }
+            }
+
+
+            gmsh::vectorpair modeldim2;
+            gmsh::model::getEntities(modeldim2, 2);
+
+            gmsh::vectorpair modeldim3;
+            gmsh::model::getEntities(modeldim3, 3);
+
+            gmsh::model::occ::synchronize();
+
+            if(modeldim2.size()>0 && linetags.size()>0)
+            {
+                int isurf = modeldim2.front().second;
+                gmsh::model::mesh::embed(1, linetags, 2, isurf);
+            }
+            gmsh::model::occ::synchronize();
+        }
+        catch(std::runtime_error &err)
+        {
+            QApplication::restoreOverrideCursor();
+            QString strange = "Error adding embedding lines:" + QString::fromStdString(err.what()) + EOLch;
+            emit outputMsg(strange);
+            return;
+        }
+        catch (std::exception &err)
+        {
+            QString strange = "Error adding embedding lines:" + QString::fromStdString(err.what()) + EOLch;
+            emit outputMsg(strange);
+            return;
+        }
+        catch(...)
+        {
+            QApplication::restoreOverrideCursor();
+            emit outputMsg("Unknown error adding embedding lines\n");
+            return;
+        }*/
+}
+
+
 void GMesherWt::meshFuseShells()
 {
     if(!m_pFuse) return;
-
     QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    const int DIM2 = 2; // faces
 
     m_Triangles.clear();
     gmsh::logger::start();
     m_iLoggerStack = 0;
+
     gmsh::clear();
+    gmsh::model::mesh::clear();
+
     gmsh::model::add("Occ Surfaces");
 
     gmsh::option::setNumber("Mesh.Algorithm", meshAlgo());
@@ -757,48 +780,119 @@ void GMesherWt::meshFuseShells()
     onCheckLogger();
 
 
-    // gmsh::model::occ::importShapesNativePointer crashes with no thrown exception
-    // OCC version compatibility issue?
-    //        TopoDS_Shape aFace = shapeExplorer.Current();
-    //        gmsh::model::occ::importShapesNativePointer(&aFace, outDimTags, bHighestDimOnly);
-
-    // fallback
-    // converting to BREP and exporting importing
+    // converting to BREP and export+import
     TopoDS_ListOfShape const *pShells(nullptr);
     FuseXfl const*pFuseXfl = dynamic_cast<FuseXfl const*>(m_pFuse);
     if(pFuseXfl) pShells = &pFuseXfl->rightSideShells();
     else         pShells = &m_pFuse->shells();
-
-//    int nShells = pShells->Extent();
     std::vector<std::string> brepstr;
     occ::shapesToBreps(*pShells, brepstr);
-
-    /*for(int iShell=0; iShell<nShells; iShell++)
-    {
-        std::stringstream sstream;
-        for(TopTools_ListIteratorOfListOfShape shapeit(*pShells); shapeit.More(); shapeit.Next())
-        {
-            sstream.str(std::string()); // clear the stream
-            BRepTools::Write(shapeit.Value(), sstream); // stream the brep to the stringstream
-            std::string s = sstream.str();
-            QString brep = QString::fromStdString(s);
-            brepstr.append(brep);
-        }
-    }
-    QString BRepAll;*/
     gmesh::BRepstoGmsh(brepstr);
 
-    gmsh::model::mesh::clear();
+    // get all the fuse faces
+    gmsh::vectorpair fusedimtags;
+    gmsh::model::occ::getEntities(fusedimtags, DIM2);
+
+    // embed wings
+    // make the fragmenting tools
+    gmsh::vectorpair wingDimTags;
+
+    for (int iw=0; iw<m_Wings.size(); iw++)
+    {
+        WingXfl const *pWing = m_Wings.at(iw);
+
+//        Vector3d wingLE = pWing->position(); // no need, surfaces are built in position
+        Vector3d fuseLE = m_pFuse->position();
+        Vector3d t = Vector3d()-fuseLE;
+
+        std::vector<int> wiretags;
+        std::vector<std::vector<Node>> midwires;
+        pWing->makeMidWires(midwires);
+
+        for(std::vector<Node> const &wire : midwires)
+        {
+            std::vector<int> pointtags;
+            for(Node const &nd : wire)
+            {
+                pointtags.push_back(gmsh::model::occ::addPoint(nd.x+t.x, nd.y+t.y, nd.z+t.z));
+            }
+
+            std::vector<int> linetags;
+            for(uint it=0; it<pointtags.size()-1; it++)
+            {
+                linetags.push_back(gmsh::model::occ::addLine(pointtags.at(it), pointtags.at(it+1)));
+            }
+
+            wiretags.push_back(gmsh::model::occ::addWire(linetags));
+        }
+
+        gmsh::vectorpair surfDimTags;
+        gmsh::model::occ::addThruSections(wiretags, surfDimTags, -1, false);
+
+        for(std::pair<int,int> pair : surfDimTags)
+            wingDimTags.push_back(pair);
+    }
+
+
+    gmsh::vectorpair outDimTags;
+    std::vector<gmsh::vectorpair> outDimTagsMap;
+
+    // Fragment and embed automatically
+    // Note: remove tools does not remove the wings from the model, needs manual removal
+    gmsh::model::occ::fragment(fusedimtags, wingDimTags, outDimTags, outDimTagsMap, -1, true, true);
+
+    // Remove all dim 2 objects except the original fuse faces.
+    gmsh::vectorpair RedundantDimTags;
+    for(std::pair<int,int> dimtag : outDimTags)
+    {
+        if(dimtag.first==DIM2)
+        {
+            bool bIsFuseDimTag = false;
+            for(uint kf=0; kf<fusedimtags.size(); kf++)
+            {
+                if(dimtag.second==fusedimtags.at(kf).second)
+                {
+                    bIsFuseDimTag = true;
+                    break;
+                }
+            }
+
+            if(!bIsFuseDimTag) RedundantDimTags.push_back(dimtag);
+        }
+    }
+    gmsh::model::occ::remove(RedundantDimTags, true);
 
     gmsh::model::occ::synchronize();
 
-    QApplication::restoreOverrideCursor();
 
-    emit outputMsg("Starting G-mesher in separate thread...\n");
-
+    emit outputMsg("Starting G-mesher in a separate thread...\n");
     emit meshCurrent();
 
 }
+
+
+void GMesherWt::onMesh()
+{
+    if(!readMeshSize()) return;
+
+    setEnabled(false);
+    if(m_pFuse)
+    {
+        meshFuseShells();
+    }
+    else if(m_pSail)
+    {
+        m_pSail->clearTEIndexes();
+        m_pSail->clearRefTriangles();
+
+        if     (m_pSail->isNURBSSail())  meshNURBSSail();
+        else if(m_pSail->isSplineSail()) meshSplineSail();
+        else if(m_pSail->isOccSail())    meshOccSail();
+    }
+    else
+        setEnabled(true);
+}
+
 
 
 

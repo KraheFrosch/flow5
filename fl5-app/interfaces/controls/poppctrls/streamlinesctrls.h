@@ -103,7 +103,7 @@ class StreamLineCtrls : public QWidget
         gl3dXSailView *m_pgl3dXSailView;
 
         IntEdit *m_pieNXPoint;
-        FloatEdit *m_pdeMaxLength, *m_pdeL0, *m_pdeXFactor;
+        FloatEdit *m_pfeMaxLength, *m_pfeL0, *m_pfeXFactor;
 
         LineBtn *m_plbStreamLines;
         QCheckBox *m_pchUseWingColour;
@@ -113,7 +113,7 @@ class StreamLineCtrls : public QWidget
         FloatEdit *m_pfeXOffset, *m_pfeYOffset, *m_pfeZOffset;
 
         IntEdit *m_pieNStreamLines;
-        FloatEdit *m_pdeDeltaPos;
+        FloatEdit *m_pfeDeltaPos;
         QPushButton *m_ppbUpdateStreamLines;
 
         QLabel *m_plabLengthUnit0, *m_plabLengthUnit1, *m_plabLengthUnit2, *m_plabLengthUnit3, *m_plabLengthUnit4, *m_plabLengthUnit5;

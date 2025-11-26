@@ -169,13 +169,13 @@ void FlowCtrls::setupLayout()
                 QHBoxLayout *pDTLayout = new QHBoxLayout;
                 {
                     QLabel *plabDt = new QLabel("dt=");
-                    m_pdeDt = new FloatEdit(s_Flowdt);
-                    m_pdeDt->setToolTip("<p>Defines the time increment used to move the particles:<br>"
+                    m_pfeDt = new FloatEdit(s_Flowdt);
+                    m_pfeDt->setToolTip("<p>Defines the time increment used to move the particles:<br>"
                                         "At each frame update, the particles move in the x-direction "
                                         "a distance equal to V<sub>&infin;</sub>.dt</p>");
                     QLabel *plabSec = new QLabel("s");
                     pDTLayout->addWidget(plabDt);
-                    pDTLayout->addWidget(m_pdeDt);
+                    pDTLayout->addWidget(m_pfeDt);
                     pDTLayout->addWidget(plabSec);
                     pDTLayout->addStretch();
                 }
@@ -259,7 +259,7 @@ void FlowCtrls::setupLayout()
 
 void FlowCtrls::connectSignals()
 {
-    connect(m_pdeDt,               SIGNAL(floatChanged(float)),    SLOT(onFlowUpdate()));
+    connect(m_pfeDt,               SIGNAL(floatChanged(float)),    SLOT(onFlowUpdate()));
     connect(m_pieNGroups,          SIGNAL(intChanged(int)),        SLOT(onFlowRestart()));
     connect(m_pfeStart,            SIGNAL(floatChanged(float)),    SLOT(onFlowUpdate()));
     connect(m_pfeEnd,              SIGNAL(floatChanged(float)),    SLOT(onFlowUpdate()));
@@ -280,7 +280,7 @@ void FlowCtrls::initWidget()
 
     //flow
     m_pieNGroups->setValue(s_FlowNGroups);
-    m_pdeDt->setValue(s_Flowdt);
+    m_pfeDt->setValue(s_Flowdt);
 
     updateFlowInfo();
     m_plbFlowLines->setTheStyle(W3dPrefs::s_FlowStyle);
@@ -392,7 +392,7 @@ void FlowCtrls::onFlowLineStyle()
 
 void FlowCtrls::onFlowUpdate()
 {
-    s_Flowdt        = m_pdeDt->valuef();
+    s_Flowdt        = m_pfeDt->valuef();
     s_FlowNGroups   = m_pieNGroups->value();
 
     s_FlowTopLeft.x  = m_pfeStart->value()/Units::mtoUnit();

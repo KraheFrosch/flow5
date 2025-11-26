@@ -24,17 +24,18 @@
 
 #pragma once
 
-#include <QStack>
-#include <QLabel>
-#include <QDialog>
-#include <QTableView>
 #include <QCheckBox>
-#include <QRadioButton>
 #include <QComboBox>
-#include <QSplitter>
+#include <QDialog>
+#include <QLabel>
 #include <QListWidget>
-#include <QTextEdit>
+#include <QRadioButton>
 #include <QSettings>
+#include <QSplitter>
+#include <QStack>
+#include <QStackedWidget>
+#include <QTableView>
+#include <QTextEdit>
 
 #include <TopTools_ListOfShape.hxx>
 #include <TopoDS_Wire.hxx>
@@ -125,6 +126,11 @@ class PlaneXflDlg : public PlaneDlg
 
         bool endPanelMods();
 
+        void makeIntersection_0();
+        bool makeFragments();
+
+        QVector<WingXfl*> thinWingList() const;
+
     protected slots:
         void onButton(QAbstractButton *pButton) override;
         void onClearOutput();
@@ -151,7 +157,8 @@ class PlaneXflDlg : public PlaneDlg
         void onInsertWing();
         void onInsertWingFromXml();
         void onInsertWingFromVSP();
-        void onListClick();
+        void onThickListClick();
+        void onThinListClick();
         void onMovePartDown();
         void onMovePartUp();
         void onNamesChanged();
@@ -171,6 +178,7 @@ class PlaneXflDlg : public PlaneDlg
         void onSplitterMoved(int pos, int index);
         void onTabChanged(int iNewTab);
         void onTessellation();
+        void onThinThick();
         void onUpdateHighlightedPanels();
         void onUpdatePlaneProps() override;
         void onUpdateMesh();
@@ -201,10 +209,7 @@ class PlaneXflDlg : public PlaneDlg
         QPushButton *m_ppbExportBody;
 
         QPushButton *m_ppbCutFuse;
-        QCheckBox *m_pchCutParallel;
-        QAction *m_pTessellation, *m_pResetFuse;
-
-        QPushButton *m_ppbFuseMenuButton;
+        QAction *m_pResetFuse, *m_pTessellation;
 
         QRadioButton *m_prbfl5Mesher, *m_prbGMesher;
         MesherWt *m_pMesherWt;
@@ -246,7 +251,10 @@ class PlaneXflDlg : public PlaneDlg
 
         QSplitter *m_pHSplitter;
 
-        QListWidget *m_plwFuseListWt, *m_plwWingListWt;
+        QStackedWidget *m_pswThinThick;
+        QRadioButton *m_prbThin, *m_prbThick;
+        QListWidget *m_plwThinWings;
+        QListWidget *m_plwFuseListWt, *m_plwThickWings;
 
         QSplitter *m_pPartSplitter;
 
@@ -267,7 +275,7 @@ class PlaneXflDlg : public PlaneDlg
         static QByteArray s_PartSplitterSizes;
         static QByteArray s_XflGeometry;
 
-        static bool s_bParallelCut;
+        static bool s_bThickSurfAssy;
 
         static int s_iActivePage;
 

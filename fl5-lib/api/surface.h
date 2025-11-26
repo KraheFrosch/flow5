@@ -270,7 +270,7 @@ class FL5LIB_EXPORT Surface
         int nPanel4() const {return int(m_Panel4List.size());}
 
         bool makeSectionSplines(BSpline3d & leftspline, BSpline3d &rightspline) const;
-        bool makeSectionHalfSpline(bool bTop, bool bLeft, int degree, int nCtrlPoints, int nOutPoints, BSpline3d &spline) const;
+        bool makeSectionHalfSpline(xfl::enumSurfacePosition pos, bool bLeft, int degree, int nCtrlPoints, int nOutPoints, BSpline3d &spline) const;
 
         bool makeSectionSplinesOcc(bool bTop, bool bLeft, Handle(Geom_BSplineCurve)& theSpline) const;
 

@@ -495,9 +495,9 @@ void BtPolarDlg::initDialog(Boat const *pBoat, BoatPolar *pBtPolar)
     m_pfeWakeLength->setValue(s_BtPolar.totalWakeLengthFactor());
     m_pfeWakePanelFactor->setValue(s_BtPolar.wakePanelFactor());
 
-    m_pdeVPWBufferWake->setValue(s_BtPolar.bufferWakeFactor());
-    m_pdeVPWLength->setValue(s_BtPolar.VPWMaxLength());
-    m_pdeVortonCoreSize->setValue(s_BtPolar.vortonCoreSize());
+    m_pfeVPWBufferWake->setValue(s_BtPolar.bufferWakeFactor());
+    m_pfeVPWLength->setValue(s_BtPolar.VPWMaxLength());
+    m_pfeVortonCoreSize->setValue(s_BtPolar.vortonCoreSize());
     m_pfeVortonL0->setValue(s_BtPolar.vortonL0());
     m_pieVPWIterations->setValue(s_BtPolar.VPWIterations());
     setVPWUnits(s_BtPolar);

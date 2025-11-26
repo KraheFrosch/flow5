@@ -373,10 +373,10 @@ void MesherWt::initWt(TopoDS_ListOfShape const &shells, double maxedgelength, bo
     for(TopTools_ListIteratorOfListOfShape iterator(shells); iterator.More(); iterator.Next())
     {
         m_Shapes.Append(iterator.Value());
-        strange = QString::asprintf("   Shell %d ", iShell);
-        if     (iterator.Value().Orientation()==TopAbs_FORWARD)  strange += " is FORWARD";
-        else if(iterator.Value().Orientation()==TopAbs_REVERSED) strange += " is REVERSED";
-        emit outputMsg(strange+"\n");
+        strange = QString::asprintf("Shell %d ", iShell);
+        if     (iterator.Value().Orientation()==TopAbs_FORWARD)  strange += " is FORWARD\n\n";
+        else if(iterator.Value().Orientation()==TopAbs_REVERSED) strange += " is REVERSED\n\n";
+        emit outputMsg(strange);
 
         occ::shapeBoundingBox(iterator.Value(), Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
         std::string str;

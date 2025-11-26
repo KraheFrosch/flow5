@@ -367,7 +367,7 @@ PlaneTask* PlaneAnalysisDlg::analyze(Plane *pPlane, PlanePolar *pPlPolar, std::v
 
     m_pActiveTask->setObjects(pPlane, pPlPolar);
 
-    m_pActiveTask->setComputeDerivatives(Analysis3dSettings::bStabDerivatives());
+    m_pActiveTask->setComputeDerivatives(XPlane::bStoreOpps3d() && Analysis3dSettings::bStabDerivatives());
 
     if (pPlPolar->isType123() || pPlPolar->isType4() || pPlPolar->isType5())
                                     m_pActiveTask->setOppList(opplist);

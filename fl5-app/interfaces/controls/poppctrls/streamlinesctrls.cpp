@@ -83,13 +83,13 @@ void StreamLineCtrls::setupLayout()
                 pfrStatic->setToolTip(tip);
                 m_pieNXPoint = new IntEdit(s_NX);
                 m_pieNXPoint->setToolTip(tip);
-                m_pdeL0 = new FloatEdit(s_L0* Units::mtoUnit());
-                m_pdeL0->setToolTip(tip);
-                m_pdeXFactor = new FloatEdit(s_XFactor);
-                m_pdeXFactor->setToolTip(tip);
-                m_pdeMaxLength = new FloatEdit;
-                m_pdeMaxLength->setToolTip(tip);
-                m_pdeMaxLength->setEnabled(false);
+                m_pfeL0 = new FloatEdit(s_L0* Units::mtoUnit());
+                m_pfeL0->setToolTip(tip);
+                m_pfeXFactor = new FloatEdit(s_XFactor);
+                m_pfeXFactor->setToolTip(tip);
+                m_pfeMaxLength = new FloatEdit;
+                m_pfeMaxLength->setToolTip(tip);
+                m_pfeMaxLength->setEnabled(false);
 
                 QLabel *pLab4 = new QLabel("Streamwise segments:");
                 QLabel *pLab5 = new QLabel("1<sup>st</sup> segment:");
@@ -102,12 +102,12 @@ void StreamLineCtrls::setupLayout()
                 pLengthLayout->addWidget(pLab4,             2,1, Qt::AlignVCenter |Qt::AlignRight);
                 pLengthLayout->addWidget(m_pieNXPoint,      2,2);
                 pLengthLayout->addWidget(pLab5,             3,1, Qt::AlignVCenter |Qt::AlignRight);
-                pLengthLayout->addWidget(m_pdeL0,           3,2);
+                pLengthLayout->addWidget(m_pfeL0,           3,2);
                 pLengthLayout->addWidget(m_plabLengthUnit0, 3,3);
                 pLengthLayout->addWidget(pLab6,             4,1, Qt::AlignVCenter |Qt::AlignRight);
-                pLengthLayout->addWidget(m_pdeXFactor,      4,2);
+                pLengthLayout->addWidget(m_pfeXFactor,      4,2);
                 pLengthLayout->addWidget(pLab7,             5,1, Qt::AlignVCenter |Qt::AlignRight);
-                pLengthLayout->addWidget(m_pdeMaxLength,    5,2);
+                pLengthLayout->addWidget(m_pfeMaxLength,    5,2);
                 pLengthLayout->addWidget(m_plabLengthUnit1, 5,3);
 
                 pLengthLayout->setColumnStretch(1,1);
@@ -209,13 +209,13 @@ void StreamLineCtrls::setupLayout()
 
                     m_pieNStreamLines = new IntEdit(s_NStreamLines);
                     m_pieNStreamLines->setToolTip("<p>Defines the number of strealines to be drawn along the Y or Z line</p>");
-                    m_pdeDeltaPos     = new FloatEdit(s_DeltaL*Units::mtoUnit());
-                    m_pdeDeltaPos->setToolTip("<p>Defines the distance between the starting points of two adjacent streamlines along the Y or Z directions</p>");
+                    m_pfeDeltaPos     = new FloatEdit(s_DeltaL*Units::mtoUnit());
+                    m_pfeDeltaPos->setToolTip("<p>Defines the distance between the starting points of two adjacent streamlines along the Y or Z directions</p>");
 
                     pLinesLayout->addWidget(plabNStreamLines,   4,1);
                     pLinesLayout->addWidget(m_pieNStreamLines,  4,2);
                     pLinesLayout->addWidget(plabDeltaL,         5,1);
-                    pLinesLayout->addWidget(m_pdeDeltaPos,      5,2);
+                    pLinesLayout->addWidget(m_pfeDeltaPos,      5,2);
                     pLinesLayout->addWidget(m_plabLengthUnit5,  5,3);
                     pLinesLayout->setColumnStretch(3,1);
                 }
@@ -252,8 +252,8 @@ void StreamLineCtrls::connectSignals()
     connect(m_prbZLine,             SIGNAL(clicked(bool)),         SLOT(onCalcStreamlines()));
 
     connect(m_pieNXPoint,           SIGNAL(intChanged(int)),       SLOT(onCalcStreamlines()));
-    connect(m_pdeL0,                SIGNAL(floatChanged(float)),   SLOT(onCalcStreamlines()));
-    connect(m_pdeXFactor,           SIGNAL(floatChanged(float)),   SLOT(onCalcStreamlines()));
+    connect(m_pfeL0,                SIGNAL(floatChanged(float)),   SLOT(onCalcStreamlines()));
+    connect(m_pfeXFactor,           SIGNAL(floatChanged(float)),   SLOT(onCalcStreamlines()));
 
     connect(m_pslXOffset,           SIGNAL(sliderReleased()),      SLOT(onSliderOffset()));
     connect(m_pslYOffset,           SIGNAL(sliderReleased()),      SLOT(onSliderOffset()));
@@ -261,7 +261,7 @@ void StreamLineCtrls::connectSignals()
     connect(m_pfeXOffset,           SIGNAL(floatChanged(float)),   SLOT(onFloatOffset()));
     connect(m_pfeYOffset,           SIGNAL(floatChanged(float)),   SLOT(onFloatOffset()));
     connect(m_pfeZOffset,           SIGNAL(floatChanged(float)),   SLOT(onFloatOffset()));
-    connect(m_pdeDeltaPos,          SIGNAL(floatChanged(float)),   SLOT(onCalcStreamlines()));
+    connect(m_pfeDeltaPos,          SIGNAL(floatChanged(float)),   SLOT(onCalcStreamlines()));
     connect(m_pieNStreamLines,      SIGNAL(intChanged(int)),       SLOT(onCalcStreamlines()));
 
     connect(m_pchUseWingColour,     SIGNAL(clicked(bool)),         SLOT(onCalcStreamlines()));
@@ -273,7 +273,7 @@ void StreamLineCtrls::initWidget()
 {
     updateUnits();
 
-    m_pdeXFactor->setValue(s_XFactor);
+    m_pfeXFactor->setValue(s_XFactor);
     m_pieNXPoint->setValue(s_NX);
 
     m_prbTE->setChecked(   s_pos==TRAILINGEDGE);
@@ -288,9 +288,9 @@ void StreamLineCtrls::initWidget()
     m_pchUseWingColour->setChecked(W3dPrefs::s_bUseWingColour);
 
     m_pieNStreamLines->setValue(s_NStreamLines);
-    m_pdeDeltaPos->setValue(s_DeltaL*Units::mtoUnit());
+    m_pfeDeltaPos->setValue(s_DeltaL*Units::mtoUnit());
     m_pieNStreamLines->setEnabled(s_pos==Y_LINE || s_pos==Z_LINE);
-    m_pdeDeltaPos->setEnabled(    s_pos==Y_LINE || s_pos==Z_LINE);
+    m_pfeDeltaPos->setEnabled(    s_pos==Y_LINE || s_pos==Z_LINE);
     onCalcStreamlines();
 }
 
@@ -307,8 +307,8 @@ void StreamLineCtrls::updateUnits()
     m_plabLengthUnit4->setText(str);
     m_plabLengthUnit5->setText(str);
 
-    m_pdeDeltaPos->setValue(s_DeltaL *Units::mtoUnit());
-    m_pdeL0->setValue(s_L0* Units::mtoUnit());
+    m_pfeDeltaPos->setValue(s_DeltaL *Units::mtoUnit());
+    m_pfeL0->setValue(s_L0* Units::mtoUnit());
     m_pfeXOffset->setValue(s_XOffset*Units::mtoUnit());
     m_pfeYOffset->setValue(s_YOffset*Units::mtoUnit());
     m_pfeZOffset->setValue(s_ZOffset*Units::mtoUnit());
@@ -382,14 +382,14 @@ void StreamLineCtrls::readStreamParams()
     s_ZOffset = m_pslZOffset->value();
 
     s_NX      = m_pieNXPoint->value();
-    s_L0      = m_pdeL0->value()  / Units::mtoUnit();
-    s_XFactor = m_pdeXFactor->value();
+    s_L0      = m_pfeL0->value()  / Units::mtoUnit();
+    s_XFactor = m_pfeXFactor->value();
 
     s_NStreamLines = m_pieNStreamLines->value();
-    s_DeltaL = m_pdeDeltaPos->value()/Units::mtoUnit();
+    s_DeltaL = m_pfeDeltaPos->value()/Units::mtoUnit();
 
     m_pieNStreamLines->setEnabled(s_pos==Y_LINE || s_pos==Z_LINE);
-    m_pdeDeltaPos->setEnabled(    s_pos==Y_LINE || s_pos==Z_LINE);
+    m_pfeDeltaPos->setEnabled(    s_pos==Y_LINE || s_pos==Z_LINE);
 
     W3dPrefs::s_bUseWingColour = m_pchUseWingColour->isChecked();
 }
@@ -439,8 +439,8 @@ void StreamLineCtrls::onCalcStreamlines()
         series +=r;
         r*=s_XFactor;
     }
-    double l0 = m_pdeL0->value()/Units::mtoUnit();
-    m_pdeMaxLength->setValue(series*l0*Units::mtoUnit()); //double conversion superfluous
+    double l0 = m_pfeL0->value()/Units::mtoUnit();
+    m_pfeMaxLength->setValue(series*l0*Units::mtoUnit()); //double conversion superfluous
 
     emit update3dStreamlines();
 }
@@ -455,7 +455,7 @@ void StreamLineCtrls::enableStreamControls()
     m_pslYOffset->setEnabled(s_pos!=TRAILINGEDGE);
     m_pslZOffset->setEnabled(s_pos!=TRAILINGEDGE);
     m_pieNStreamLines->setEnabled(s_pos!=TRAILINGEDGE);
-    m_pdeDeltaPos->setEnabled(s_pos!=TRAILINGEDGE);
+    m_pfeDeltaPos->setEnabled(s_pos!=TRAILINGEDGE);
     m_pchUseWingColour->setEnabled(s_pos==TRAILINGEDGE);
 }
 

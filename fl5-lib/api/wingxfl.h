@@ -268,6 +268,8 @@ class FL5LIB_EXPORT WingXfl : public Part
         int nSurfaces() const {return int(m_Surface.size());}
         Surface const &firstSurface() const {return m_Surface.front();}
         Surface const &lastSurface() const  {return m_Surface.back();}
+        Surface const &rootLeftSurface() const;
+        Surface const &rootRightSurface() const;
 
         double stripArea(int p) const {return m_StripArea.at(p);}
 
@@ -277,7 +279,7 @@ class FL5LIB_EXPORT WingXfl : public Part
         bool checkFoils(std::string &log) const;
 
         int nTriangles() const;
-        void exportWingToAVL(std::string &avlstring, int index, double y, double Thetay, double lengthunit) const;
+        void exportToAVL(std::string &avlstring, int index, const Vector3d &T, double ry, double lengthunit) const;
 
         void resizeSpanDistribs(int nStations=-1);
 
@@ -294,6 +296,8 @@ class FL5LIB_EXPORT WingXfl : public Part
         bool connectSurfaceToNext(int iSurf, std::vector<Panel3> &panels, bool bConnectFlaps, bool bThickSurfaces);
 
         bool hasCenterGap() const;
+
+        void makeMidWires(std::vector<std::vector<Node> > &midwires) const;
 
         static double minSurfaceLength() {return s_MinSurfaceLength;}
         static void setMinSurfaceLength(double size) {s_MinSurfaceLength=size;}

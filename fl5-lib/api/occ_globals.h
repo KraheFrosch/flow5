@@ -90,8 +90,10 @@ namespace occ
     FL5LIB_EXPORT void stitchFaces(double stitchprecision, TopoDS_Shape &theshape, TopoDS_Shell &theshell, std::string &logmsg);
 
     FL5LIB_EXPORT void makeWingShape(WingXfl const *pWing, double stitchprecision, TopoDS_Shape &wingshape, std::string &logmsg);
-    FL5LIB_EXPORT void makeFoilWires(Surface const &aSurf, TopoDS_Wire &TLWire, TopoDS_Wire & BLWire, TopoDS_Wire &TRWire, TopoDS_Wire &BRWire, std::string &logmsg);
-
+    FL5LIB_EXPORT bool makeFoilMidWires(Surface const &aSurf, TopoDS_Wire & LeftWire, TopoDS_Wire &RightWire, std::string &logmsg);
+    FL5LIB_EXPORT bool makeFoilWires(Surface const &aSurf, TopoDS_Wire &TLWire, TopoDS_Wire & BLWire, TopoDS_Wire &TRWire, TopoDS_Wire &BRWire, std::string &logmsg);
+    FL5LIB_EXPORT bool makePolyLineWire(std::vector<Vector3d> const &Pt, TopoDS_Wire & LeftWire, std::string &logmsg);
+    FL5LIB_EXPORT bool makePolyLineWire(std::vector<Node> const &nd, TopoDS_Wire & LeftWire, std::string &logmsg);
 
     FL5LIB_EXPORT bool makeSplineWire(const BSpline3d &spline, TopoDS_Wire &wire, std::string &logmsg);
 
@@ -131,6 +133,9 @@ namespace occ
     FL5LIB_EXPORT bool makeWing2NurbsShape(WingXfl const *pWing, double stitchprecision, int degree, int nCtrlPoints, int nOutPoints, TopoDS_Shape &wingshape, std::string &logmsg);
     FL5LIB_EXPORT bool makeWingSplineSweep(WingXfl const *pWing, double stitchprecision, int degree, int nCtrlPoints, int nOutPoints, TopoDS_Shape &wingshape, std::string &logmsg);
 
+    FL5LIB_EXPORT bool makeWingSweepMidSection(WingXfl const *pWing, TopoDS_Shape &midshape, std::string &logmsg);
+    FL5LIB_EXPORT bool makeWingSplineSweepMidSection(WingXfl const *pWing, int degree, int nCtrlPoints, int nOutPoints, TopoDS_Shape &wingshape, std::string &logmsg);
+
     FL5LIB_EXPORT bool makeWingSplineSweepMultiSections(WingXfl const *pWing, double stitchprecision, int degree, int nCtrlPoints, int nOutPoints, TopoDS_Shape &wingshape, std::string &logmsg);
     FL5LIB_EXPORT bool makeWingSplineSweepSolid(WingXfl const *pWing, double stitchprecision, int degree, int nCtrlPoints, int nOutPoints, TopoDS_Shape &wingshape, std::string &logmsg);
 
@@ -147,3 +152,6 @@ namespace occ
     FL5LIB_EXPORT bool shapeToBrep(const TopoDS_Shape &shape, std::string &brep);
     FL5LIB_EXPORT bool shapesToBreps(const TopoDS_ListOfShape &shapes, std::vector<std::string> &breps);
 }
+
+
+

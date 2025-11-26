@@ -24,8 +24,8 @@
 
 #include <QVector>
 
-#include <BRep_Tool.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
+#include <BRep_Tool.hxx>
 #include <Geom_Curve.hxx>
 #include <Poly.hxx>
 #include <TopExp_Explorer.hxx>
@@ -39,7 +39,7 @@
 #include <api/occ_globals.h>
 
 #define WIRERES 77
-void glMakeWire(TopoDS_Wire const &wire, QOpenGLBuffer &vbo)
+void gl::glMakeWire(TopoDS_Wire const &wire, QOpenGLBuffer &vbo)
 {
     if(wire.IsNull())
     {
@@ -88,7 +88,7 @@ void glMakeWire(TopoDS_Wire const &wire, QOpenGLBuffer &vbo)
 }
 
 
-void glMakeShapeTriangles(TopoDS_Shape const &shape, OccMeshParams const& params, QOpenGLBuffer &vbo)
+void gl::glMakeShapeTriangles(TopoDS_Shape const &shape, OccMeshParams const& params, QOpenGLBuffer &vbo)
 {
     TopExp_Explorer shapeExplorer;
     QVector<float> meshvertexarray;
@@ -174,8 +174,7 @@ void glMakeShapeTriangles(TopoDS_Shape const &shape, OccMeshParams const& params
 }
 
 
-
-void glMakeEdges(TopoDS_Shape const &Shape, QOpenGLBuffer &vboEdges, QVector<Vector3d> &labelpoints)
+void gl::glMakeEdges(TopoDS_Shape const &Shape, QOpenGLBuffer &vboEdges, QVector<Vector3d> &labelpoints)
 {
     //could also use BRep_Tool::PolygonOnSurface
     std::string strange;
@@ -183,13 +182,13 @@ void glMakeEdges(TopoDS_Shape const &Shape, QOpenGLBuffer &vboEdges, QVector<Vec
 
     occ::findEdges(Shape, theEdges, strange);
 
-    glMakeEdges(theEdges, vboEdges, labelpoints);
+    glMakeEdges(theEdges, Vector3d(), vboEdges, labelpoints);
 }
 
 
 #define EDGERES 37
 
-void glMakeEdges(TopoDS_ListOfShape const &theEdges, QOpenGLBuffer &vboEdges, QVector<Vector3d> &labelpoints)
+void gl::glMakeEdges(TopoDS_ListOfShape const &theEdges, Vector3d const &T, QOpenGLBuffer &vboEdges, QVector<Vector3d> &labelpoints)
 {
     if(vboEdges.isCreated()) vboEdges.destroy();
 
@@ -213,12 +212,12 @@ void glMakeEdges(TopoDS_ListOfShape const &theEdges, QOpenGLBuffer &vboEdges, QV
                 double u1 = First + df1 * (Last-First);
                 edgecurve->D0(u0, pt0);
                 edgecurve->D0(u1, pt1);
-                OutlineVertexArray.push_back(float(pt0.X()));
-                OutlineVertexArray.push_back(float(pt0.Y()));
-                OutlineVertexArray.push_back(float(pt0.Z()));
-                OutlineVertexArray.push_back(float(pt1.X()));
-                OutlineVertexArray.push_back(float(pt1.Y()));
-                OutlineVertexArray.push_back(float(pt1.Z()));
+                OutlineVertexArray.push_back(float(pt0.X() + T.x));
+                OutlineVertexArray.push_back(float(pt0.Y() + T.y));
+                OutlineVertexArray.push_back(float(pt0.Z() + T.z));
+                OutlineVertexArray.push_back(float(pt1.X() + T.x));
+                OutlineVertexArray.push_back(float(pt1.Y() + T.y));
+                OutlineVertexArray.push_back(float(pt1.Z() + T.z));
                 if(i==int(EDGERES/2))
                 {
                     labelpoints.append({pt0.X(), pt0.Y(), pt0.Z()});
@@ -241,7 +240,7 @@ void glMakeEdges(TopoDS_ListOfShape const &theEdges, QOpenGLBuffer &vboEdges, QV
 }
 
 
-void glMakeEdge(const TopoDS_Edge &Edge, QOpenGLBuffer &vboEdge)
+void gl::glMakeEdge(const TopoDS_Edge &Edge, QOpenGLBuffer &vboEdge)
 {
     if(vboEdge.isCreated()) vboEdge.destroy();
 
@@ -279,8 +278,7 @@ void glMakeEdge(const TopoDS_Edge &Edge, QOpenGLBuffer &vboEdge)
 }
 
 
-
-void glMakeShellOutline(const TopoDS_ListOfShape &shapes, const Vector3d &position, QOpenGLBuffer &vbo, int nWireRes)
+void gl::glMakeShellOutline(const TopoDS_ListOfShape &shapes, const Vector3d &position, QOpenGLBuffer &vbo, int nWireRes)
 {
     if(shapes.Extent()<=0)
     {

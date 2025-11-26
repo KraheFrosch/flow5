@@ -273,7 +273,7 @@ void gl3dXSailView::glMake3dObjects()
             {
                 FuseOcc const*pFocc = dynamic_cast<FuseOcc const*>(pFuse);
                 //                glMakeTriangulation(pTranslatedFocc->triangulation(), Vector3d(), m_vboFuseTriangulation[ifuse]);
-                glMakeShellOutline(pFocc->shells(), pFocc->position(), m_vboFuseOutline[ifuse]);
+                gl::glMakeShellOutline(pFocc->shells(), pFocc->position(), m_vboFuseOutline[ifuse]);
                 gl::makeTriangulation3Vtx(pFuse->triangulation(), pFuse->position(), m_vboFuseTriangulation[ifuse], false);
 
             }
@@ -314,7 +314,7 @@ void gl3dXSailView::glMake3dObjects()
             else if(pSail->isOccSail())
             {
                 SailOcc const *pOccSail = dynamic_cast<SailOcc const *>(pSail);
-                glMakeShellOutline(pOccSail->shapes(), position, m_vboSailOutline[isail]);
+                gl::glMakeShellOutline(pOccSail->shapes(), position, m_vboSailOutline[isail]);
             }
             else if(pSail->isStlSail())
             {

@@ -29,7 +29,7 @@
 struct GmshParams
 {
     public:
-        double m_MinSize=0.005;// 5 mm
-        double m_MaxSize=10.0; // 10 meter
+        double m_MinSize=0.05;// 50 mm
+        double m_MaxSize=1.0; // 1 meter
         int m_nCurvature=30;
 };

@@ -71,6 +71,9 @@ class MesherWt : public QFrame
         void showPickEdge(bool bShow) {m_pchPickEdge->setVisible(bShow);}
         void showDebugBox(bool bShow) {m_pTraceBox->setVisible(bShow);}
 
+        QSize sizeHint() const override {return QSize(300,150);}
+        QSize minimumSizeHint() const override {return QSize(100,50);}
+
         static void loadSettings(QSettings &settings);
         static void saveSettings(QSettings &settings);
 

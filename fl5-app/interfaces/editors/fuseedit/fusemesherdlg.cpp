@@ -58,6 +58,7 @@
 #include <core/xflcore.h>
 #include <interfaces/mesh/afmesher.h>
 #include <interfaces/mesh/gmesherwt.h>
+#include <interfaces/mesh/gmesh_globals.h>
 #include <interfaces/mesh/mesherwt.h>
 #include <interfaces/mesh/meshevent.h>
 #include <interfaces/mesh/panelcheckdlg.h>
@@ -139,8 +140,8 @@ void FuseMesherDlg::setupLayout()
                     pOccViewFrame->setLayout(pOccViewLayout);
                 }
 
-                m_ptabViewWt->addTab(p3dViewFrame,"3d g-space");
-                m_ptabViewWt->addTab(pOccViewFrame,"3d shape");
+                m_ptabViewWt->addTab(p3dViewFrame,"Fuse view");
+                m_ptabViewWt->addTab(pOccViewFrame,"Shape view");
             }
 
             m_pVSplitter = new QSplitter(Qt::Vertical);
@@ -275,6 +276,8 @@ void FuseMesherDlg::setupLayout()
 void FuseMesherDlg::initDialog(Fuse *pFuse)
 {
     if(!pFuse) return;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     m_pFuse = pFuse;
     FuseXfl *pFuseXfl = dynamic_cast<FuseXfl*>(pFuse);
     if(pFuseXfl)
@@ -296,22 +299,13 @@ void FuseMesherDlg::initDialog(Fuse *pFuse)
     m_pglFuseView->setBotLeftOutput(strange);
     m_pglFuseView->showPartFrame(false);
 
-    if(pFuse->isXflType())
-    {
-        FuseXfl const *pFuseXfl = dynamic_cast<FuseXfl const*>(m_pFuse);
-        m_pglShapeView->setReferenceLength(pFuseXfl->length());
-        m_pglShapeView->setShape(pFuseXfl->m_RightSideShell.First(), pFuseXfl->occTessParams());
-    }
-    else if(pFuse->isOccType())
-    {
-        m_pglShapeView->setReferenceLength(pFuse->length());
-        m_pglShapeView->setShape(m_pFuse->shells().First(), m_pFuse->occTessParams());
+    m_pglShapeView->setFuse(pFuse);
 
-    }
-    else m_pglShapeView->clearShape();
     m_pglShapeView->showPartFrame(false);
 
     m_ppbUndoLastMerge->setEnabled(false);
+
+    QApplication::restoreOverrideCursor();
 }
 
 

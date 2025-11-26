@@ -165,7 +165,7 @@ void gl3dBoatView::glMakeHulls()
             else if(m_pBoat->hull(ifuse)->isOccType())
             {
                 FuseOcc* pFocc = dynamic_cast<FuseOcc*>(pFuse);
-                glMakeShellOutline(pFocc->shells(), pFocc->position(), m_vboFuseOutline[ifuse]);
+                gl::glMakeShellOutline(pFocc->shells(), pFocc->position(), m_vboFuseOutline[ifuse]);
                 gl::makeTriangulation3Vtx(pFuse->triangulation(),
                                         pFuse->position(),
                                         m_vboFuseTriangulation[ifuse],
@@ -213,7 +213,7 @@ void gl3dBoatView::glMakeSails()
             else if(pSail->isOccSail())
             {
                 SailOcc const *pOccSail = dynamic_cast<SailOcc const *>(pSail);
-                glMakeShellOutline(pOccSail->shapes(), pSail->position(), m_vboSailOutline[isail]);
+                gl::glMakeShellOutline(pOccSail->shapes(), pSail->position(), m_vboSailOutline[isail]);
             }
             else if(pSail->isStlSail())
             {

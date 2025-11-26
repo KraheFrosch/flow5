@@ -30,6 +30,8 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
 
+#include <gmsh.h>
+
 #include <api/fl5lib_global.h>
 
 

@@ -159,7 +159,7 @@ class XPlane : public QObject
         void resetGraphScales();
 
         Plane * curPlane()  const {return m_pCurPlane;}
-        PlanePolar *curWPolar() const {return m_pCurWPolar;}
+        PlanePolar *curWPolar() const {return m_pCurPlPolar;}
         PlaneOpp const *curPOpp() const {return m_pCurPOpp;}
 
         bool curPOppOnly() const {return m_bCurPOppOnly;}
@@ -344,7 +344,7 @@ class XPlane : public QObject
         bool m_bShowBellCurve;              /**< true if the bell distribution loading should be displayed in the local lift graph */
 
         Plane *m_pCurPlane;          /**< a pointer to the active Plane >*/
-        PlanePolar *m_pCurWPolar;        /**< a pointer to the active WPolar >*/
+        PlanePolar *m_pCurPlPolar;        /**< a pointer to the active WPolar >*/
         PlaneOpp *m_pCurPOpp;        /**< a pointer to the active Plane Operating Point, or NULL if none is active; const because only the style can be changed >*/
 
 

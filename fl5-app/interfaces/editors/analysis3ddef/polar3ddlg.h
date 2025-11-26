@@ -139,9 +139,9 @@ class Polar3dDlg : public QDialog
 
         QRadioButton*m_prbPanelWake;
         QRadioButton*m_prbVortonWake;
-        FloatEdit *m_pdeVPWBufferWake;
+        FloatEdit *m_pfeVPWBufferWake;
         FloatEdit *m_pfeVortonL0;
-        FloatEdit *m_pdeVortonCoreSize, *m_pdeVPWLength;
+        FloatEdit *m_pfeVortonCoreSize, *m_pfeVPWLength;
         IntEdit *m_pieVPWIterations;
         QLabel *m_plabVPWBufferWakeUnit, *m_plabVPWStepUnit,*m_plabVtnCoreUnit, *m_plabVPWDiscard, *m_plabVPWMaxLength;
 

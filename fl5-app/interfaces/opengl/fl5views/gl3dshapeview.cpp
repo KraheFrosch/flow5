@@ -42,18 +42,25 @@
 
 #include "gl3dshapeview.h"
 
-#include <interfaces/opengl/globals/gl_occ.h>
-#include <interfaces/opengl/globals/gl_globals.h>
-#include <interfaces/controls/w3dprefs.h>
-#include <api/utils.h>
-#include <core/displayoptions.h>
 #include <api/occ_globals.h>
+#include <api/fuse.h>
+#include <api/fusexfl.h>
+#include <api/utils.h>
+
+
+#include <core/displayoptions.h>
+#include <interfaces/controls/w3dprefs.h>
+#include <interfaces/mesh/gmesh_globals.h>
+#include <interfaces/opengl/globals/gl_globals.h>
+#include <interfaces/opengl/globals/gl_occ.h>
+
 
 gl3dShapeView::gl3dShapeView(QWidget*pParent) : gl3dXflView(pParent)
 {
     m_bResetglGeom = true;
     m_bResetglShape = true;
 
+    m_pFuse  = nullptr;
     m_pShape = nullptr;
 }
 
@@ -187,13 +194,29 @@ bool gl3dShapeView::intersectTheObject(Vector3d const &A, Vector3d const&B, Vect
 }
 
 
-void gl3dShapeView::setShape(TopoDS_Shape const &shape, const OccMeshParams &params)
+void gl3dShapeView::setFuse(Fuse *pFuse)
 {
-    m_pShape = &shape;
+    m_pFuse = pFuse;
+    m_OccTessParams = pFuse->occTessParams();
+    m_GmshTessParams = pFuse->gmshTessParams();
+
+    setReferenceLength(pFuse->length());
+
+    if(pFuse->isXflType())
+    {
+        FuseXfl const *pFuseXfl = dynamic_cast<FuseXfl const*>(m_pFuse);
+        m_pShape = &pFuseXfl->rightSideShells().First();
+    }
+    else if(pFuse->isOccType())
+    {
+        m_pShape = &m_pFuse->shells().First();
+
+    }
+    else clearShape();
+
     m_bResetglShape = true;
     std::string strange;
-    occ::listShapeContent(shape, strange);
-    m_OccMeshParams = params;
+    occ::listShapeContent(*m_pShape, strange);
 
     setBotLeftOutput(strange);
     reset3dScale();
@@ -202,12 +225,16 @@ void gl3dShapeView::setShape(TopoDS_Shape const &shape, const OccMeshParams &par
 
 void gl3dShapeView::glMake3dObjects()
 {
-    if(m_bResetglShape && m_pShape)
+    if(m_bResetglShape && m_pFuse)
     {
         m_EdgeLabelPts.clear();
-        glMakeEdges(*m_pShape, m_vboEdges, m_EdgeLabelPts);
+        gl::glMakeEdges(*m_pShape, m_vboEdges, m_EdgeLabelPts);
 //        glMakeWires();
-        glMakeShapeTriangles(*m_pShape, m_OccMeshParams, m_vboFaces);
+
+        QString log;
+        gmesh::makeFuseTriangulation(m_pFuse, log);
+        gl::makeTriangles3Vtx(m_pFuse->triangles(), false, m_vboFaces);
+
         m_bResetglShape = false;
     }
 
@@ -311,7 +338,7 @@ void gl3dShapeView::mouseMoveEvent(QMouseEvent *pEvent)
             m_vboWires.append(QOpenGLBuffer());
             TopoDS_Wire const &aWire = TopoDS::Wire(ShapeIt.Value());
 
-            glMakeWire(aWire, m_vboWires.back());
+            gl::glMakeWire(aWire, m_vboWires.back());
 
             TopExp_Explorer WireExplorer;
             Standard_Real First(0),Last(0);

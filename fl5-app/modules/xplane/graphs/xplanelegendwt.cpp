@@ -155,7 +155,7 @@ void XPlaneLegendWt::makeWPolarLegendBtns(XPlane::enumViews eXPlaneView, bool bH
                 ls.m_Tag = pWPolar->name();
                 pLegendBtn->setStyle(ls);
                 pLegendBtn->setBackground(true);
-                if(pWPolar==s_pXPlane->m_pCurWPolar && Graph::isHighLighting() && bHighlight)
+                if(pWPolar==s_pXPlane->m_pCurPlPolar && Graph::isHighLighting() && bHighlight)
                     pLegendBtn->setHighLight(true);
                 m_XflObjectMap.insert(pLegendBtn, pWPolar);
 

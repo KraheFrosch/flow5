@@ -494,7 +494,7 @@ void POpp3dCtrls::onPanelForce()
     PlaneOpp *pPOpp = s_pXPlane->m_pCurPOpp;
     if(pPOpp && m_bPanelForce)
     {
-        qDyn=0.5*s_pXPlane->m_pCurWPolar->density()*s_pXPlane->m_pCurPOpp->QInf()*s_pXPlane->m_pCurPOpp->QInf();
+        qDyn=0.5*s_pXPlane->m_pCurPlPolar->density()*s_pXPlane->m_pCurPOpp->QInf()*s_pXPlane->m_pCurPOpp->QInf();
         qDyn *= Units::PatoUnit();
 
         if(s_pXPlane->m_pCurPOpp->isTriLinearMethod())
@@ -517,7 +517,7 @@ void POpp3dCtrls::on3dPickCp()
 {
     if(m_pchPickPanel->isChecked())
     {
-        if(!s_pXPlane->m_pCurWPolar)
+        if(!s_pXPlane->m_pCurPlPolar)
             m_pgl3dXPlaneView->setPicking(xfl::PANEL3);
         else
         {
@@ -653,7 +653,7 @@ void POpp3dCtrls::onFlow(bool bFlow)
 
 void POpp3dCtrls::onAnimatePOpp()
 {
-    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurWPolar || !s_pXPlane->is3dView())
+    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurPlPolar || !s_pXPlane->is3dView())
     {
         m_bAnimateWOpp = false;
         return;
@@ -674,7 +674,7 @@ void POpp3dCtrls::onAnimatePOpp()
         pPOpp = Objects3d::POppAt(l);
 
         if (pPOpp &&
-                pPOpp->polarName() == s_pXPlane->m_pCurWPolar->name() &&
+                pPOpp->polarName() == s_pXPlane->m_pCurPlPolar->name() &&
                 pPOpp->planeName() == s_pXPlane->m_pCurPlane->name())
         {
             if(s_pXPlane->m_pCurPOpp->alpha() - pPOpp->alpha()<AOAPRECISION)
@@ -692,7 +692,7 @@ void POpp3dCtrls::onAnimatePOpp()
 void POpp3dCtrls::onAnimatePOppSingle()
 {
     if(!s_pXPlane->is3dView()) return; //nothing to animate
-    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurWPolar) return;
+    if(!s_pXPlane->m_pCurPlane || !s_pXPlane->m_pCurPlPolar) return;
 
     int size = Objects3d::nPOpps();
     if(size<=1) return;
@@ -707,7 +707,7 @@ void POpp3dCtrls::onAnimatePOppSingle()
         PlaneOpp *pPOpp = Objects3d::POppAt(m_posAnimateWOpp);
         if(!pPOpp) return;
 
-        bIsValid =(pPOpp->polarName()==s_pXPlane->m_pCurWPolar->name()  &&
+        bIsValid =(pPOpp->polarName()==s_pXPlane->m_pCurPlPolar->name()  &&
                    pPOpp->planeName()==s_pXPlane->m_pCurPlane->name());
 
         if (bIsValid && !bSkipOne)

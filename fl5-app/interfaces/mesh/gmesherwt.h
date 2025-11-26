@@ -33,6 +33,7 @@
 #include <QSettings>
 
 #include <api/gmshparams.h>
+#include <api/node.h>
 
 class Fuse;
 class Sail;
@@ -41,7 +42,10 @@ class IntEdit;
 class PlainTextOutput;
 class GMesher;
 class Vector3d;
+class Node;
 class Triangle3d;
+class WingXfl;
+
 
 class GMesherWt : public QFrame
 {
@@ -56,6 +60,13 @@ class GMesherWt : public QFrame
         std::vector<Triangle3d> const &triangles() const {return m_Triangles;}
 
         void setAlgo(int iAlgo) {s_idxAlgo=iAlgo;}
+
+        void setExtraNodes(std::vector<std::vector<Node>> const &nodes) {m_Nodes=nodes;}
+        void setWings(QVector<WingXfl*> const &wings) {m_Wings=wings;}
+        void clearWings() {m_Wings.clear();}
+
+        QSize sizeHint() const override {return QSize(300,150);}
+        QSize minimumSizeHint() const override {return QSize(100,50);}
 
         static void loadSettings(QSettings &settings);
         static void saveSettings(QSettings &settings);
@@ -78,7 +89,8 @@ class GMesherWt : public QFrame
         bool readMeshSize();
         void convertFromGmsh();
         void convertTriangles(const std::vector<std::size_t> &elementTags, const QVector<Vector3d> &node);
-        void makeModelCurves();
+
+        void embedPoints();
 
     signals:
         void meshCurrent();
@@ -103,6 +115,7 @@ class GMesherWt : public QFrame
 
 
         std::vector<Triangle3d> m_Triangles; /**< the resulting triangles */
+        std::vector<std::vector<Node>> m_Nodes;
 
         QVector<QVector<Vector3d>> m_Curves;
 
@@ -111,6 +124,8 @@ class GMesherWt : public QFrame
 
         Fuse *m_pFuse;
         Sail *m_pSail;
+
+        QVector<WingXfl*> m_Wings; /** if not emmpty, used to embed mid lines in the fuse mesh */
 
         static int s_idxAlgo;
 };

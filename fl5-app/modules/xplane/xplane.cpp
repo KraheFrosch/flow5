@@ -195,7 +195,7 @@ XPlane::XPlane(MainFrame *pMainFrame) : QObject()
 
     m_pCurPlane   = nullptr;
     m_pCurPOpp    = nullptr;
-    m_pCurWPolar  = nullptr;
+    m_pCurPlPolar  = nullptr;
 
     m_bCurPOppOnly       = false;
 
@@ -488,8 +488,8 @@ void XPlane::checkActions()
     m_pMenus->m_pCurrentPlaneMenu->setEnabled(m_pCurPlane && !m_pCurPlane->isLocked());
     m_pMenus->m_pCurrentPlaneCtxMenu->setEnabled(m_pCurPlane && !m_pCurPlane->isLocked());
 
-    m_pMenus->m_pCurWPlrMenu->setEnabled(m_pCurPlane && m_pCurWPolar && !m_pCurPlane->isLocked());
-    m_pMenus->m_pCurWPlrCtxMenu->setEnabled(m_pCurPlane && m_pCurWPolar && !m_pCurPlane->isLocked());
+    m_pMenus->m_pCurWPlrMenu->setEnabled(m_pCurPlane && m_pCurPlPolar && !m_pCurPlane->isLocked());
+    m_pMenus->m_pCurWPlrCtxMenu->setEnabled(m_pCurPlane && m_pCurPlPolar && !m_pCurPlane->isLocked());
 
     m_pMenus->m_pCurPOppMenu->setEnabled(m_pCurPlane && m_pCurPOpp && !m_pCurPlane->isLocked());
     m_pMenus->m_pCurPOppCtxMenu->setEnabled(m_pCurPlane && m_pCurPOpp && !m_pCurPlane->isLocked());
@@ -662,7 +662,7 @@ void XPlane::onAddCpSectionCurve()
 
 void XPlane::createCpCurves()
 {
-    if(!m_pCurPOpp || !m_pCurWPolar || !m_pCurPlane || !m_pCurPlane->isXflType())
+    if(!m_pCurPOpp || !m_pCurPlPolar || !m_pCurPlane || !m_pCurPlane->isXflType())
     {
         s_pMainFrame->m_pCpViewWt->CpGraph()->deleteCurves();
         s_pMainFrame->m_pCpViewWt->makeLegend(false);
@@ -800,7 +800,7 @@ void XPlane::createWOppCurves()
                     double y = sqrt(1.0 - x*x);
                     lift += y*m_pCurPOpp->WOpp(0).spanResults().m_StripArea[i] ;
                 }
-                maxlift = m_pCurPOpp->m_AF.CL() / lift * m_pCurPlane->planformArea(m_pCurWPolar->bIncludeOtherWingAreas());
+                maxlift = m_pCurPOpp->m_AF.CL() / lift * m_pCurPlane->planformArea(m_pCurPlPolar->bIncludeOtherWingAreas());
             }
 
             for(int ig=0; ig<m_WingGraph.size(); ig++)
@@ -833,7 +833,7 @@ void XPlane::createWOppCurves()
                     double y = pow(cos(x*PI/2.0), m_BellCurveExp);
                     lift += y*m_pCurPOpp->WOpp(0).spanResults().m_StripArea[i] ;
                 }
-                maxlift = m_pCurPOpp->m_AF.CL() / lift * m_pCurPlane->planformArea(m_pCurWPolar->bIncludeOtherWingAreas());
+                maxlift = m_pCurPOpp->m_AF.CL() / lift * m_pCurPlane->planformArea(m_pCurPlPolar->bIncludeOtherWingAreas());
             }
 
             for(int ig=0; ig<m_WingGraph.size(); ig++)
@@ -887,7 +887,7 @@ void XPlane::createWPolarCurves()
                 fillWPlrCurve(pCurveL, pWPolar, pGraph->xVariable(), pGraph->yVariable(0));
                 pCurveL->setTheStyle(pWPolar->theStyle());
                 pWPolar->appendCurve(pCurveL);
-                if(pWPolar==m_pCurWPolar) pGraph->selectCurve(pCurveL);
+                if(pWPolar==m_pCurPlPolar) pGraph->selectCurve(pCurveL);
 
                 // add right axis curves
                 if(pGraph->hasRightAxis())
@@ -896,7 +896,7 @@ void XPlane::createWPolarCurves()
                     fillWPlrCurve(pCurveR, pWPolar, pGraph->xVariable(), pGraph->yVariable(1));
                     pCurveR->setTheStyle(pWPolar->theStyle());
                     pWPolar->appendCurve(pCurveR);
-                    if(pWPolar==m_pCurWPolar) pGraph->selectCurve(pCurveR);
+                    if(pWPolar==m_pCurPlPolar) pGraph->selectCurve(pCurveR);
                 }
             }
         }
@@ -984,7 +984,7 @@ void XPlane::createStabilityCurves()
                 pCurve->setName(QString::fromStdString(pWPolar->planeName() + " / " + pWPolar->name())+QString::asprintf("_Mode_%d", iCurve+1));
                 fillStabCurve(pCurve, pWPolar, iCurve);
                 pWPolar->appendCurve(pCurve);
-                if(pWPolar==m_pCurWPolar)
+                if(pWPolar==m_pCurPlPolar)
                 {
                     m_StabPlrGraph.at(0)->selectCurve(pCurve);
                 }
@@ -998,7 +998,7 @@ void XPlane::createStabilityCurves()
                 pCurve->setName(QString::fromStdString(pWPolar->planeName() + " / " + pWPolar->name())+QString::asprintf("_Mode_%d", iCurve+1));
                 fillStabCurve(pCurve, pWPolar, iCurve+4);
                 pWPolar->appendCurve(pCurve);
-                if(pWPolar==m_pCurWPolar)
+                if(pWPolar==m_pCurPlPolar)
                 {
                     m_StabPlrGraph.at(1)->selectCurve(pCurve);
                 }
@@ -1228,7 +1228,7 @@ void XPlane::fillStabCurve(Curve *pCurve, const PlanePolar *pWPolar, int iMode)
         {
             if(fabs(pWPolar->m_Alpha.at(i)-m_pCurPOpp->alpha())<ANGLEPRECISION)
             {
-                if(m_pCurWPolar->hasPOpp(m_pCurPOpp))
+                if(m_pCurPlPolar->hasPOpp(m_pCurPOpp))
                 {
                     pCurve->setSelectedPoint(i);
                 }
@@ -1259,7 +1259,7 @@ void XPlane::fillWPlrCurve(Curve *pCurve, PlanePolar const *pWPolar, int XVar, i
 
         pCurve->appendPoint(x,y);
 
-        if(m_pCurPOpp && pWPolar==m_pCurWPolar && Graph::isHighLighting())
+        if(m_pCurPOpp && pWPolar==m_pCurPlPolar && Graph::isHighLighting())
         {
             double d(0.001);
 
@@ -1786,17 +1786,17 @@ void XPlane::resetPrefs()
     if(m_pCurPlane)
     {
         QString props = QString::fromStdString(m_pCurPlane->planeData(true));
-        if(m_pCurWPolar)
+        if(m_pCurPlPolar)
         {
-            props = QString::fromStdString(m_pCurPlane->planeData(m_pCurWPolar->bIncludeOtherWingAreas()));
+            props = QString::fromStdString(m_pCurPlane->planeData(m_pCurPlPolar->bIncludeOtherWingAreas()));
             props +="\n";
             QString strange;
-            if(m_pCurWPolar->isQuadMethod() && m_pCurPlane->isXflType())
+            if(m_pCurPlPolar->isQuadMethod() && m_pCurPlane->isXflType())
             {
                 PlaneXfl const * pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pCurPlane);
                 strange = QString::asprintf("Quad panels     = %d", pPlaneXfl->quadMesh().nPanels());
             }
-            else if(m_pCurWPolar->isTriangleMethod())
+            else if(m_pCurPlPolar->isTriangleMethod())
                 strange = QString::asprintf("Triangles       = %d", m_pCurPlane->triMesh().nPanels());
             props += strange;
         }
@@ -1849,7 +1849,7 @@ void XPlane::onAnimateModeSingle(bool bStep)
         m_pTimerMode->stop();
         return; //nothing to animate
     }
-    if(!m_pCurPlane || !m_pCurWPolar || !m_pCurWPolar->isStabilityPolar() || !m_pCurPOpp)
+    if(!m_pCurPlane || !m_pCurPlPolar || !m_pCurPlPolar->isStabilityPolar() || !m_pCurPOpp)
     {
         m_pTimerMode->stop();
         return; //nothing to animate
@@ -2077,7 +2077,7 @@ void XPlane::onBatchAnalysis()
 void XPlane::onBatchAnalysis2()
 {
     m_pCurPlane = nullptr;
-    m_pCurWPolar = nullptr;
+    m_pCurPlPolar = nullptr;
     m_pCurPOpp = nullptr;
 
     BatchXmlDlg BatchDlg(s_pMainFrame);
@@ -2096,15 +2096,15 @@ void XPlane::onBatchAnalysis2()
 
 void XPlane::onDuplicateCurAnalysis()
 {
-    if(!m_pCurPlane || !m_pCurWPolar) return;
+    if(!m_pCurPlane || !m_pCurPlPolar) return;
 
     PlanePolar* pNewWPolar(nullptr);
-    if(m_pCurWPolar->isExternalPolar())
+    if(m_pCurPlPolar->isExternalPolar())
     {
         pNewWPolar = new PlanePolarExt;
-        pNewWPolar->copy(m_pCurWPolar);
+        pNewWPolar->copy(m_pCurPlPolar);
     }
-    else pNewWPolar = new PlanePolar(*m_pCurWPolar);
+    else pNewWPolar = new PlanePolar(*m_pCurPlPolar);
 
     pNewWPolar->setVisible(true);
 
@@ -2243,22 +2243,22 @@ void XPlane::onEditCurWPolarPts()
 {
     stopAnimate();
 
-    if(!m_pCurPlane || !m_pCurWPolar) return;
+    if(!m_pCurPlane || !m_pCurPlPolar) return;
 
     PlanePolar* pMemWPolar = nullptr;
-    if(m_pCurWPolar->isExternalPolar())
+    if(m_pCurPlPolar->isExternalPolar())
         pMemWPolar = new PlanePolarExt;
     else
         pMemWPolar = new PlanePolar;
-    pMemWPolar->copy(m_pCurWPolar);
+    pMemWPolar->copy(m_pCurPlPolar);
 
     EditPlrDlg epDlg(s_pMainFrame);
-    epDlg.initDialog(nullptr, m_pCurWPolar);
+    epDlg.initDialog(nullptr, m_pCurPlPolar);
 
     connect(&epDlg, SIGNAL(dataChanged()), this, SLOT(onResetWPolarCurves()));
 
-    Line::enumPointStyle iPoints = m_pCurWPolar->pointStyle();
-    m_pCurWPolar->setPointStyle(Line::NOSYMBOL);
+    Line::enumPointStyle iPoints = m_pCurPlPolar->pointStyle();
+    m_pCurPlPolar->setPointStyle(Line::NOSYMBOL);
 
     m_bResetCurves = true;
     updateView();
@@ -2269,9 +2269,9 @@ void XPlane::onEditCurWPolarPts()
     }
     else
     {
-        m_pCurWPolar->copy(pMemWPolar);
+        m_pCurPlPolar->copy(pMemWPolar);
     }
-    m_pCurWPolar->setPointStyle(iPoints);
+    m_pCurPlPolar->setPointStyle(iPoints);
 
     delete pMemWPolar;
 
@@ -2286,17 +2286,17 @@ void XPlane::onEditCurWPolarPts()
  */
 void XPlane::onDeleteWPlrPOpps()
 {
-    if(!m_pCurPlane || !m_pCurWPolar) return;
+    if(!m_pCurPlane || !m_pCurPlPolar) return;
 
     emit projectModified();
 
-    m_pPlaneTreeView->removeWPolarPOpps(m_pCurWPolar);
+    m_pPlaneTreeView->removeWPolarPOpps(m_pCurPlPolar);
 
     for (int i=Objects3d::nPOpps()-1; i>=0; i--)
     {
         PlaneOpp*pPOpp =  Objects3d::POppAt(i);
 
-        if(pPOpp->polarName() == m_pCurWPolar->name() &&
+        if(pPOpp->polarName() == m_pCurPlPolar->name() &&
                 pPOpp->planeName() == m_pCurPlane->name())
         {
             Objects3d::removePOppAt(i);
@@ -2362,7 +2362,7 @@ void XPlane::onDeleteCurPlane()
     Objects3d::deletePlane(m_pCurPlane);
 
     m_pCurPlane = nullptr;
-    m_pCurWPolar = nullptr;
+    m_pCurPlPolar = nullptr;
     m_pCurPOpp = nullptr;
 
     setPlane(nextPlaneName);
@@ -2408,7 +2408,7 @@ void XPlane::onDeleteCurPOpp()
         PlaneOpp *pPOpp = Objects3d::POppAt(iPOpp);
         if(pPOpp)
         {
-            if(pPOpp->polarName().compare(m_pCurWPolar->name())==0 && pPOpp->planeName().compare(m_pCurPlane->name())==0)
+            if(pPOpp->polarName().compare(m_pCurPlPolar->name())==0 && pPOpp->planeName().compare(m_pCurPlane->name())==0)
             {
                 setPlaneOpp(pPOpp);
                 bFound = true;
@@ -2424,7 +2424,7 @@ void XPlane::onDeleteCurPOpp()
     }
 
     if(m_pCurPOpp) m_pPlaneTreeView->selectPlaneOpp(m_pCurPOpp);
-    else           m_pPlaneTreeView->selectWPolar(m_pCurWPolar, true);
+    else           m_pPlaneTreeView->selectWPolar(m_pCurPlPolar, true);
     emit projectModified();
 
     m_bResetCurves = true;
@@ -2495,31 +2495,31 @@ void XPlane::onDeletePlaneWPolars()
 
 void XPlane::onDeleteCurWPolar()
 {
-    if(!m_pCurWPolar) return;
-    if(m_pCurWPolar->isLocked())
+    if(!m_pCurPlPolar) return;
+    if(m_pCurPlPolar->isLocked())
     {
         displayMessage("The polar is locked by an analysis and cannot be deleted.\n\n", true, false);
         return;
     }
 
-    QString strong = "Are you sure you want to delete the polar :\n" +  QString::fromStdString(m_pCurWPolar->name()) +"?\n";
+    QString strong = "Are you sure you want to delete the polar :\n" +  QString::fromStdString(m_pCurPlPolar->name()) +"?\n";
     if (QMessageBox::Yes != QMessageBox::question(s_pMainFrame, "Question", strong,
                                                   QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
     stopAnimate();
 
 
-    PlanePolar *pWPolarDel = m_pCurWPolar; // in case of unfortunate signal/slot to setWPolar;
-    QString nextWPolarName = m_pPlaneTreeView->removeWPolar(m_pCurWPolar);
+    PlanePolar *pWPolarDel = m_pCurPlPolar; // in case of unfortunate signal/slot to setWPolar;
+    QString nextWPolarName = m_pPlaneTreeView->removeWPolar(m_pCurPlPolar);
     Objects3d::deleteWPolar(pWPolarDel);
 
     m_pCurPOpp = nullptr;
-    m_pCurWPolar = nullptr;
+    m_pCurPlPolar = nullptr;
     emit projectModified();
 
     setPolar(nextWPolarName);
 
-    if(m_pCurWPolar) m_pPlaneTreeView->selectWPolar(m_pCurWPolar, false);
+    if(m_pCurPlPolar) m_pPlaneTreeView->selectWPolar(m_pCurPlPolar, false);
     else             m_pPlaneTreeView->selectPlane(m_pCurPlane);
 
     m_pPlaneTreeView->setObjectProperties();
@@ -2841,7 +2841,7 @@ Plane* XPlane::setModPlane(Plane *pModPlane, bool bUsed, bool bAsNew)
     m_pCurPOpp = nullptr; // all the plane's oppoints have been deleted
 
     setPlane(pModPlane);
-    setPolar(m_pCurWPolar);
+    setPolar(m_pCurPlPolar);
 
     m_pPlaneTreeView->updatePlane(m_pCurPlane);
     m_pPlaneTreeView->selectObjects();
@@ -2946,42 +2946,22 @@ void XPlane::onTranslatePlane()
         return;
     }
 
-    Plane* pModPlane = nullptr;
-    if(m_pCurPlane->isXflType())
-    {
-        pModPlane = new PlaneXfl;
-        PlaneXfl *pModPlaneXfl = dynamic_cast<PlaneXfl*>(pModPlane);
-        if(pModPlaneXfl)
-        {
-            pModPlaneXfl->duplicate(m_pCurPlane);
-            pModPlaneXfl->setInitialized(false);
-        }
-    }
-    else if(m_pCurPlane->isSTLType())
-    {
-        pModPlane = new PlaneSTL;
-        PlaneSTL *pModPlaneSTL = dynamic_cast<PlaneSTL*>(pModPlane);
-        if(pModPlaneSTL)
-        {
-            pModPlaneSTL->duplicate(m_pCurPlane);
-            pModPlaneSTL->restoreMesh();
-        }
-    }
-    else return;
-
 
     TranslateDlg dlg(s_pMainFrame);
     if(dlg.exec()!=QDialog::Accepted)
     {
-        delete pModPlane;
         return;
     }
-    pModPlane->translate(dlg.translationVector());
+    m_pCurPlane->translate(dlg.translationVector());
+
+    m_pCurPlane->setInitialized(false);
+    setPlane();
+    if(m_pCurPlPolar) setPolar();
 
     emit projectModified();
     m_pPlaneTreeView->setObjectProperties();
 
-    setModPlane(pModPlane, Objects3d::hasResults(m_pCurPlane), true);
+//    setModPlane(pModPlane, Objects3d::hasResults(m_pCurPlane), true);
 
     m_pgl3dXPlaneView->setPlaneReferenceLength(m_pCurPlane);
     if(m_pXPlaneWt) m_pXPlaneWt->gl3dFloatView()->setPlaneReferenceLength(m_pCurPlane);
@@ -3323,9 +3303,9 @@ void XPlane::onCopyCurPOppData()
     QString strange, strong;
     exportMainDataToString(m_pCurPOpp, m_pCurPlane, strange, SaveOptions::exportFileType(), SaveOptions::textSeparator());
     if(m_pCurPOpp->isQuadMethod())
-        exportPanel4DataToString(m_pCurPOpp,  m_pCurPlane, m_pCurWPolar, SaveOptions::exportFileType(), strong);
+        exportPanel4DataToString(m_pCurPOpp,  m_pCurPlane, m_pCurPlPolar, SaveOptions::exportFileType(), strong);
     else if(m_pCurPOpp->isTriangleMethod())
-        exportPanel3DataToString(m_pCurPOpp, m_pCurPlane, m_pCurWPolar, SaveOptions::exportFileType(), SaveOptions::textSeparator(), strong);
+        exportPanel3DataToString(m_pCurPOpp, m_pCurPlane, m_pCurPlPolar, SaveOptions::exportFileType(), SaveOptions::textSeparator(), strong);
 
     pClipBoard->setText(strange +  strong);
     displayMessage("The data of the operating point has been copied to the clipboard", false, true);
@@ -3375,9 +3355,9 @@ void XPlane::onExportCurPOpp()
     out <<strange;
     strong.clear();
     if(m_pCurPOpp->isQuadMethod())
-        exportPanel4DataToString(m_pCurPOpp, m_pCurPlane, m_pCurWPolar, SaveOptions::exportFileType(), strong);
+        exportPanel4DataToString(m_pCurPOpp, m_pCurPlane, m_pCurPlPolar, SaveOptions::exportFileType(), strong);
     else if(m_pCurPOpp->isTriangleMethod())
-        exportPanel3DataToString(m_pCurPOpp, m_pCurPlane, m_pCurWPolar, SaveOptions::exportFileType(), SaveOptions::textSeparator(), strong);
+        exportPanel3DataToString(m_pCurPOpp, m_pCurPlane, m_pCurPlPolar, SaveOptions::exportFileType(), SaveOptions::textSeparator(), strong);
     out << strong;
 
     out << ("\n\n");
@@ -3388,14 +3368,14 @@ void XPlane::onExportCurPOpp()
 
 void XPlane::onExportWPolarToFile()
 {
-    if (!m_pCurWPolar) return;
+    if (!m_pCurPlPolar) return;
 
     QString FileName, filter;
 
     if(SaveOptions::exportFileType()==xfl::TXT) filter = "Text File (*.txt)";
     else                                        filter = "Comma Separated Values (*.csv)";
 
-    FileName = QString::fromStdString(m_pCurWPolar->name());
+    FileName = QString::fromStdString(m_pCurPlPolar->name());
     FileName.replace("/", "_");
     FileName.replace(".", "_");
     FileName = QFileDialog::getSaveFileName(s_pMainFrame, "Export Polar",
@@ -3422,7 +3402,7 @@ void XPlane::onExportWPolarToFile()
     std::string polardata;
     std::string sep = "  ";
     if(SaveOptions::exportFileType()==xfl::CSV) sep = SaveOptions::textSeparator().toStdString()+ " ";
-    polardata = m_pCurWPolar->exportToString(sep);
+    polardata = m_pCurPlPolar->exportToString(sep);
 
     QTextStream out(&XFile);
     out << QString::fromStdString(polardata);
@@ -3435,11 +3415,11 @@ void XPlane::onExportWPolarToFile()
 
 QString XPlane::onExportWPolarToClipboard()
 {
-    if(!m_pCurWPolar) return QString();
+    if(!m_pCurPlPolar) return QString();
     std::string polardata;
     std::string sep = "  ";
     if(SaveOptions::exportFileType()==xfl::CSV) sep = SaveOptions::textSeparator().toStdString()+ " ";
-    polardata = m_pCurWPolar->exportToString(sep);
+    polardata = m_pCurPlPolar->exportToString(sep);
     QClipboard *pClipBoard = QApplication::clipboard();
     pClipBoard->setText(QString::fromStdString(polardata));
 
@@ -3525,9 +3505,9 @@ void XPlane::onExporttoAVL()
 
     QTextStream out(&XFile);
     out << "# \n";
-    out << "# Note: check consistency of area unit and length units in this file\n";
-    out << "# Note: check consistency with inertia units of the .mass file\n";
-    out << "# Note: remove duplicate sections in wing definitions\n";
+    out << "# TODO: check consistency of area unit and length units in this file\n";
+    out << "# TODO: check consistency with inertia units of the .mass file\n";
+    out << "# TODO: remove duplicate sections in wing definitions\n";
     out << "# \n";
     out << "# \n";
 
@@ -3543,40 +3523,43 @@ void XPlane::onExporttoAVL()
     else                                     out << ("0     0     0.0                     | iYsym  iZsym  Zsym\n");
 
     double area = 0;
-    if(m_pCurWPolar) area = pPlaneXfl->planformArea(m_pCurWPolar->bIncludeOtherWingAreas());
+    if(m_pCurPlPolar) area = pPlaneXfl->planformArea(m_pCurPlPolar->bIncludeOtherWingAreas());
     else             area = pPlaneXfl->planformArea(true);
 
-    strong = QString("%1   %2   %3   | Sref   Cref   Bref\n")
-            .arg(area*Units::mtoUnit()*Units::mtoUnit(),9,'f',5)
-            .arg(pPlaneXfl->mainWing()->MAC()*Units::mtoUnit(),9,'f',5)
-            .arg(pPlaneXfl->planformSpan()*Units::mtoUnit(), 9,'f',5);
+    strong = QString::asprintf("%9g   %9g   %9g   | Sref   Cref   Bref\n",
+                               area*Units::mtoUnit()*Units::mtoUnit(),
+                               pPlaneXfl->mainWing()->MAC()*Units::mtoUnit(),
+                               pPlaneXfl->planformSpan()*Units::mtoUnit());
     out << strong;
 
     if(m_pCurPlane)
-        strong = QString("%1   %2   %3   | Xref   Yref   Zref\n")
-                .arg(m_pCurPlane->CoG_t().x*Units::mtoUnit(),9,'f',5)
-                .arg(m_pCurPlane->CoG_t().y*Units::mtoUnit(),9,'f',5)
-                .arg(m_pCurPlane->CoG_t().z*Units::mtoUnit(),9,'f',5);
+        strong = QString::asprintf("%g   %g   %g   | Xref   Yref   Zref\n",
+                                   m_pCurPlane->CoG_t().x*Units::mtoUnit(),
+                                   m_pCurPlane->CoG_t().y*Units::mtoUnit(),
+                                   m_pCurPlane->CoG_t().z*Units::mtoUnit());
 
     out << strong;
 
-    out << (" 0.00                               | CDp  (optional)\n");
+    out << " 0.00                               | CDp  (optional)\n";
 
-    out << ("\n\n\n");
+    out << EOLch << EOLch<< EOLch;
 
 
-    int index = QRandomGenerator::global()->bounded(1000);
-
-    std::string avlstring;
-//    pPlaneXfl->wingAt(0)->exportWingToAVL(avlstring, index, 0.0, pPlaneXfl->ryAngle(0), Units::mtoUnit());
-//    out << QString::fromStdString(avlstring);
+    int index = QRandomGenerator::global()->bounded(100);
 
     for(int iw=0; iw<pPlaneXfl->nWings(); iw++)
     {
-        if(pPlaneXfl->wingAt(iw))
-            pPlaneXfl->wingAt(iw)->exportWingToAVL(avlstring, index+iw, 0.0, pPlaneXfl->ryAngle(iw), Units::mtoUnit());
+        WingXfl const *pWing = pPlaneXfl->wingAt(iw);
+
+        WingXfl wing;
+        wing.duplicate(pWing);
+        wing.createSurfaces(Vector3d(), wing.rx(), 0.0);
+
+        std::string avlstring;
+        wing.exportToAVL(avlstring, index+iw, wing.position(), wing.ry(), Units::mtoUnit());
+
+        out << QString::fromStdString(avlstring);
     }
-    out << QString::fromStdString(avlstring);
     XFile.close();
 }
 
@@ -3628,8 +3611,8 @@ void XPlane::onHideAllWPlrOpps()
         for (int i=0; i< Objects3d::nPOpps(); i++)
         {
             PlaneOpp *pPOpp = Objects3d::POppAt(i);
-            if (pPOpp->planeName() == m_pCurWPolar->planeName() &&
-                    pPOpp->polarName() == m_pCurWPolar->name())
+            if (pPOpp->planeName() == m_pCurPlPolar->planeName() &&
+                    pPOpp->polarName() == m_pCurPlPolar->name())
             {
                 pPOpp->setVisible(false);
             }
@@ -3665,7 +3648,7 @@ void XPlane::onHidePlaneOpps()
     for (int i=0; i< Objects3d::nPOpps(); i++)
     {
         PlaneOpp *pPOpp = Objects3d::POppAt(i);
-        if (pPOpp->planeName() == m_pCurWPolar->planeName())
+        if (pPOpp->planeName() == m_pCurPlPolar->planeName())
         {
             pPOpp->setVisible(false);
         }
@@ -3746,7 +3729,7 @@ void XPlane::onNewPlane()
     m_pPlaneTreeView->update();
     m_pPlaneTreeView->selectPlane(pPlane);
 
-    m_pCurWPolar = nullptr;
+    m_pCurPlPolar = nullptr;
     m_pCurPOpp = nullptr;
     setPlane();
 
@@ -3812,19 +3795,19 @@ void XPlane::onImportSTLPlane()
 
 void XPlane::onEditExtraDrag()
 {
-    if(!m_pCurPlane || !m_pCurWPolar || m_pCurWPolar->isExternalPolar()) return;
-    if(m_pCurWPolar->isLocked())
+    if(!m_pCurPlane || !m_pCurPlPolar || m_pCurPlPolar->isExternalPolar()) return;
+    if(m_pCurPlPolar->isLocked())
     {
         displayMessage("The polar object is locked by an analysis and cannot be modified.\n\n", true, false);
         return;
     }
 
     ExtraDragDlg dlg(s_pMainFrame);
-    dlg.initDialog(m_pCurWPolar);
+    dlg.initDialog(m_pCurPlPolar);
     if(dlg.exec()==QDialog::Accepted)
     {
-        dlg.setExtraDragData(m_pCurWPolar);
-        m_pCurWPolar->recalcExtraDrag();
+        dlg.setExtraDragData(m_pCurPlPolar);
+        m_pCurPlPolar->recalcExtraDrag();
         m_bResetCurves = true;
         updateView();
         emit projectModified();
@@ -3836,8 +3819,8 @@ void XPlane::onEditCurWPolar()
 {
     stopAnimate();
 
-    if(!m_pCurPlane || !m_pCurWPolar || m_pCurWPolar->isExternalPolar()) return;
-    if(m_pCurWPolar->isLocked())
+    if(!m_pCurPlane || !m_pCurPlPolar || m_pCurPlPolar->isExternalPolar()) return;
+    if(m_pCurPlPolar->isLocked())
     {
         displayMessage("The polar object is locked by an analysis and cannot be modified.\n\n", true, false);
         return;
@@ -3848,18 +3831,18 @@ void XPlane::onEditCurWPolar()
 
     PlanePolar *pNewWPolar = new PlanePolar;
 
-    if(m_pCurWPolar->isStabilityPolar())
+    if(m_pCurPlPolar->isStabilityPolar())
     {
         T123578PolarDlg dlg(s_pMainFrame);
-        dlg.initPolar3dDlg(m_pCurPlane, m_pCurWPolar);
+        dlg.initPolar3dDlg(m_pCurPlane, m_pCurPlPolar);
         res = dlg.exec();
         pNewWPolar->duplicateSpec(&PlanePolarDlg::staticWPolar());
         WPolarName = PlanePolarDlg::staticWPolar().name();
     }
-    else if(m_pCurWPolar->isControlPolar())
+    else if(m_pCurPlPolar->isControlPolar())
     {
         T6PolarDlg dlg(s_pMainFrame);
-        dlg.initPolar3dDlg(m_pCurPlane, m_pCurWPolar);
+        dlg.initPolar3dDlg(m_pCurPlane, m_pCurPlPolar);
         res = dlg.exec();
         pNewWPolar->duplicateSpec(&PlanePolarDlg::staticWPolar());
         WPolarName = PlanePolarDlg::staticWPolar().name();
@@ -3867,7 +3850,7 @@ void XPlane::onEditCurWPolar()
     else
     {
         T123578PolarDlg dlg(s_pMainFrame);
-        dlg.initPolar3dDlg(m_pCurPlane, m_pCurWPolar);
+        dlg.initPolar3dDlg(m_pCurPlane, m_pCurPlPolar);
 
         res = dlg.exec();
         pNewWPolar->duplicateSpec(&PlanePolarDlg::staticWPolar());
@@ -3878,7 +3861,7 @@ void XPlane::onEditCurWPolar()
     {
         emit projectModified();
 
-        if(m_pCurWPolar->isLocked())
+        if(m_pCurPlPolar->isLocked())
         {
             displayMessage("The polar object is locked by an analysis and cannot be modified.\n\n", true, false);
             delete pNewWPolar;
@@ -3901,8 +3884,8 @@ void XPlane::onEditCurWPolar()
 
         setPolar(pNewWPolar);
 
-        m_pPlaneTreeView->insertWPolar(m_pCurWPolar);
-        m_pPlaneTreeView->selectWPolar(m_pCurWPolar, false);
+        m_pPlaneTreeView->insertWPolar(m_pCurPlPolar);
+        m_pPlaneTreeView->selectWPolar(m_pCurPlPolar, false);
         updateView();
     }
     else
@@ -3919,13 +3902,13 @@ void XPlane::onEditCurWPolar()
  */
 void XPlane::onRenameCurWPolar()
 {
-    if(!m_pCurWPolar) return;
+    if(!m_pCurPlPolar) return;
     if(!m_pCurPlane) return;
 
-    Objects3d::renameWPolar(m_pCurWPolar, m_pCurPlane);
+    Objects3d::renameWPolar(m_pCurPlPolar, m_pCurPlane);
 
     updateTreeView();
-    m_pPlaneTreeView->selectWPolar(m_pCurWPolar, false);
+    m_pPlaneTreeView->selectWPolar(m_pCurPlPolar, false);
 
     emit projectModified();
 
@@ -3962,15 +3945,15 @@ void XPlane::onRenameCurPlane()
  */
 void XPlane::onResetCurWPolar()
 {
-    if (!m_pCurPlane || !m_pCurWPolar) return;
-    QString strong = "Are you sure you want to reset the content of the polar :\n"+ QString::fromStdString(m_pCurWPolar->name()) +"?\n";
+    if (!m_pCurPlane || !m_pCurPlPolar) return;
+    QString strong = "Are you sure you want to reset the content of the polar :\n"+ QString::fromStdString(m_pCurPlPolar->name()) +"?\n";
     if (QMessageBox::Yes != QMessageBox::question(s_pMainFrame, "Question", strong,
                                                   QMessageBox::Yes|QMessageBox::No,
                                                   QMessageBox::Yes)) return;
-    Objects3d::deleteWPolarResults(m_pCurWPolar);
+    Objects3d::deleteWPolarResults(m_pCurPlPolar);
     m_pCurPOpp = nullptr;
 
-    m_pPlaneTreeView->removeWPolarPOpps(m_pCurWPolar);
+    m_pPlaneTreeView->removeWPolarPOpps(m_pCurPlPolar);
     m_pPlaneTreeView->setObjectProperties();
     emit projectModified();
     m_bResetCurves = true;
@@ -4018,15 +4001,15 @@ void XPlane::onShowPlaneWPolarsOnly()
 
 void XPlane::onShowOnlyCurWPolar()
 {
-    if(!m_pCurPlane || !m_pCurWPolar) return;
+    if(!m_pCurPlane || !m_pCurPlPolar) return;
 
     for (int i=0; i<Objects3d::nPolars(); i++)
     {
         PlanePolar *pWPolar = Objects3d::wPolarAt(i);
-        pWPolar->setVisible(pWPolar==m_pCurWPolar);
+        pWPolar->setVisible(pWPolar==m_pCurPlPolar);
     }
 
-    m_pCurWPolar->setVisible(true);
+    m_pCurPlPolar->setVisible(true);
     m_pPlaneTreeView->setCurveParams();
     emit projectModified();
     m_bResetCurves = true;
@@ -4064,7 +4047,7 @@ void XPlane::onShowPlaneOpps()
     for (i=0; i< Objects3d::nPOpps(); i++)
     {
         pPOpp = Objects3d::POppAt(i);
-        if (pPOpp->planeName() == m_pCurWPolar->planeName())
+        if (pPOpp->planeName() == m_pCurPlPolar->planeName())
         {
             pPOpp->setVisible(true);
         }
@@ -4089,7 +4072,7 @@ void XPlane::onShowWPlrPOpps()
         for (i=0; i< Objects3d::nPOpps(); i++)
         {
             pPOpp = Objects3d::POppAt(i);
-            if (m_pCurWPolar->hasPOpp(pPOpp))
+            if (m_pCurPlPolar->hasPOpp(pPOpp))
             {
                 pPOpp->setVisible(true);
             }
@@ -4105,11 +4088,11 @@ void XPlane::onShowWPlrPOpps()
 
 void XPlane::onShowWPolarOppsOnly()
 {
-    if(!m_pCurPlane || !m_pCurWPolar) return;
+    if(!m_pCurPlane || !m_pCurPlPolar) return;
     for(int i=0; i<Objects3d::nPOpps(); i++)
     {
         PlaneOpp *pPOpp = Objects3d::POppAt(i);
-        if(m_pCurWPolar->hasPOpp(pPOpp))
+        if(m_pCurPlPolar->hasPOpp(pPOpp))
         {
             pPOpp->setVisible(true);
         }
@@ -4526,7 +4509,7 @@ QString XPlane::planeOppData()
     strong = QString("X_CP = "+ format).arg(m_pCurPOpp->m_AF.centreOfPressure().x*Units::mtoUnit(), 8, 'f', 3);
     for(int i=strong.length(); i<linelength; i++) strong = " "+strong;
     Result += strong + " " +str + "\n";
-    strong = QString("X_CG = " + format).arg(m_pCurWPolar->CoG().x*Units::mtoUnit(), 8, 'f', 3);
+    strong = QString("X_CG = " + format).arg(m_pCurPlPolar->CoG().x*Units::mtoUnit(), 8, 'f', 3);
     for(int i=strong.length(); i<linelength; i++) strong = " "+strong;
     Result += strong + " " +str;
 
@@ -4536,8 +4519,8 @@ QString XPlane::planeOppData()
 
 void XPlane::onAnalyze()
 {
-    if(!m_pCurPlane || !m_pCurWPolar)   return;
-    if(m_pCurWPolar->isExternalPolar()) return;
+    if(!m_pCurPlane || !m_pCurPlPolar)   return;
+    if(m_pCurPlPolar->isExternalPolar()) return;
 
     PlaneXfl const * pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pCurPlane);
     if(pPlaneXfl)
@@ -4569,10 +4552,10 @@ void XPlane::onAnalyze()
     }
 
     m_pAnalysisControls->enableAnalyze(false);
-    if(m_pCurWPolar->isPanelMethod())
+    if(m_pCurPlPolar->isPanelMethod())
     {
         std::vector<T8Opp> xranges;
-        if(m_pCurWPolar->isType8())
+        if(m_pCurPlPolar->isType8())
         {
             m_pAnalysisControls->getXRanges(xranges);
             if(!xranges.size())
@@ -4582,12 +4565,12 @@ void XPlane::onAnalyze()
             return;
 
         m_pPanelAnalysisDlg->show();
-        m_pPanelAnalysisDlg->analyze(m_pCurPlane, m_pCurWPolar, m_pAnalysisControls->oppList(), xranges);
+        m_pPanelAnalysisDlg->analyze(m_pCurPlane, m_pCurPlPolar, m_pAnalysisControls->oppList(), xranges);
     }
-    else if(m_pCurPlane->isXflType() && m_pCurWPolar->isLLTMethod())
+    else if(m_pCurPlane->isXflType() && m_pCurPlPolar->isLLTMethod())
     {
         PlaneXfl *pPlaneXfl = dynamic_cast<PlaneXfl*>(m_pCurPlane);
-        m_pLLTAnalysisDlg->initDialog(pPlaneXfl, m_pCurWPolar, m_pAnalysisControls->oppList());
+        m_pLLTAnalysisDlg->initDialog(pPlaneXfl, m_pCurPlPolar, m_pAnalysisControls->oppList());
         m_pLLTAnalysisDlg->show();
         m_pLLTAnalysisDlg->update();
 
@@ -4622,11 +4605,11 @@ void XPlane::onFinishAnalysis(PlanePolar *pWPolar)
     }
 
     m_pPlaneTreeView->addPOpps(pWPolar);
-    if(m_pCurWPolar==pWPolar)
+    if(m_pCurPlPolar==pWPolar)
     {
         setPlaneOpp(pLastPOpp);
         if(pLastPOpp) m_pPlaneTreeView->selectPlaneOpp(pLastPOpp);
-        else          m_pPlaneTreeView->selectWPolar(m_pCurWPolar, true);
+        else          m_pPlaneTreeView->selectWPolar(m_pCurPlPolar, true);
     }
     else
         setPlaneOpp(nullptr);
@@ -4702,7 +4685,7 @@ Plane *XPlane::setPlane(Plane* pPlane)
         {
             //it's another plane
             m_pCurPOpp = nullptr;
-            m_pCurWPolar = nullptr;
+            m_pCurPlPolar = nullptr;
         }
     }
 
@@ -4730,7 +4713,7 @@ Plane *XPlane::setPlane(Plane* pPlane)
         // no plane,
         //clear the pointers
         //clear the GUI
-        m_pCurWPolar = nullptr;
+        m_pCurPlPolar = nullptr;
         m_pCurPOpp  = nullptr;
 
         m_bResetCurves = true;
@@ -4823,7 +4806,7 @@ void XPlane::setPolar(PlanePolar *pPlPolar)
 
     if(!m_pCurPlane || !pPlPolar)
     {
-        m_pCurWPolar = nullptr;
+        m_pCurPlPolar = nullptr;
         m_pCurPOpp = nullptr;
         m_pgl3dXPlaneView->clearTopRightOutput();
         m_pgl3dXPlaneView->clearBotRightOutput();
@@ -4838,32 +4821,32 @@ void XPlane::setPolar(PlanePolar *pPlPolar)
         return;
     }
 
-    m_pCurWPolar = pPlPolar;
+    m_pCurPlPolar = pPlPolar;
 
-    if(m_pCurPlane && m_pCurWPolar)
+    if(m_pCurPlane && m_pCurPlPolar)
     {
         //make sure the polar is up to date with the latest plane data
-        if(m_pCurWPolar->bAutoInertia())
+        if(m_pCurPlPolar->bAutoInertia())
         {
-            m_pCurWPolar->setMass(m_pCurPlane->totalMass());
-            m_pCurWPolar->setCoG(m_pCurPlane->CoG_t());
-            m_pCurWPolar->setInertiaTensor(m_pCurPlane->Ixx_t(), m_pCurPlane->Iyy_t(), m_pCurPlane->Izz_t(), m_pCurPlane->Ixz_t());
+            m_pCurPlPolar->setMass(m_pCurPlane->totalMass());
+            m_pCurPlPolar->setCoG(m_pCurPlane->CoG_t());
+            m_pCurPlPolar->setInertiaTensor(m_pCurPlane->Ixx_t(), m_pCurPlane->Iyy_t(), m_pCurPlane->Izz_t(), m_pCurPlane->Ixz_t());
         }
 
-        if(m_pCurWPolar->referenceDim()!=xfl::CUSTOM)
+        if(m_pCurPlPolar->referenceDim()!=xfl::CUSTOM)
         {
             // get the latest dimensions from the plane definition
             //
-            m_pCurWPolar->setReferenceChordLength(m_pCurPlane->mac());
-            if(m_pCurWPolar->referenceDim()==xfl::PLANFORM)
+            m_pCurPlPolar->setReferenceChordLength(m_pCurPlane->mac());
+            if(m_pCurPlPolar->referenceDim()==xfl::PLANFORM)
             {
-                m_pCurWPolar->setReferenceArea(m_pCurPlane->planformArea(m_pCurWPolar->bIncludeOtherWingAreas()));
-                m_pCurWPolar->setReferenceSpanLength(m_pCurPlane->planformSpan());
+                m_pCurPlPolar->setReferenceArea(m_pCurPlane->planformArea(m_pCurPlPolar->bIncludeOtherWingAreas()));
+                m_pCurPlPolar->setReferenceSpanLength(m_pCurPlane->planformSpan());
             }
-            else if(m_pCurWPolar->referenceDim()==xfl::PROJECTED)
+            else if(m_pCurPlPolar->referenceDim()==xfl::PROJECTED)
             {
-                m_pCurWPolar->setReferenceArea(m_pCurPlane->projectedArea(m_pCurWPolar->bIncludeOtherWingAreas()));
-                m_pCurWPolar->setReferenceSpanLength(m_pCurPlane->projectedSpan());
+                m_pCurPlPolar->setReferenceArea(m_pCurPlane->projectedArea(m_pCurPlPolar->bIncludeOtherWingAreas()));
+                m_pCurPlPolar->setReferenceSpanLength(m_pCurPlane->projectedSpan());
             }
         }
     }
@@ -4871,32 +4854,32 @@ void XPlane::setPolar(PlanePolar *pPlPolar)
 
     PlaneXfl *pPlaneXfl = dynamic_cast<PlaneXfl *>(m_pCurPlane);
 
-    if(m_pCurWPolar)
+    if(m_pCurPlPolar)
     {
-        if(m_pCurWPolar->isQuadMethod() && m_pCurPlane->isXflType())
+        if(m_pCurPlPolar->isQuadMethod() && m_pCurPlane->isXflType())
         {
 
-            pPlaneXfl->makeQuadMesh(m_pCurWPolar->bThickSurfaces(), m_pCurWPolar->bIgnoreBodyPanels());
+            pPlaneXfl->makeQuadMesh(m_pCurPlPolar->bThickSurfaces(), m_pCurPlPolar->bIgnoreBodyPanels());
 
-            if(!m_pCurWPolar->bVortonWake())
+            if(!m_pCurPlPolar->bVortonWake())
             {
-                pPlaneXfl->refQuadMesh().makeWakePanels(m_pCurWPolar->NXWakePanel4(), m_pCurWPolar->wakePanelFactor(), m_pCurWPolar->wakeLength(),
+                pPlaneXfl->refQuadMesh().makeWakePanels(m_pCurPlPolar->NXWakePanel4(), m_pCurPlPolar->wakePanelFactor(), m_pCurPlPolar->wakeLength(),
                                                         Vector3d(1.0,0,0), true);
             }
             else
             {
-                pPlaneXfl->refQuadMesh().makeWakePanels(3, 1.0, m_pCurWPolar->bufferWakeLength(), Vector3d(1.0,0,0), false);
+                pPlaneXfl->refQuadMesh().makeWakePanels(3, 1.0, m_pCurPlPolar->bufferWakeLength(), Vector3d(1.0,0,0), false);
             }
         }
 
-        if(m_pCurWPolar->isTriangleMethod())
+        if(m_pCurPlPolar->isTriangleMethod())
         {
             if(m_pCurPlane->isXflType())
-                m_pCurPlane->makeTriMesh(m_pCurWPolar->bThickSurfaces());
+                m_pCurPlane->makeTriMesh(m_pCurPlPolar->bThickSurfaces());
         }
         m_pCurPlane->restoreMesh();
 
-        switch(m_pCurWPolar->type())
+        switch(m_pCurPlPolar->type())
         {
             case xfl::T1POLAR:
             case xfl::T2POLAR:
@@ -4905,15 +4888,15 @@ void XPlane::setPolar(PlanePolar *pPlPolar)
             case xfl::T7POLAR:
             case xfl::T8POLAR:
             {
-                if(pPlaneXfl && m_pCurWPolar->hasActiveFlap())
+                if(pPlaneXfl && m_pCurPlPolar->hasActiveFlap())
                 {
                     std::string strange;
-                    pPlaneXfl->setFlaps(m_pCurWPolar, strange);
+                    pPlaneXfl->setFlaps(m_pCurPlPolar, strange);
                 }
-                if(fabs(m_pCurWPolar->phi())>AOAPRECISION)
+                if(fabs(m_pCurPlPolar->phi())>AOAPRECISION)
                 {
-                    if(m_pCurWPolar->isQuadMethod())                pPlaneXfl->quadMesh().rotate(0,0,m_pCurWPolar->phi());
-                    else if(m_pCurWPolar->isTriangleMethod())       m_pCurPlane->triMesh().rotate(0,0,m_pCurWPolar->phi());
+                    if(m_pCurPlPolar->isQuadMethod())                pPlaneXfl->quadMesh().rotate(0,0,m_pCurPlPolar->phi());
+                    else if(m_pCurPlPolar->isTriangleMethod())       m_pCurPlane->triMesh().rotate(0,0,m_pCurPlPolar->phi());
                 }
                 break;
             }
@@ -4930,9 +4913,9 @@ void XPlane::setPolar(PlanePolar *pPlPolar)
                         nctrls += pPlaneXfl->wingAt(iw)->nFlaps();
                     }
                     // if not, resize
-                    if(nctrls!=m_pCurWPolar->nAngleRangeCtrls())
+                    if(nctrls!=m_pCurPlPolar->nAngleRangeCtrls())
                     {
-                        m_pCurWPolar->resetAngleRanges(m_pCurPlane);
+                        m_pCurPlPolar->resetAngleRanges(m_pCurPlane);
                     }
                 }
                 break;
@@ -4962,13 +4945,13 @@ void XPlane::setPolar(PlanePolar *pPlPolar)
 
     if(m_pgl3dXPlaneView->isPicking())
     {
-        if      (m_pCurWPolar->isQuadMethod())       m_pgl3dXPlaneView->setPicking(xfl::PANEL4);
-        else if (m_pCurWPolar->isTriUniformMethod()) m_pgl3dXPlaneView->setPicking(xfl::PANEL3);
-        else if (m_pCurWPolar->isTriLinearMethod())  m_pgl3dXPlaneView->setPicking(xfl::MESHNODE);
+        if      (m_pCurPlPolar->isQuadMethod())       m_pgl3dXPlaneView->setPicking(xfl::PANEL4);
+        else if (m_pCurPlPolar->isTriUniformMethod()) m_pgl3dXPlaneView->setPicking(xfl::PANEL3);
+        else if (m_pCurPlPolar->isTriLinearMethod())  m_pgl3dXPlaneView->setPicking(xfl::MESHNODE);
     }
 
     m_pAnalysisControls->setAnalysisRange();
-    m_pStabTimeControls->fillAVLcontrols(m_pCurWPolar);
+    m_pStabTimeControls->fillAVLcontrols(m_pCurPlPolar);
 
     m_pgl3dXPlaneView->resetglMesh();
     m_bResetCurves = true;
@@ -5128,13 +5111,13 @@ void XPlane::setView(xfl::enumGraphView eView)
 
 void XPlane::onWPolarProperties()
 {
-    if(!m_pCurWPolar) return;
+    if(!m_pCurPlPolar) return;
     ObjectPropsDlg *pOPDlg = new ObjectPropsDlg(s_pMainFrame);
     std::string strangeProps;
 
-    m_pCurWPolar->getProperties(strangeProps, m_pCurPlane);
+    m_pCurPlPolar->getProperties(strangeProps, m_pCurPlane);
 
-    pOPDlg->initDialog(QString::fromStdString(m_pCurPlane->name()+ "/" +m_pCurWPolar->name()), QString::fromStdString(strangeProps));
+    pOPDlg->initDialog(QString::fromStdString(m_pCurPlane->name()+ "/" +m_pCurPlPolar->name()), QString::fromStdString(strangeProps));
     pOPDlg->show();
 }
 
@@ -5144,7 +5127,7 @@ void XPlane::onPlaneOppProperties()
     if(!m_pCurPOpp) return;
     ObjectPropsDlg *pOPDlg = new ObjectPropsDlg(s_pMainFrame);
     std::string strangeprops;
-    m_pCurPOpp->getProperties(m_pCurPlane, m_pCurWPolar, strangeprops);
+    m_pCurPOpp->getProperties(m_pCurPlane, m_pCurPlPolar, strangeprops);
     pOPDlg->initDialog(QString::fromStdString(m_pCurPOpp->title(false)), QString::fromStdString(strangeprops));
     pOPDlg->show();
 }
@@ -5152,7 +5135,7 @@ void XPlane::onPlaneOppProperties()
 
 PlaneOpp* XPlane::setPlaneOpp(PlaneOpp *pPOpp)
 {
-    if(!m_pCurPlane || !m_pCurWPolar)
+    if(!m_pCurPlane || !m_pCurPlPolar)
     {
         m_pgl3dXPlaneView->resetglMesh();
         m_pCurPOpp = nullptr;
@@ -5169,7 +5152,7 @@ PlaneOpp* XPlane::setPlaneOpp(PlaneOpp *pPOpp)
         for(int ipopp=0; ipopp<Objects3d::nPOpps(); ipopp++)
         {
             PlaneOpp *pOldPOpp = Objects3d::POppAt(ipopp);
-            if(pOldPOpp->planeName().compare(m_pCurPlane->name())==0 && pOldPOpp->polarName().compare(m_pCurWPolar->name())==0)
+            if(pOldPOpp->planeName().compare(m_pCurPlane->name())==0 && pOldPOpp->polarName().compare(m_pCurPlPolar->name())==0)
             {
                 pPOpp = pOldPOpp;
                 break;
@@ -5184,9 +5167,9 @@ PlaneOpp* XPlane::setPlaneOpp(PlaneOpp *pPOpp)
     if(!pPOpp)
     {
         //nothing left to try
-        if(m_pPanelResultTest) m_pPanelResultTest->setAnalysis(m_pCurPlane, m_pCurWPolar, m_pCurPOpp);
+        if(m_pPanelResultTest) m_pPanelResultTest->setAnalysis(m_pCurPlane, m_pCurPlPolar, m_pCurPOpp);
 
-        setPolar(m_pCurWPolar);// to restore the flapped mesh
+        setPolar(m_pCurPlPolar);// to restore the flapped mesh
         return nullptr;
     }
 
@@ -5214,7 +5197,7 @@ PlaneOpp* XPlane::setPlaneOpp(PlaneOpp *pPOpp)
     PlaneXfl * pPlaneXfl = dynamic_cast<PlaneXfl*>(m_pCurPlane);
     if(pPlaneXfl)
     {
-        switch(m_pCurWPolar->type())
+        switch(m_pCurPlPolar->type())
         {
             case xfl::T1POLAR:
             case xfl::T2POLAR:
@@ -5223,23 +5206,23 @@ PlaneOpp* XPlane::setPlaneOpp(PlaneOpp *pPOpp)
             case xfl::T7POLAR:
             case xfl::T8POLAR:
             {
-                if(m_pCurWPolar->hasActiveFlap())
+                if(m_pCurPlPolar->hasActiveFlap())
                 {
                     std::string strange;
-                    pPlaneXfl->setFlaps(m_pCurWPolar, strange);
+                    pPlaneXfl->setFlaps(m_pCurPlPolar, strange);
                 }
                 break;
             }
             case xfl::T6POLAR:
             {
                 std::string log;
-                if(m_pCurWPolar->isQuadMethod())
+                if(m_pCurPlPolar->isQuadMethod())
                 {
-                    pPlaneXfl->setRangePositions4(m_pCurWPolar, m_pCurPOpp->ctrl(), log);
+                    pPlaneXfl->setRangePositions4(m_pCurPlPolar, m_pCurPOpp->ctrl(), log);
                 }
-                else if(m_pCurWPolar->isTriangleMethod())
+                else if(m_pCurPlPolar->isTriangleMethod())
                 {
-                    pPlaneXfl->setRangePositions3(m_pCurWPolar, m_pCurPOpp->ctrl(), log);
+                    pPlaneXfl->setRangePositions3(m_pCurPlPolar, m_pCurPOpp->ctrl(), log);
                 }
                 break;
             }
@@ -5256,34 +5239,34 @@ PlaneOpp* XPlane::setPlaneOpp(PlaneOpp *pPOpp)
     // extend the wake behind the plane's last trailing point;
     if(pPlaneXfl && m_pCurPOpp->isQuadMethod())
     {
-        if(!m_pCurWPolar->bVortonWake())
+        if(!m_pCurPlPolar->bVortonWake())
         {
             Vector3d pt;
             pPlaneXfl->quadMesh().getLastTrailingPoint(pt);
-            pPlaneXfl->quadMesh().makeWakePanels(m_pCurWPolar->NXWakePanel4(), m_pCurWPolar->wakePanelFactor(),
-                                                 pt.x + m_pCurWPolar->wakeLength(), WindDir, true);
+            pPlaneXfl->quadMesh().makeWakePanels(m_pCurPlPolar->NXWakePanel4(), m_pCurPlPolar->wakePanelFactor(),
+                                                 pt.x + m_pCurPlPolar->wakeLength(), WindDir, true);
         }
         else
         {
-            pPlaneXfl->quadMesh().makeWakePanels(3, 1.0, m_pCurWPolar->bufferWakeLength(), WindDir, false);
+            pPlaneXfl->quadMesh().makeWakePanels(3, 1.0, m_pCurPlPolar->bufferWakeLength(), WindDir, false);
         }
     }
     else if(m_pCurPOpp->isTriangleMethod())
     {
-        if(!m_pCurWPolar->bVortonWake())
+        if(!m_pCurPlPolar->bVortonWake())
         {
             Vector3d pt;
             m_pCurPlane->triMesh().getLastTrailingPoint(pt);
-            m_pCurPlane->triMesh().makeWakePanels(m_pCurWPolar->NXWakePanel4(), m_pCurWPolar->wakePanelFactor(),
-                                                  pt.x + m_pCurWPolar->wakeLength(), WindDir, true);
+            m_pCurPlane->triMesh().makeWakePanels(m_pCurPlPolar->NXWakePanel4(), m_pCurPlPolar->wakePanelFactor(),
+                                                  pt.x + m_pCurPlPolar->wakeLength(), WindDir, true);
         }
         else
         {
-            m_pCurPlane->triMesh().makeWakePanels(m_pCurWPolar->NXBufferWakePanels(), 1, m_pCurWPolar->bufferWakeLength(), WindDir, false);
+            m_pCurPlane->triMesh().makeWakePanels(m_pCurPlPolar->NXBufferWakePanels(), 1, m_pCurPlPolar->bufferWakeLength(), WindDir, false);
         }
     }
 
-    updateVisiblePanels(m_pCurPlane, m_pCurWPolar);
+    updateVisiblePanels(m_pCurPlane, m_pCurPlPolar);
 
 
 //    if(is3dView())
@@ -5295,7 +5278,7 @@ PlaneOpp* XPlane::setPlaneOpp(PlaneOpp *pPOpp)
     }
     if(m_pXPlaneWt) m_pXPlaneWt->updateObjectData();
 
-    if(m_pPanelResultTest) m_pPanelResultTest->setAnalysis(m_pCurPlane, m_pCurWPolar, m_pCurPOpp);
+    if(m_pPanelResultTest) m_pPanelResultTest->setAnalysis(m_pCurPlane, m_pCurPlPolar, m_pCurPOpp);
 
     if(m_eView==XPlane::CPVIEW)
     {
@@ -5852,13 +5835,13 @@ void XPlane::onExportPlanetoXML()
 
 void XPlane::onExportAnalysisToXML()
 {
-    if(!m_pCurPlane || !m_pCurWPolar) return ;// is there anything to export?
+    if(!m_pCurPlane || !m_pCurPlPolar) return ;// is there anything to export?
 
     QString filter = "XML file (*.xml)";
     QString FileName, strong;
 
 //    strong = m_pCurPlane->planeName()+"_"+m_pCurWPolar->name();
-    strong = QString::fromStdString(m_pCurWPolar->name());
+    strong = QString::fromStdString(m_pCurPlPolar->name());
     strong.replace("/", "_");
     strong.replace(".", "_");
 //    strong += ".xml";
@@ -5878,7 +5861,7 @@ void XPlane::onExportAnalysisToXML()
     if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
 
     XmlPlanePolarWriter wpolarWriter(XFile);
-    wpolarWriter.writeXMLWPolar(m_pCurWPolar);
+    wpolarWriter.writeXMLWPolar(m_pCurPlPolar);
 
     XFile.close();
 }
@@ -6179,20 +6162,20 @@ void XPlane::onWingCurveSelection()
 void XPlane::outputNodeProperties(int nodeindex, double pickedval)
 {
     if(!m_pCurPlane) return;
-    if(!m_pCurWPolar) return;
-    if(!m_pCurWPolar->isTriLinearMethod()) return;
+    if(!m_pCurPlPolar) return;
+    if(!m_pCurPlPolar->isTriLinearMethod()) return;
 
     QString strange, strong;
 
     // check index validity
-    if(m_pCurWPolar->isTriangleMethod())
+    if(m_pCurPlPolar->isTriangleMethod())
     {
         if(nodeindex<0 || nodeindex>=m_pCurPlane->nNodes()) return;
     }
 
     Node const &node = m_pCurPlane->triMesh().node(nodeindex);
 
-    if(m_pCurWPolar)
+    if(m_pCurPlPolar)
     {
         strange = QString::fromStdString(node.properties()) + EOLch;
     }
@@ -6222,11 +6205,11 @@ void XPlane::outputPanelProperties(int panelindex)
     QString strange, strong;
 
     // check index validity
-    if(m_pCurWPolar->isTriangleMethod())
+    if(m_pCurPlPolar->isTriangleMethod())
     {
         if(panelindex<0 || panelindex>=m_pCurPlane->nPanel3()) return;
     }
-    else if(m_pCurWPolar->isQuadMethod())
+    else if(m_pCurPlPolar->isQuadMethod())
     {
         if(panelindex<0 || panelindex>=m_pCurPlane->nPanel4()) return;
     }
@@ -6235,13 +6218,13 @@ void XPlane::outputPanelProperties(int panelindex)
 #ifdef QT_DEBUG
     bLong = true;
 #endif
-    if(m_pCurWPolar)
+    if(m_pCurPlPolar)
     {
-        if(m_pCurWPolar->isTriangleMethod())
+        if(m_pCurPlPolar->isTriangleMethod())
         {
             str = m_pCurPlane->panel3(panelindex).properties(bLong);
         }
-        else if(m_pCurWPolar->isQuadMethod() && m_pCurPlane->isXflType())
+        else if(m_pCurPlPolar->isQuadMethod() && m_pCurPlane->isXflType())
         {
             PlaneXfl const * pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pCurPlane);
             str = pPlaneXfl->panel4(panelindex).properties(bLong);
@@ -6251,7 +6234,7 @@ void XPlane::outputPanelProperties(int panelindex)
 
     if(m_pCurPOpp && (m_pPOpp3dCtrls->m_b3dCp || m_pPOpp3dCtrls->m_bGamma || m_pPOpp3dCtrls->m_bPanelForce))
     {
-        double q = 0.5*m_pCurWPolar->density() *m_pCurPOpp->m_QInf*m_pCurPOpp->m_QInf;
+        double q = 0.5*m_pCurPlPolar->density() *m_pCurPOpp->m_QInf*m_pCurPOpp->m_QInf;
         double cp(0), gamma(0);
         if(m_pCurPOpp->isTriangleMethod())
         {
@@ -6287,7 +6270,7 @@ void XPlane::outputPanelProperties(int panelindex)
 
 void XPlane::onOpenAnalysisWindow()
 {
-    if(m_pCurWPolar && m_pCurWPolar->isLLTMethod())
+    if(m_pCurPlPolar && m_pCurPlPolar->isLLTMethod())
         m_pLLTAnalysisDlg->show();
     else
         m_pPanelAnalysisDlg->show();
@@ -6296,14 +6279,14 @@ void XPlane::onOpenAnalysisWindow()
 
 void XPlane::onMeshInfo()
 {
-    if(!m_pCurPlane || !m_pCurWPolar) return;
+    if(!m_pCurPlane || !m_pCurPlPolar) return;
     QString log;
     QString strange, strong;
     std::string str;
 
     log = QString::fromStdString(m_pCurPlane->name()) + EOLch;
 
-    if(m_pCurWPolar->isQuadMethod() && m_pCurPlane->isXflType())
+    if(m_pCurPlPolar->isQuadMethod() && m_pCurPlane->isXflType())
     {
         PlaneXfl const * pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pCurPlane);
 
@@ -6327,7 +6310,7 @@ void XPlane::onMeshInfo()
         pPlaneXfl->quadMesh().getMeshInfo(str);
         log += QString::fromStdString(str);
     }
-    else if(m_pCurWPolar->isTriangleMethod())
+    else if(m_pCurPlPolar->isTriangleMethod())
     {
         strong = "  Triangular panels:";
         log += strong +"\n";
@@ -6371,7 +6354,7 @@ void XPlane::onCheckPanels()
 {
     m_pgl3dXPlaneView->clearHighlightList();
 
-    if(!m_pCurWPolar || !m_pCurPlane) return;
+    if(!m_pCurPlPolar || !m_pCurPlane) return;
 
     m_pgl3dXPlaneView->m_bMeshPanels = true;
     m_pPOpp3dCtrls->checkPanels(m_pgl3dXPlaneView->m_bMeshPanels);
@@ -6383,7 +6366,7 @@ void XPlane::onCheckPanels()
     std::string log = "Checking panels\n";
     displayStdMessage(log, false, false);
     log.clear();
-    PanelCheckDlg dlg(m_pCurWPolar->isQuadMethod());
+    PanelCheckDlg dlg(m_pCurPlPolar->isQuadMethod());
     int res = dlg.exec();
     bool bCheck = dlg.checkSkinny() || dlg.checkMinArea() || dlg.checkMinSize() || dlg.checkMinAngles() || dlg.checkMinQuadWarp();
     if(res!=QDialog::Accepted)
@@ -6417,7 +6400,7 @@ void XPlane::onCheckPanels()
 
 
     // check Triangles
-    if(m_pCurWPolar->isTriangleMethod())
+    if(m_pCurPlPolar->isTriangleMethod())
     {
         std::vector<int> skinnylist, anglelist, arealist, sizelist;
 
@@ -6434,7 +6417,7 @@ void XPlane::onCheckPanels()
     }
 
     // check Quads
-    if(m_pCurWPolar->isQuadMethod() && m_pCurPlane->isXflType())
+    if(m_pCurPlPolar->isQuadMethod() && m_pCurPlane->isXflType())
     {
         PlaneXfl *pPlaneXfl = dynamic_cast<PlaneXfl *>(m_pCurPlane);
 
@@ -6466,7 +6449,7 @@ void XPlane::onCheckPanels()
 void XPlane::onConnectTriangles()
 {
     if(!m_pCurPlane) return;
-    if(!m_pCurWPolar)
+    if(!m_pCurPlPolar)
     {
         displayMessage("Connect panels: no Polar selected\n", true, false);
         return;
@@ -6483,7 +6466,7 @@ void XPlane::onConnectTriangles()
     else
     {
         PlaneXfl *pPlaneXfl = dynamic_cast<PlaneXfl*>(m_pCurPlane);
-        pPlaneXfl->connectTriMesh(false, m_pCurWPolar->bThickSurfaces(), xfl::isMultiThreaded());
+        pPlaneXfl->connectTriMesh(false, m_pCurPlPolar->bThickSurfaces(), xfl::isMultiThreaded());
     }
 
     QString log("\nTriangle connections done\n\n");
@@ -6498,9 +6481,9 @@ void XPlane::onConnectTriangles()
 
 void XPlane::onCheckFreeEdges()
 {
-    if(!m_pCurPlane || !m_pCurWPolar) return;
+    if(!m_pCurPlane || !m_pCurPlPolar) return;
     std::vector<Segment3d> freeedges;
-    if(m_pCurWPolar->isTriangleMethod())
+    if(m_pCurPlPolar->isTriangleMethod())
         m_pCurPlane->triMesh().getFreeEdges(freeedges);
     else
     {
@@ -6532,7 +6515,7 @@ void XPlane::onCheckFreeEdges()
 
 void XPlane::onCenterViewOnPanel()
 {
-    if(!m_pCurPlane || !m_pCurWPolar) return;
+    if(!m_pCurPlane || !m_pCurPlPolar) return;
 
     IntValueDlg dlg(s_pMainFrame);
     dlg.setValue(-1);
@@ -6540,7 +6523,7 @@ void XPlane::onCenterViewOnPanel()
     if(dlg.exec()==QDialog::Accepted)
     {
         int ip = dlg.value();
-        if(m_pCurPlane->isXflType() && m_pCurWPolar->isQuadMethod())
+        if(m_pCurPlane->isXflType() && m_pCurPlPolar->isQuadMethod())
         {
             PlaneXfl const *pPlaneXfl = dynamic_cast<PlaneXfl const *>(m_pCurPlane);
             if(ip>=0 && ip<pPlaneXfl->quadMesh().nPanels())
@@ -6611,7 +6594,7 @@ void XPlane::cancelStreamLines()
 void XPlane::updateVisiblePanels(Plane const *pPlane, PlanePolar const*pWPolar)
 {
     if(!pPlane)  pPlane  = m_pCurPlane;
-    if(!pWPolar) pWPolar = m_pCurWPolar;
+    if(!pWPolar) pWPolar = m_pCurPlPolar;
 
     if(!pWPolar)
     {
@@ -6904,7 +6887,7 @@ void XPlane::onOptim3d()
         m_pPlaneTreeView->update();
         m_pPlaneTreeView->selectPlane(o3d.bestPlane());
 
-        m_pCurWPolar = nullptr;
+        m_pCurPlPolar = nullptr;
         m_pCurPOpp = nullptr;
         setPlane();
 

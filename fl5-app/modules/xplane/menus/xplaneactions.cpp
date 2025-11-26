@@ -59,13 +59,13 @@ void XPlaneActions::makeActions()
     m_pWPolarAct->setStatusTip("Switch to the polar view");
     connect(m_pWPolarAct, SIGNAL(triggered()), m_pXPlane, SLOT(onWPolarView()));
 
-    m_pStabTimeAct = new QAction(QIcon(":/icons/OnStabView.png"), "Time response view\tCTRL+F8", m_pXPlane);
+    m_pStabTimeAct = new QAction(QIcon(":/icons/OnStabView.png"), "Time response view", m_pXPlane);
     m_pStabTimeAct->setShortcut(QKeySequence(Qt::CTRL|Qt::Key_F8));
     m_pStabTimeAct->setCheckable(true);
     m_pStabTimeAct->setStatusTip("Switch to stability analysis post-processing");
     connect(m_pStabTimeAct, SIGNAL(triggered()), m_pXPlane, SLOT(onStabTimeView()));
 
-    m_pRootLocusAct = new QAction(QIcon(":/icons/OnRootLocus.png"), "Root locus view\tSHIFT+F8", m_pXPlane);
+    m_pRootLocusAct = new QAction(QIcon(":/icons/OnRootLocus.png"), "Root locus view", m_pXPlane);
     m_pRootLocusAct->setShortcut(QKeySequence(Qt::SHIFT|Qt::Key_F8));
     m_pRootLocusAct->setCheckable(true);
     m_pRootLocusAct->setStatusTip("Switch to root locus view");

@@ -37,9 +37,6 @@ class gl3dPlaneXflView : public gl3dXflView
 
         void setPlane(PlaneXfl *pPlane);
 
-        bool bThickWings() const {return m_bThickWings;}
-        void setThickWings(bool bThick) {m_bThickWings=bThick;}
-
         void resetgl3dPlane() {m_bResetglPlane=true;}
         void resetgl3dFuse()  {m_bResetglFuse=true;}
         void resetgl3dP3Sel() {m_bResetP3Select=true;}
@@ -83,8 +80,6 @@ class gl3dPlaneXflView : public gl3dXflView
 
         bool m_bResetglPlane;
         bool m_bResetglFuse;
-
-        bool m_bThickWings; /** Unused */
 
         bool m_bIsSelecting;
         QVector<int> m_P3Selection;

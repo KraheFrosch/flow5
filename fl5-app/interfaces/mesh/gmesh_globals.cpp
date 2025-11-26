@@ -57,10 +57,10 @@ void gmesh::listMainOptions(std::string &list)
     list += EOLstr;
     list += "   General:\n";
     list += "      " + getStringOption("General.Version")                      + EOLstr;
-    list += "      " + getStringOption("General.BuildInfo")                    + EOLstr;
+//    list += "      " + getStringOption("General.BuildInfo")                    + EOLstr;
     list += "      " + getNumberOption("General.Terminal")                     + EOLstr;
     list += "      " + getNumberOption("General.Verbosity")                    + EOLstr;
-    list += "      " + getNumberOption("General.NumThreads")                   + EOLstr; /** @todo test */
+    list += "      " + getNumberOption("General.NumThreads")                   + EOLstr;
 
     list += EOLstr;
     list += "   Geometry:\n";
@@ -71,11 +71,12 @@ void gmesh::listMainOptions(std::string &list)
     list += "      " + getNumberOption("Geometry.OCCFixDegenerated")           + EOLstr;
     list += "      " + getNumberOption("Geometry.OCCFixSmallEdges")            + EOLstr;
     list += "      " + getNumberOption("Geometry.OCCFixSmallFaces")            + EOLstr;
-    list += "      " + getNumberOption("Geometry.OCCParallel")                 + EOLstr; /** @todo test */
+    list += "      " + getNumberOption("Geometry.OCCParallel")                 + EOLstr;
     list += "      " + getNumberOption("Geometry.OCCFastUnbind")               + EOLstr;
     list += "      " + getNumberOption("Geometry.OCCSewFaces")                 + EOLstr;
-    list += "      " + getNumberOption("Geometry.OCCUseGenericClosestPoint")   + EOLstr; /** @todo test */
+    list += "      " + getNumberOption("Geometry.OCCUseGenericClosestPoint")   + EOLstr;
     list += EOLstr;
+
 }
 
 
@@ -411,6 +412,11 @@ bool gmesh::importBRepList(std::vector<std::string> const &breps, std::string &b
     {
         gmsh::write(temppath);
     }
+    catch (std::exception &e)
+    {
+        std::cout << "Gmsh exception: " << e.what() << EOLstr;
+        return false;
+    }
     catch(...)
     {
         return false;
@@ -521,7 +527,7 @@ void gmesh::bRepToStepFile(const std::string &brep, const std::string &pathname)
 
     // Specify
     gmsh::option::setString("Geometry.OCCTargetUnit", "M");
-    // before merging the STEP file, OpenCASCADE to converted the units to meters (instead of the default, which is millimeters).
+    // before merging the STEP file, so that OpenCASCADE converts the units to meters (instead of the default, which is millimeters).
 
     gmsh::write(pathname); // assumes extension has been set
 }
@@ -1061,7 +1067,6 @@ void gmesh::tessellateShape(TopoDS_Shape const&Shape, GmshParams const &params, 
     {
         TopoDS_Face aFace = TopoDS::Face(shapeExplorer.Current());
         tessellateFace(aFace, params, triangles, log);
-
     }
 }
 

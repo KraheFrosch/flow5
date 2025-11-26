@@ -83,8 +83,8 @@ class FL5LIB_EXPORT Fuse : public Part
 
         TopoDS_ListOfShape &shapes() {return m_Shape;}
         TopoDS_ListOfShape const &shapes() const {return m_Shape;}
-        TopoDS_ListOfShape const &shells() const {return m_Shell;}
         TopoDS_ListOfShape &shells() {return m_Shell;}
+        TopoDS_ListOfShape const &shells() const {return m_Shell;}
 
         // Methods related to the Uncut shape
         void appendShape(TopoDS_Shape const &shape) {m_Shape.Append(shape);}

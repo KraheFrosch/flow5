@@ -1636,7 +1636,7 @@ bool XFoil::blsolve()
 
     ivte1 = isys[iblte[1]][1];
     //
-    for (iv=1; iv<= nsys; iv++)
+    for (iv=1; iv<=nsys; iv++)
     {
         //
         ivp = iv + 1;
@@ -1651,7 +1651,7 @@ bool XFoil::blsolve()
         vdel[1][2][iv] *= pivot;
         //
         //------ eliminate lower first column in va block
-        for (k=2; k<= 3; k++)
+        for (k=2; k<=3; k++)
         {
             vtmp = va[k][1][iv];
             va[k][2][iv] -= vtmp*va[1][2][iv];
@@ -1692,18 +1692,17 @@ bool XFoil::blsolve()
         vdel[2][1][iv] -= vtmp2*vdel[3][1][iv];
         vdel[1][2][iv] -= vtmp1*vdel[3][2][iv];
         vdel[2][2][iv] -= vtmp2*vdel[3][2][iv];
-        //
+
         //------ eliminate upper second column in va block
         vtmp = va[1][2][iv];
         for (l=ivp; l<=nsys;l++) vm[1][l][iv] -= vtmp*vm[2][l][iv];
 
         vdel[1][1][iv] -= vtmp*vdel[2][1][iv];
         vdel[1][2][iv] -= vtmp*vdel[2][2][iv];
-        //
-        //
+
+
         if(iv!=nsys)
         {
-            //
             //====== eliminate vb(iv+1) block][ rows  1 -> 3
             for (k=1; k<= 3;k++)
             {
@@ -1714,7 +1713,7 @@ bool XFoil::blsolve()
                 vdel[k][1][ivp] -= (vtmp1*vdel[1][1][iv]+vtmp2*vdel[2][1][iv]+ vtmp3*vdel[3][1][iv]);
                 vdel[k][2][ivp] -= (vtmp1*vdel[1][2][iv]+vtmp2*vdel[2][2][iv]+ vtmp3*vdel[3][2][iv]);
             }
-            //
+
             if(iv==ivte1)
             {
                 //------- eliminate vz block
@@ -1732,45 +1731,44 @@ bool XFoil::blsolve()
                     vdel[k][2][ivz] -= (vtmp1*vdel[1][2][iv]+ vtmp2*vdel[2][2][iv]);
                 }
             }
-            //
+
             if(ivp!=nsys)
             {
-                //
                 //====== eliminate lower vm column
                 for(kv=iv+2; kv<= nsys;kv++)
                 {
                     vtmp1 = vm[1][iv][kv];
                     vtmp2 = vm[2][iv][kv];
                     vtmp3 = vm[3][iv][kv];
-                    //
+
                     if(fabs(vtmp1)>vaccel)
                     {
                         for(l=ivp;l<= nsys;l++) vm[1][l][kv] -= vtmp1*vm[3][l][iv];
                         vdel[1][1][kv] -= vtmp1*vdel[3][1][iv];
                         vdel[1][2][kv] -= vtmp1*vdel[3][2][iv];
                     }
-                    //
+
                     if(fabs(vtmp2)>vaccel)
                     {
                         for (l=ivp;l<=nsys;l++) vm[2][l][kv] -= vtmp2*vm[3][l][iv];
                         vdel[2][1][kv] -= vtmp2*vdel[3][1][iv];
                         vdel[2][2][kv] -= vtmp2*vdel[3][2][iv];
                     }
-                    //
+
                     if(fabs(vtmp3)>vaccel)
                     {
                         for(l=ivp;l<=nsys;l++) vm[3][l][kv] -= vtmp3*vm[3][l][iv];
                         vdel[3][1][kv] -= vtmp3*vdel[3][1][iv];
                         vdel[3][2][kv] -= vtmp3*vdel[3][2][iv];
                     }
-                    //
+
                 }
             }
         }
     }//1000
 
-    //
-    for (iv=nsys; iv>=2;iv--)
+
+    for (iv=nsys; iv>=2; iv--)
     {
         //------ eliminate upper vm columns
         vtmp = vdel[3][1][iv];
@@ -1787,7 +1785,6 @@ bool XFoil::blsolve()
             vdel[2][2][kv] -= vm[2][iv][kv]*vtmp;
             vdel[3][2][kv] -= vm[3][iv][kv]*vtmp;
         }
-        //
     }
     return true;
 }
@@ -9768,6 +9765,7 @@ bool XFoil::ViscalEnd()
 
 }
 
+
 bool XFoil::ViscousIter()
 {
     //    Performs one iteration
@@ -9776,6 +9774,7 @@ bool XFoil::ViscousIter()
 
 
     setbl();//    ------ fill newton system for bl variables
+
 
     blsolve();//    ------ solve newton system with custom solver
 
@@ -9798,6 +9797,7 @@ bool XFoil::ViscousIter()
     //    ------ set updated cl,cd
     clcalc(xcmref,ycmref);
     cdcalc();
+
 
     //    ------ display changes and test for convergence
     if(rlx<1.0)
