@@ -310,7 +310,6 @@ void EditPlrDlg::fillWPolarData()
             index = m_pPointModel->index(i, j, QModelIndex());
             m_pPointModel->setData(index, m_pWPolar->getVariable(j,i));
         }
-
     }
     m_pcptPoint->resizeRowsToContents();
 

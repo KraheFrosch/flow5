@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <QLabel>
+
 #include <QStack>
 
 #include <interfaces/opengl/fl5views/gl3dxflview.h>

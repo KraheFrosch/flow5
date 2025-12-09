@@ -274,7 +274,7 @@ void PlaneDlg::onConnectPanels()
     QApplication::setOverrideCursor(Qt::WaitCursor);
     updateOutput("Connecting panels...");
 
-    if(!m_pPlane->connectTriMesh(true, m_pPlane->isSTLType(), true, xfl::isMultiThreaded()))
+    if(!m_pPlane->connectTriMesh(true, m_pPlane->isSTLType(), xfl::isMultiThreaded()))
     {
         updateOutput(" ... error connecting panels\n\n");
     }

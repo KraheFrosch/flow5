@@ -198,7 +198,7 @@ void Polar3dDlg::makeBaseCommonControls()
             {
                 QVBoxLayout *pWingSurfLayout = new QVBoxLayout;
                 {
-                    m_prbThinSurfaces  = new QRadioButton("Thin surfaces");
+                    m_prbThinSurfaces  = new QRadioButton("Thin surfaces\t(Recommended method)");
                     m_prbThinSurfaces->setToolTip("<p>When assembling the plane, "
                                                   "ensure that the fuselage's mesh conforms to the wings' "
                                                   "mid-camber line at their root chords.</p>");

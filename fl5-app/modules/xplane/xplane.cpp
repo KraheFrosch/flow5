@@ -1922,7 +1922,7 @@ void XPlane::onDefineT6Polar()
             m_pCurPOpp = nullptr;
             setPolar(pNewControlPolar);
             m_pPlaneExplorer->insertWPolar(pNewControlPolar);
-            m_pPlaneExplorer->selectWPolar(pNewControlPolar, false);
+            m_pPlaneExplorer->selectPlPolar(pNewControlPolar, false);
         }
         m_pgl3dXPlaneView->resetglGeom();
         m_pgl3dXPlaneView->resetglPOpp();
@@ -1981,7 +1981,7 @@ void XPlane::onDefineT123578Polar()
         {
             setPolar(pNewWPolar);
             m_pPlaneExplorer->insertWPolar(pNewWPolar);
-            m_pPlaneExplorer->selectWPolar(pNewWPolar, false);
+            m_pPlaneExplorer->selectPlPolar(pNewWPolar, false);
             m_pCurPOpp = nullptr;
         }
 
@@ -2043,7 +2043,7 @@ void XPlane::onDefineT7Polar()
         {
             setPolar(pNewWPolar);
             m_pPlaneExplorer->insertWPolar(pNewWPolar);
-            m_pPlaneExplorer->selectWPolar(pNewWPolar, false);
+            m_pPlaneExplorer->selectPlPolar(pNewWPolar, false);
             m_pCurPOpp = nullptr;
         }
 
@@ -2114,7 +2114,7 @@ void XPlane::onDuplicateCurAnalysis()
     {
         setPolar(pNewWPolar);
         m_pPlaneExplorer->insertWPolar(pNewWPolar);
-        m_pPlaneExplorer->selectWPolar(pNewWPolar, false);
+        m_pPlaneExplorer->selectPlPolar(pNewWPolar, false);
         m_pCurPOpp = nullptr;
     }
 
@@ -2172,7 +2172,7 @@ void XPlane::onDuplicateAnalyses()
     if(pNewWPolar)
     {
         setPolar(pNewWPolar);
-        m_pPlaneExplorer->selectWPolar(pNewWPolar, false);
+        m_pPlaneExplorer->selectPlPolar(pNewWPolar, false);
         m_pCurPOpp = nullptr;
     }
 
@@ -2222,7 +2222,7 @@ void XPlane::onImportExternalPolar()
     {
         setPolar(pNewPlPolar);
         m_pPlaneExplorer->insertWPolar(pNewPlPolar);
-        m_pPlaneExplorer->selectWPolar(pNewPlPolar, false);
+        m_pPlaneExplorer->selectPlPolar(pNewPlPolar, false);
         m_pCurPOpp = nullptr;
     }
 
@@ -2421,7 +2421,7 @@ void XPlane::onDeleteCurPOpp()
     }
 
     if(m_pCurPOpp) m_pPlaneExplorer->selectPlaneOpp(m_pCurPOpp);
-    else           m_pPlaneExplorer->selectWPolar(m_pCurPlPolar, true);
+    else           m_pPlaneExplorer->selectPlPolar(m_pCurPlPolar, true);
     emit projectModified();
 
     m_bResetCurves = true;
@@ -2516,7 +2516,7 @@ void XPlane::onDeleteCurPlPolar()
 
     setPolar(nextWPolarName);
 
-    if(m_pCurPlPolar) m_pPlaneExplorer->selectWPolar(m_pCurPlPolar, false);
+    if(m_pCurPlPolar) m_pPlaneExplorer->selectPlPolar(m_pCurPlPolar, false);
     else             m_pPlaneExplorer->selectPlane(m_pCurPlane);
 
     m_pPlaneExplorer->setObjectProperties();
@@ -3882,7 +3882,7 @@ void XPlane::onEditCurPlPolar()
         setPolar(pNewWPolar);
 
         m_pPlaneExplorer->insertWPolar(m_pCurPlPolar);
-        m_pPlaneExplorer->selectWPolar(m_pCurPlPolar, false);
+        m_pPlaneExplorer->selectPlPolar(m_pCurPlPolar, false);
         updateView();
     }
     else
@@ -3902,7 +3902,7 @@ void XPlane::onRenameCurWPolar()
     Objects3d::renamePlPolar(m_pCurPlPolar, m_pCurPlane);
 
     updateTreeView();
-    m_pPlaneExplorer->selectWPolar(m_pCurPlPolar, false);
+    m_pPlaneExplorer->selectPlPolar(m_pCurPlPolar, false);
 
     emit projectModified();
 
@@ -4595,7 +4595,7 @@ void XPlane::onFinishAnalysis(PlanePolar *pWPolar)
     {
         setPlaneOpp(pLastPOpp);
         if(pLastPOpp) m_pPlaneExplorer->selectPlaneOpp(pLastPOpp);
-        else          m_pPlaneExplorer->selectWPolar(m_pCurPlPolar, true);
+        else          m_pPlaneExplorer->selectPlPolar(m_pCurPlPolar, true);
     }
     else
         setPlaneOpp(nullptr);
@@ -5950,7 +5950,7 @@ void XPlane::onCurveClicked(Curve*pCurve, int ipt)
                             setPlaneOpp(nullptr);
                         }
 
-                        m_pPlaneExplorer->selectWPolar(pWPolar, false);
+                        m_pPlaneExplorer->selectPlPolar(pWPolar, false);
                         m_pPlaneExplorer->setCurveParams();
 //                        displayMessage("Selected the polar: "+pWPolar->planeName()+"/"+pWPolar->name() + "\n");
                         updateView();
@@ -6452,7 +6452,7 @@ void XPlane::onConnectTriangles()
     else
     {
         PlaneXfl *pPlaneXfl = dynamic_cast<PlaneXfl*>(m_pCurPlane);
-        pPlaneXfl->connectTriMesh(false, false, m_pCurPlPolar->bThickSurfaces(), xfl::isMultiThreaded());
+        pPlaneXfl->connectTriMesh(false, false, xfl::isMultiThreaded());
     }
 
     QString log("\nTriangle connections done\n\n");
@@ -6778,7 +6778,7 @@ void XPlane::onImportAnalysesFromXML()
     if(pWPolar)
     {
         setPolar(pWPolar);
-        m_pPlaneExplorer->selectWPolar(pWPolar, false);
+        m_pPlaneExplorer->selectPlPolar(pWPolar, false);
     }
 
     emit projectModified();

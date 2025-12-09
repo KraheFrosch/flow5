@@ -248,8 +248,8 @@ void gl3dXPlaneView::setPlane(Plane const *pPlane)
     updatePartFrame(pPlane);
     if(pPlane)
     {
-        if(s_pXPlane->curWPolar())
-            setBotLeftOutput(pPlane->planeData(s_pXPlane->curWPolar()->bIncludeOtherWingAreas()));
+        if(s_pXPlane->curPlPolar())
+            setBotLeftOutput(pPlane->planeData(s_pXPlane->curPlPolar()->bIncludeOtherWingAreas()));
         else
             setBotLeftOutput(pPlane->planeData(true));
     }
@@ -263,7 +263,7 @@ void gl3dXPlaneView::setPlane(Plane const *pPlane)
 void gl3dXPlaneView::glRenderPanelBasedBuffers()
 {
     Plane    const *pPlane    = s_pXPlane->curPlane();
-    PlanePolar   const *pWPolar   = s_pXPlane->curWPolar();
+    PlanePolar   const *pWPolar   = s_pXPlane->curPlPolar();
     PlaneOpp const *pPOpp     = s_pXPlane->curPOpp();
 
     bool bBackGround = !m_bSurfaces;
@@ -512,7 +512,7 @@ void gl3dXPlaneView::glRenderGeometryBasedBuffers()
 
         if(m_pPOpp3dControls->m_bFlaps)
         {
-            paintFlaps(pPlaneXfl, s_pXPlane->curWPolar(), s_pXPlane->curPOpp());
+            paintFlaps(pPlaneXfl, s_pXPlane->curPlPolar(), s_pXPlane->curPOpp());
         }
 
         for(int iw=0; iw<pPlaneXfl->nWings(); iw++)
@@ -547,7 +547,7 @@ void gl3dXPlaneView::glRenderGeometryBasedBuffers()
 void gl3dXPlaneView::glRenderPOppBasedBuffers()
 {
     Plane    const *pPlane  = s_pXPlane->curPlane();
-    PlanePolar   const *pWPolar = s_pXPlane->curWPolar();
+    PlanePolar   const *pWPolar = s_pXPlane->curPlPolar();
     PlaneOpp const *pPOpp   = s_pXPlane->curPOpp();
     if(!pPlane || !pWPolar || !pPOpp) return;
 
@@ -603,7 +603,7 @@ void gl3dXPlaneView::glRenderView()
 {
     QMatrix4x4 modeMatrix;
     Plane    const *pPlane  = s_pXPlane->curPlane();
-    PlanePolar   const *pWPolar = s_pXPlane->curWPolar();
+    PlanePolar   const *pWPolar = s_pXPlane->curPlPolar();
     PlaneOpp const *pPOpp   = s_pXPlane->curPOpp();
 
     if(!pPlane) return;
@@ -1014,15 +1014,15 @@ bool gl3dXPlaneView::glMakeStreamLines(const std::vector<Panel3> &panel3list, st
     int iv = 0;
     StreamlineMaker::cancelTasks(false);
 
-    if(s_pXPlane->curWPolar()->isTriUniformMethod())
+    if(s_pXPlane->curPlPolar()->isTriUniformMethod())
     {
-        m_pP3UniAnalysis->initializeAnalysis(s_pXPlane->curWPolar(),0);
+        m_pP3UniAnalysis->initializeAnalysis(s_pXPlane->curPlPolar(),0);
         m_pP3UniAnalysis->setTriMesh(s_pXPlane->curPlane()->triMesh());
         m_pP3UniAnalysis->setVortons(pPOpp->m_Vorton);
     }
-    else if(s_pXPlane->curWPolar()->isTriLinearMethod())
+    else if(s_pXPlane->curPlPolar()->isTriLinearMethod())
     {
-        m_pP3LinAnalysis->initializeAnalysis(s_pXPlane->curWPolar(),0);
+        m_pP3LinAnalysis->initializeAnalysis(s_pXPlane->curPlPolar(),0);
         m_pP3LinAnalysis->setTriMesh(s_pXPlane->curPlane()->triMesh());
         m_pP3LinAnalysis->setVortons(pPOpp->m_Vorton);
     }
@@ -1056,9 +1056,9 @@ bool gl3dXPlaneView::glMakeStreamLines(const std::vector<Panel3> &panel3list, st
 
         StreamlineMaker *pLineMaker = new StreamlineMaker;
         makers.append(pLineMaker);
-        pLineMaker->setOpp(s_pXPlane->curWPolar(), pPOpp->QInf(), 0.0, 0.0, pPOpp->gamma().data(), pPOpp->sigma().data());
-        if     (s_pXPlane->curWPolar()->isTriUniformMethod()) pLineMaker->setP3Analysis(m_pP3UniAnalysis);
-        else if(s_pXPlane->curWPolar()->isTriLinearMethod())  pLineMaker->setP3Analysis(m_pP3LinAnalysis);
+        pLineMaker->setOpp(s_pXPlane->curPlPolar(), pPOpp->QInf(), 0.0, 0.0, pPOpp->gamma().data(), pPOpp->sigma().data());
+        if     (s_pXPlane->curPlPolar()->isTriUniformMethod()) pLineMaker->setP3Analysis(m_pP3UniAnalysis);
+        else if(s_pXPlane->curPlPolar()->isTriLinearMethod())  pLineMaker->setP3Analysis(m_pP3LinAnalysis);
         pLineMaker->initializeLineMaker(in, StreamVertexArray.data()+iv, C, v0List[in], TC,
                                         StreamLineCtrls::nX(), StreamLineCtrls::l0(), StreamLineCtrls::XFactor());
 
@@ -1227,11 +1227,11 @@ bool gl3dXPlaneView::glMakeStreamLines(std::vector<Panel4> const &panel4list, Pl
     int iv = 0;
     StreamlineMaker::cancelTasks(false);
 
-    if(m_pP4Analysis->polar3d()!=s_pXPlane->curWPolar() && s_pXPlane->curPlane()->isXflType())
+    if(m_pP4Analysis->polar3d()!=s_pXPlane->curPlPolar() && s_pXPlane->curPlane()->isXflType())
     {
         PlaneXfl const* pPlaneXfl = dynamic_cast<PlaneXfl*>(s_pXPlane->curPlane());
         m_pP4Analysis->setQuadMesh(pPlaneXfl->refQuadMesh());
-        m_pP4Analysis->initializeAnalysis(s_pXPlane->curWPolar(), 0);
+        m_pP4Analysis->initializeAnalysis(s_pXPlane->curPlPolar(), 0);
     }
 
     m_pP4Analysis->setVortons(pPOpp->m_Vorton);
@@ -1264,7 +1264,7 @@ bool gl3dXPlaneView::glMakeStreamLines(std::vector<Panel4> const &panel4list, Pl
         }
 
         StreamlineMaker *pLineMaker = new StreamlineMaker(this);
-        pLineMaker->setOpp(s_pXPlane->curWPolar(), pPOpp->QInf(), 0.0, 0.0, pPOpp->gamma().data(), pPOpp->sigma().data());
+        pLineMaker->setOpp(s_pXPlane->curPlPolar(), pPOpp->QInf(), 0.0, 0.0, pPOpp->gamma().data(), pPOpp->sigma().data());
         pLineMaker->setP4Analysis(m_pP4Analysis);
 
         pLineMaker->initializeLineMaker(in, StreamVertexArray.data()+iv, C, V0, TC,
@@ -1307,11 +1307,11 @@ void gl3dXPlaneView::computeP4VelocityVectors(Opp3d const *pPOpp, QVector<Vector
 {
     velvectors.resize(points.size());
 
-    if(m_pP4Analysis->polar3d()!=s_pXPlane->curWPolar())
+    if(m_pP4Analysis->polar3d()!=s_pXPlane->curPlPolar())
     {
         PlaneXfl * pPlaneXfl = dynamic_cast<PlaneXfl*>(s_pXPlane->curPlane());
         m_pP4Analysis->setQuadMesh(pPlaneXfl->quadMesh());
-        m_pP4Analysis->initializeAnalysis(s_pXPlane->curWPolar(), 0);
+        m_pP4Analysis->initializeAnalysis(s_pXPlane->curPlPolar(), 0);
     }
     m_pP4Analysis->setVortons(pPOpp->m_Vorton);
 
@@ -1351,16 +1351,16 @@ void gl3dXPlaneView::computeP3VelocityVectors(Opp3d const *pPOpp, QVector<Vector
     velvectors.resize(nPoints);
 
     Plane *pPlane = s_pXPlane->curPlane();
-    if(s_pXPlane->curWPolar()->isTriUniformMethod())
+    if(s_pXPlane->curPlPolar()->isTriUniformMethod())
     {
         m_pP3UniAnalysis->setTriMesh(pPlane->triMesh());
-        m_pP3UniAnalysis->initializeAnalysis(s_pXPlane->curWPolar(),0);
+        m_pP3UniAnalysis->initializeAnalysis(s_pXPlane->curPlPolar(),0);
         m_pP3UniAnalysis->setVortons(pPOpp->m_Vorton);
     }
-    else if(s_pXPlane->curWPolar()->isTriLinearMethod())
+    else if(s_pXPlane->curPlPolar()->isTriLinearMethod())
     {
         m_pP3LinAnalysis->setTriMesh(pPlane->triMesh());
-        m_pP3LinAnalysis->initializeAnalysis(s_pXPlane->curWPolar(),0);
+        m_pP3LinAnalysis->initializeAnalysis(s_pXPlane->curPlPolar(),0);
         m_pP3LinAnalysis->setVortons(pPOpp->m_Vorton);
     }
 
@@ -1421,9 +1421,9 @@ void gl3dXPlaneView::makeTriVelocityBlock(int iBlock, QVector<Vector3d> const &C
 
     for (int ip=iStart; ip<iMax; ip++)
     {
-        if (s_pXPlane->curWPolar()->isTriUniformMethod())
+        if (s_pXPlane->curPlPolar()->isTriUniformMethod())
             m_pP3UniAnalysis->getVelocityVector(C.at(ip), mu, sigma, V, Vortex::coreRadius(), false, false);
-        else if(s_pXPlane->curWPolar()->isTriLinearMethod())
+        else if(s_pXPlane->curPlPolar()->isTriLinearMethod())
             m_pP3LinAnalysis->getVelocityVector(C.at(ip), mu, sigma, V, Vortex::coreRadius(), false, false);
 
         VField[ip] = V;
@@ -1485,7 +1485,7 @@ bool gl3dXPlaneView::intersectTheObject(Vector3d const &AA, Vector3d const &BB, 
         }
     }
 
-    PlanePolar const *pWPolar = s_pXPlane->curWPolar();
+    PlanePolar const *pWPolar = s_pXPlane->curPlPolar();
     if(m_pPOpp3dControls->m_bWakePanels && pPlane && pWPolar && pWPolar->isType6() && s_pXPlane->m_pCurPOpp)
     {
         if(pWPolar->isTriangleMethod())
@@ -1545,7 +1545,7 @@ void gl3dXPlaneView::mouseReleaseEvent(QMouseEvent *pEvent)
         return;
     }
     Plane const *pPlane = s_pXPlane->curPlane();
-    PlanePolar const *pWPolar = s_pXPlane->curWPolar();
+    PlanePolar const *pWPolar = s_pXPlane->curPlPolar();
     if(pWPolar->isQuadMethod()) pickQuadPanel(pEvent->pos());
     else
     {
@@ -1617,7 +1617,7 @@ void gl3dXPlaneView::mouseMoveEvent(QMouseEvent *pEvent)
     }
 
     Plane  const *pPlane  = s_pXPlane->curPlane();
-    PlanePolar const *pWPolar = s_pXPlane->curWPolar();
+    PlanePolar const *pWPolar = s_pXPlane->curPlPolar();
 
     if(!isPicking() || !pPlane)
     {
@@ -1651,7 +1651,20 @@ void gl3dXPlaneView::mouseMoveEvent(QMouseEvent *pEvent)
         setTopRightOutput(QString());
         update();
     }
-    else
+    else if(pWPolar && pWPolar->isQuadMethod())
+    {
+        if(pPlane->isXflType())
+        {
+            PlaneXfl const* pPlaneXfl = dynamic_cast<PlaneXfl const*>(pPlane);
+            if(m_PickedPanelIndex>=0 && m_PickedPanelIndex<pPlaneXfl->quadMesh().nPanels())
+            {
+                Panel4 const &p4 = pPlaneXfl->quadMesh().panelAt(m_PickedPanelIndex);
+                gl::makeQuad(p4.vertex(0), p4.vertex(1), p4.vertex(2), p4.vertex(3), m_vboPickedQuad);
+                setTopRightOutput(p4.properties(true));
+            }
+        }
+    }
+    else if(pWPolar && pWPolar->isTriangleMethod())
     {
         Panel3 const &p3 = pPlane->panel3At(m_PickedPanelIndex);
         if(bPickNode())
@@ -1673,28 +1686,16 @@ void gl3dXPlaneView::mouseMoveEvent(QMouseEvent *pEvent)
         }
         else
         {
-            if(pWPolar && pWPolar->isTriangleMethod())
+            if(m_PickedPanelIndex>=0 && m_PickedPanelIndex<pPlane->nPanel3())
             {
-                if(m_PickedPanelIndex>=0 && m_PickedPanelIndex<pPlane->nPanel3())
-                {
-                    Panel3 const &p3 = pPlane->panel3At(m_PickedPanelIndex);
-                    gl::makeTriangle(p3.vertexAt(0), p3.vertexAt(1), p3.vertexAt(2), m_vboTriangle);
+                Panel3 const &p3 = pPlane->panel3At(m_PickedPanelIndex);
+                gl::makeTriangle(p3.vertexAt(0), p3.vertexAt(1), p3.vertexAt(2), m_vboTriangle);
 
-                    setTopRightOutput(p3.properties());
-                }
-            }
-            else if(pWPolar && pWPolar->isQuadMethod() && pPlane->isXflType())
-            {
-                PlaneXfl const* pPlaneXfl = dynamic_cast<PlaneXfl const*>(pPlane);
-                if(m_PickedPanelIndex>=0 && m_PickedPanelIndex<pPlaneXfl->quadMesh().nPanels())
-                {
-                    Panel4 const &p4 = pPlaneXfl->quadMesh().panelAt(m_PickedPanelIndex);
-                    gl::makeQuad(p4.vertex(0), p4.vertex(1), p4.vertex(2), p4.vertex(3), m_vboPickedQuad);
-                }
+                setTopRightOutput(p3.properties());
             }
         }
-        update();
     }
+    update();
 }
 
 
@@ -1813,10 +1814,6 @@ bool gl3dXPlaneView::pickQuadPanel(QPoint const &point)
     {
         if(pPOpp->isQuadMethod() && s_pXPlane->curPlane()->isXflType())
         {
-
-//            for(int i4=0; i4<pPlaneXfl->quadMesh().nPanels(); i4++)
-//            {
-//                Panel4 const &p4 = pPlaneXfl->quadMesh().panel(i4);
             for(uint i4=0; i4<m_Panel4Visible.size(); i4++)
             {
                 Panel4 const &p4 = m_Panel4Visible.at(i4);
@@ -1880,7 +1877,7 @@ void gl3dXPlaneView::glMake3dObjects()
 {
     if(!s_pXPlane->m_pCurPlane) return;
     Plane    *pPlane  = s_pXPlane->curPlane();
-    PlanePolar   const *pWPolar = s_pXPlane->curWPolar();
+    PlanePolar   const *pWPolar = s_pXPlane->curPlPolar();
 //    PlaneOpp const *pPOpp   = s_pXPlane->curPOpp();
 
     if(s_bResetglGeom)
@@ -3309,7 +3306,7 @@ void gl3dXPlaneView::glMakeFlowBuffers()
 
     if(m_bResetFlowPanels)
     {
-        m_pP3UniAnalysis->initializeAnalysis(s_pXPlane->curWPolar(),0);
+        m_pP3UniAnalysis->initializeAnalysis(s_pXPlane->curPlPolar(),0);
         m_pP3UniAnalysis->setTriMesh(s_pXPlane->curPlane()->triMesh());
         m_pP3UniAnalysis->setVortons(pPOpp->m_Vorton);
 
@@ -3483,7 +3480,7 @@ void gl3dXPlaneView::glMakeFlowBuffers()
 
     if(m_bResetBoids)
     {
-        PlanePolar const *pWPolar = s_pXPlane->curWPolar();
+        PlanePolar const *pWPolar = s_pXPlane->curPlPolar();
         PlaneOpp const *pPOpp = s_pXPlane->curPOpp();
         if(!pPOpp || !pPOpp->isTriUniformMethod()) return;
 
@@ -3589,7 +3586,7 @@ void gl3dXPlaneView::moveBoids()
 
     if(oglMajor()*10+oglMinor()<43) return;
 
-    PlanePolar const *pWPolar     = s_pXPlane->curWPolar();
+    PlanePolar const *pWPolar     = s_pXPlane->curPlPolar();
     PlaneOpp const *pPOpp     = s_pXPlane->curPOpp();
     if(!pPOpp || !pPOpp->isTriUniformMethod()) return;
 
@@ -3668,7 +3665,7 @@ void gl3dXPlaneView::glRenderFlow()
     if(!m_pPOpp3dControls->isFlowActive()) return;
 
     Plane    const *pPlane  = s_pXPlane->curPlane();
-    PlanePolar   const *pWPolar = s_pXPlane->curWPolar();
+    PlanePolar   const *pWPolar = s_pXPlane->curPlPolar();
     PlaneOpp const *pPOpp   = s_pXPlane->curPOpp();
     if(!pPlane || !pWPolar || !pPOpp) return;
 

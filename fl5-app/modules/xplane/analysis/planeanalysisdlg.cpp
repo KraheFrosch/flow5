@@ -87,10 +87,10 @@ void PlaneAnalysisDlg::setupLayout()
     m_pButtonBox = new QDialogButtonBox();
     {
         m_pchLiveVortons = new QCheckBox("Live VPW update");
-        if(s_pXPlane && s_pXPlane->curWPolar())
+        if(s_pXPlane && s_pXPlane->curPlPolar())
         {
-            m_pchLiveVortons->setChecked(Task3d::bLiveUpdate() && s_pXPlane->curWPolar()->bVortonWake());
-            m_pchLiveVortons->setEnabled(s_pXPlane->curWPolar()->bVortonWake());
+            m_pchLiveVortons->setChecked(Task3d::bLiveUpdate() && s_pXPlane->curPlPolar()->bVortonWake());
+            m_pchLiveVortons->setEnabled(s_pXPlane->curPlPolar()->bVortonWake());
         }
         m_pButtonBox->addButton(m_pchLiveVortons, QDialogButtonBox::ActionRole);
         connect(m_pchLiveVortons, SIGNAL(clicked(bool)), SLOT(onLiveVortons()));
@@ -144,9 +144,9 @@ void PlaneAnalysisDlg::showEvent(QShowEvent *pEvent)
     QDialog::showEvent(pEvent);
     restoreGeometry(s_Geometry);
 
-    if(s_pXPlane && s_pXPlane->curWPolar())
+    if(s_pXPlane && s_pXPlane->curPlPolar())
     {
-        m_ppbStopIter->setVisible(s_pXPlane && s_pXPlane->curWPolar()->isType6() && s_pXPlane->curWPolar()->bVortonWake());
+        m_ppbStopIter->setVisible(s_pXPlane && s_pXPlane->curPlPolar()->isType6() && s_pXPlane->curPlPolar()->bVortonWake());
     }
     m_pchKeepOpenOnErrors->setChecked(Analysis3dSettings::keepOpenOnErrors());
     m_ppbCloseDialog->setFocus();

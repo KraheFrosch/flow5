@@ -287,6 +287,7 @@ bool PlaneTask::initializeTask()
             m_pPlane->restoreMesh();
 
             std::string outstring;
+            // rotate the flaps in position before connecting to prevent connections at flap edges if deflection is non-zero
             if(pPlaneXfl) pPlaneXfl->setFlaps(m_pPlPolar, outstring);
             traceStdLog(outstring);
 
@@ -294,7 +295,7 @@ bool PlaneTask::initializeTask()
 
             traceStdLog("Connecting triangular panels...");
 
-            if(!m_pPlane->connectTriMesh(false, false, m_pPlPolar->bThickSurfaces(), true))
+            if(!m_pPlane->connectTriMesh(true, false, true))
             {
                 strange = "\n   Error making trailing edge connections -- aborting.\n\n";
                 traceLog(strange);
@@ -332,6 +333,23 @@ bool PlaneTask::initializeTask()
         }
         case xfl::T6POLAR:
         {
+            auto start = std::chrono::system_clock::now();
+
+            traceStdLog("Connecting triangular panels...");
+
+            if(!m_pPlane->connectTriMesh(true, false, true))
+            {
+                strange = "\n   Error making trailing edge connections -- aborting.\n\n";
+                traceLog(strange);
+                m_bError = true;
+                return false;
+            }
+
+            auto end = std::chrono::system_clock::now();
+            int duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+            strange = QString::asprintf("   done in %.3f s\n", double(duration)/1000.0);
+            traceLog(strange);
+
             if(pPlaneXfl && m_pPlPolar->isQuadMethod())
             {
                 m_pP4A->setQuadMesh(pPlaneXfl->refQuadMesh());

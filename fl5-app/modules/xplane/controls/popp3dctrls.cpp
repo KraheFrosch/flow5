@@ -267,7 +267,7 @@ void POpp3dCtrls::setControls()
     m_pgl3dCtrls->setControls();
 
     PlaneXfl const* pPlaneXfl = dynamic_cast<PlaneXfl const*>(s_pXPlane->curPlane());
-    PlanePolar const *pWPolar = s_pXPlane->curWPolar();
+    PlanePolar const *pWPolar = s_pXPlane->curPlPolar();
     PlaneOpp const *pPOpp = s_pXPlane->curPOpp();
 
     m_pchFlaps->setEnabled((pPlaneXfl && pPlaneXfl->nFlaps()>0));
@@ -521,11 +521,11 @@ void POpp3dCtrls::on3dPickCp()
             m_pgl3dXPlaneView->setPicking(xfl::PANEL3);
         else
         {
-            if(s_pXPlane->curWPolar()->isQuadMethod())
+            if(s_pXPlane->curPlPolar()->isQuadMethod())
                 m_pgl3dXPlaneView->setPicking(xfl::PANEL4);
-            else if(s_pXPlane->curWPolar()->isTriUniformMethod())
+            else if(s_pXPlane->curPlPolar()->isTriUniformMethod())
                 m_pgl3dXPlaneView->setPicking(xfl::PANEL3);
-            else if(s_pXPlane->curWPolar()->isTriLinearMethod())
+            else if(s_pXPlane->curPlPolar()->isTriLinearMethod())
                 m_pgl3dXPlaneView->setPicking(xfl::MESHNODE);
         }
     }

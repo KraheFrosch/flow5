@@ -164,7 +164,7 @@ void CpGraphCtrls::setControls()
             if(pWing)
             {
                 m_pslCpSectionSlider->setMinimum(0);
-                if(s_pXPlane->curWPolar() && s_pXPlane->curWPolar()->isTriLinearMethod())
+                if(s_pXPlane->curPlPolar() && s_pXPlane->curPlPolar()->isTriLinearMethod())
                     m_pslCpSectionSlider->setMaximum(pWing->nStations());
                 else
                     m_pslCpSectionSlider->setMaximum(pWing->nStations()-1);

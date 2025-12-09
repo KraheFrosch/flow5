@@ -144,8 +144,8 @@ void XPlaneWt::updateObjectData()
 {
     if(m_pXPlane->m_pCurPlane)
     {
-        if(m_pXPlane->curWPolar())
-            m_pgl3dXPlaneFloatView->setBotLeftOutput(m_pXPlane->m_pCurPlane->planeData(m_pXPlane->curWPolar()->bIncludeOtherWingAreas()));
+        if(m_pXPlane->curPlPolar())
+            m_pgl3dXPlaneFloatView->setBotLeftOutput(m_pXPlane->m_pCurPlane->planeData(m_pXPlane->curPlPolar()->bIncludeOtherWingAreas()));
         else
             m_pgl3dXPlaneFloatView->setBotLeftOutput(m_pXPlane->m_pCurPlane->planeData(true));
     }

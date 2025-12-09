@@ -2554,7 +2554,7 @@ void PlaneXflDlg::cutFuseShapes(Fuse *pFuse, Vector3d const &fusepos, TopoDS_Lis
         theKnife.SetArguments(faces);
         theKnife.SetTools(tools);
         theKnife.SetRunParallel(true);
-        theKnife.SetFuzzyValue(1.0e-4);
+//        theKnife.SetFuzzyValue(1.0e-4);
         strange = QString::asprintf("   Using fuzzy value %g ", theKnife.FuzzyValue()*Units::mtoUnit());
         strange += Units::lengthUnitQLabel() + "\n";
         updateOutput(strange);

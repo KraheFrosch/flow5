@@ -43,7 +43,7 @@ double Panel3::s_Quality = 1.414;
 bool Panel3::s_bUseNintcheuFata = true;
 
 
-/** The default constructor */
+
 Panel3::Panel3() : Panel(), m_bNullTriangle{true}, m_bIsLeftPanel{false}, m_bFromSTL{false}, m_iOppositeIndex{-1},
    m_SignedArea{0}, m_Angle{0,0,0}, bx{0,0,0}, by{0,0,0}, m_mu{0,0,0}, m_beta{0,0,0}
 {
@@ -496,6 +496,9 @@ std::string Panel3::properties(bool bLong) const
         case xfl::WAKESURFACE: strange = "  WAKE PANEL\n";       break;
         case xfl::NOSURFACE:   strange = "  NO SURFACE\n";       break;
     }
+    props += strange;
+
+    strange = QString::asprintf("  Surface index= %d\n", m_SurfaceIndex);
     props += strange;
 
     strange = QString::asprintf("  Vertex indexes:  %4d  %4d  %4d\n", m_S[0].index(), m_S[1].index(), m_S[2].index());

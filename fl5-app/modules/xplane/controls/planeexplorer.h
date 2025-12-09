@@ -65,7 +65,7 @@ class PlaneExplorer : public QWidget
         void removeWPolarPOpps(const PlanePolar *pWPolar);
 
         void selectPlane(Plane* pPlane);
-        void selectWPolar(PlanePolar *pWPolar, bool bSelectPOpp);
+        void selectPlPolar(PlanePolar *pWPolar, bool bSelectPOpp);
         void selectPlaneOpp(PlaneOpp *pPOpp=nullptr);
 
         void selectCurrentObject();

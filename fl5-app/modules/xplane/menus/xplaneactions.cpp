@@ -445,7 +445,7 @@ void XPlaneActions::makeActions()
     connect(m_pDeletePlaneWOpps, SIGNAL(triggered()), m_pXPlane, SLOT(onDeletePlanePOpps()));
 
     m_pDeleteCurPlane = new QAction("Delete", m_pXPlane);
-    m_pDeleteCurPlane->setShortcut(Qt::Key_Delete);
+//    m_pDeleteCurPlane->setShortcut(Qt::Key_Delete);
     m_pDeleteCurPlane->setStatusTip("<p>Delete the active wing or plane</p>");
     connect(m_pDeleteCurPlane, SIGNAL(triggered()), m_pXPlane, SLOT(onDeleteCurPlane()));
 
@@ -608,12 +608,12 @@ void XPlaneActions::checkActions()
 
     m_pEditPlaneAct->setEnabled(m_pXPlane->curPlane() && !m_pXPlane->curPlane()->isLocked());
 
-    m_pEditWPolarDef->setEnabled(m_pXPlane->curWPolar() && !m_pXPlane->curWPolar()->isExternalPolar());
+    m_pEditWPolarDef->setEnabled(m_pXPlane->curPlPolar() && !m_pXPlane->curPlPolar()->isExternalPolar());
     m_pEditWPolarPts->setEnabled(m_pXPlane->curPlane() && !m_pXPlane->curPlane()->isLocked());
 
     m_pShowCurWOppOnly->setChecked(m_pXPlane->m_bCurPOppOnly);
 
-    m_pCheckFreeEdges->setEnabled(m_pXPlane->curWPolar());
+    m_pCheckFreeEdges->setEnabled(m_pXPlane->curPlPolar());
 }
 
 

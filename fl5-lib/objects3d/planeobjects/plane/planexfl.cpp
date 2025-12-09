@@ -1456,10 +1456,9 @@ void PlaneXfl::makeTriMesh(bool bThickSurfaces)
 
 
 /** Potentially lengthy task, so on-demand only */
-bool PlaneXfl::connectTriMesh(bool bRefTriMesh, bool bConnectTE, bool, bool )
+bool PlaneXfl::connectTriMesh(bool bRefTriMesh, bool bConnectTE, bool )
 {
     TriMesh *pTriMesh = bRefTriMesh ? &m_RefTriMesh : &m_TriMesh;
-
 
     QElapsedTimer t; t.start();
 
@@ -1469,7 +1468,7 @@ bool PlaneXfl::connectTriMesh(bool bRefTriMesh, bool bConnectTE, bool, bool )
         Fuse *pFuse = fuse(ifuse);
         int i1 = pFuse->firstPanel3Index();
         int n1 = pFuse->nPanel3();
-        pTriMesh->makeConnectionsFromNodePosition(i1, n1, LENGTHPRECISION, true);
+        pTriMesh->makeConnectionsFromNodePosition2(i1, n1, LENGTHPRECISION);
     }
 
     // make internal wing connections
@@ -1479,8 +1478,7 @@ bool PlaneXfl::connectTriMesh(bool bRefTriMesh, bool bConnectTE, bool, bool )
         WingXfl const &wing = m_Wing.at(iw);
         int i1 = wing.firstPanel3Index();
         int n1 = wing.nPanel3();
-        pTriMesh->makeConnectionsFromNodePosition(i1, n1, 1.0e-4, true);
-
+        pTriMesh->makeConnectionsFromNodePosition2(i1, n1, 1.0e-4);
     }
 
     pTriMesh->connectNodes();
@@ -1767,38 +1765,44 @@ void PlaneXfl::computeStructuralInertia()
 */
 void PlaneXfl::joinSurfaces(Surface const &LeftSurf, Surface const &RightSurf)
 {
-    std::vector<Panel4> &panel4 = m_RefQuadMesh.panels();
+    std::vector<Panel4> &panels = m_RefQuadMesh.panels();
 
-    for(uint i0=0; i0<LeftSurf.panel4List().size(); i0++)
+    for(uint il=0; il<LeftSurf.panel4List().size(); il++)
     {
-        int idx0 = LeftSurf.panel4List().at(i0);
-        Panel4 &p0 = panel4[idx0];
-        for(uint i1=0; i1<RightSurf.panel4List().size(); i1++)
+        int idx0 = LeftSurf.panel4List().at(il);
+        Panel4 &pl = panels[idx0];
+
+        if(pl.isFlapPanel()) continue; // do not connect flaps to adjacent surface
+
+        for(uint ir=0; ir<RightSurf.panel4List().size(); ir++)
         {
-            int idx1 = RightSurf.panel4List().at(i1);
-            Panel4 &p1 = panel4[idx1];
-            if(p0.isTopPanel() && p1.isTopPanel())
+            int idx1 = RightSurf.panel4List().at(ir);
+            Panel4 &pr = panels[idx1];
+
+            if(pr.isFlapPanel()) continue; // do not connect flaps to adjacent surface
+
+            if(pl.isTopPanel() && pr.isTopPanel())
             {
-                if(p0.LB().isSame(p1.LA()) && p0.TB().isSame(p1.TA()))
+                if(pl.LB().isSame(pr.LA()) && pl.TB().isSame(pr.TA()))
                 {
-                    p0.m_iPR = idx1;
-                    p1.m_iPL = idx0;
+                    pl.m_iPR = idx1;
+                    pr.m_iPL = idx0;
                 }
             }
-            else if(p0.isBotPanel() && p1.isBotPanel())
+            else if(pl.isBotPanel() && pr.isBotPanel())
             {
-                if(p0.LA().isSame(p1.LB()) && p0.TA().isSame(p1.TB()))
+                if(pl.LA().isSame(pr.LB()) && pl.TA().isSame(pr.TB()))
                 {
-                    p0.m_iPL = idx1;
-                    p1.m_iPR = idx0;
+                    pl.m_iPL = idx1;
+                    pr.m_iPR = idx0;
                 }
             }
-            else if(p0.isMidPanel() && p1.isMidPanel())
+            else if(pl.isMidPanel() && pr.isMidPanel())
             {
-                if(p0.LB().isSame(p1.LA()) && p0.TB().isSame(p1.TA()))
+                if(pl.LB().isSame(pr.LA()) && pl.TB().isSame(pr.TA()))
                 {
-                    p0.m_iPR = idx1;
-                    p1.m_iPL = idx0;
+                    pl.m_iPR = idx1;
+                    pr.m_iPL = idx0;
                 }
             }
         }

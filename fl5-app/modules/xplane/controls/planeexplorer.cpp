@@ -290,7 +290,7 @@ void PlaneExplorer::fillWPolars(ObjectTreeItem *pPlaneItem, const Plane *pPlane)
 
 void PlaneExplorer::addPOpps(const PlanePolar *pWPolar)
 {
-    if(!pWPolar) pWPolar = s_pXPlane->curWPolar();
+    if(!pWPolar) pWPolar = s_pXPlane->curPlPolar();
     if(!pWPolar) return;
 
     bool bAdded(false);
@@ -332,13 +332,14 @@ void PlaneExplorer::addPOpps(const PlanePolar *pWPolar)
                                 ls.m_bIsEnabled = false;
                                 pPOppItem = m_pModel->appendRow(pWPolarItem, strange, ls, Qt::PartiallyChecked);
                             }
-                            if(pPOpp->isType7() && pPOppItem)
+                            (void)pPOppItem;
+/*                            if(pPOpp->isType7() && pPOppItem)
                             {
                                 for(int iMode=0; iMode<8; iMode++)
                                 {
                                     m_pModel->appendRow(pPOppItem, QString::asprintf("Mode %d", iMode+1), LineStyle(), Qt::Unchecked);
                                 }
-                            }
+                            }*/
                         }
                     }
                     bAdded = true;
@@ -375,7 +376,7 @@ void PlaneExplorer::onItemDoubleClicked(const QModelIndex &index)
 
 void PlaneExplorer::insertWPolar(const PlanePolar *pWPolar)
 {
-    if(!pWPolar) pWPolar = s_pXPlane->curWPolar();
+    if(!pWPolar) pWPolar = s_pXPlane->curPlPolar();
     if(!pWPolar) return;
 
     for(int ir=0; ir<m_pModel->rowCount(); ir++)
@@ -499,9 +500,9 @@ void PlaneExplorer::selectPlane(Plane *pPlane)
 }
 
 
-void PlaneExplorer::selectWPolar(PlanePolar *pWPolar, bool bSelectPOpp)
+void PlaneExplorer::selectPlPolar(PlanePolar *pWPolar, bool bSelectPOpp)
 {
-    if(!pWPolar) pWPolar = s_pXPlane->curWPolar();
+    if(!pWPolar) pWPolar = s_pXPlane->curPlPolar();
     if(!pWPolar) return;
 
     //    m_pStruct->selectionModel()->blockSignals(true);
@@ -919,7 +920,7 @@ void PlaneExplorer::keyPressEvent(QKeyEvent *pEvent)
 
 void PlaneExplorer::loadSettings(QSettings &settings)
 {
-    settings.beginGroup("PlaneTreeView");
+    settings.beginGroup("PlaneExplorer");
     {
         s_SplitterSizes = settings.value("SplitterSizes").toByteArray();
     }
@@ -929,7 +930,7 @@ void PlaneExplorer::loadSettings(QSettings &settings)
 
 void PlaneExplorer::saveSettings(QSettings &settings)
 {
-    settings.beginGroup("PlaneTreeView");
+    settings.beginGroup("PlaneExplorer");
     {
         settings.setValue("SplitterSizes", s_SplitterSizes);
     }
@@ -937,23 +938,19 @@ void PlaneExplorer::saveSettings(QSettings &settings)
 }
 
 
-/**
- * @brief PlaneExplorer::selectCurrentItem
- * Selects the active object, a PlaneOpp, a WPolar or a Plane
- */
 void PlaneExplorer::selectCurrentObject()
 {
     //	qDebug("selectCurrentObject");
     if(s_pXPlane->isPOppView() || s_pXPlane->m_eView==XPlane::CPVIEW)
     {
-        if     (s_pXPlane->m_pCurPOpp)   selectPlaneOpp(s_pXPlane->m_pCurPOpp);
-        else if(s_pXPlane->m_pCurPlPolar) selectWPolar(s_pXPlane->m_pCurPlPolar, false);
-        else if(s_pXPlane->m_pCurPlane)  selectPlane(s_pXPlane->m_pCurPlane);
+        if     (s_pXPlane->m_pCurPOpp)    selectPlaneOpp(s_pXPlane->m_pCurPOpp);
+        else if(s_pXPlane->m_pCurPlPolar) selectPlPolar(s_pXPlane->m_pCurPlPolar, false);
+        else if(s_pXPlane->m_pCurPlane)   selectPlane(s_pXPlane->m_pCurPlane);
     }
     else if(s_pXPlane->m_eView==XPlane::POLARVIEW || s_pXPlane->m_eView==XPlane::STABPOLARVIEW)
     {
-        if     (s_pXPlane->m_pCurPlPolar) selectWPolar(s_pXPlane->m_pCurPlPolar, false);
-        else if(s_pXPlane->m_pCurPlane)  selectPlane(s_pXPlane->m_pCurPlane);
+        if     (s_pXPlane->m_pCurPlPolar) selectPlPolar(s_pXPlane->m_pCurPlPolar, false);
+        else if(s_pXPlane->m_pCurPlane)   selectPlane(s_pXPlane->m_pCurPlane);
     }
     else if (s_pXPlane->is3dView() || s_pXPlane->m_eView==XPlane::OTHERVIEW)
     {
@@ -965,7 +962,7 @@ void PlaneExplorer::selectCurrentObject()
 void PlaneExplorer::selectObjects()
 {
     if     (s_pXPlane->curPOpp())   selectPlaneOpp();
-    else if(s_pXPlane->curWPolar()) selectWPolar(s_pXPlane->curWPolar(), false);
+    else if(s_pXPlane->curPlPolar()) selectPlPolar(s_pXPlane->curPlPolar(), false);
     else                            selectPlane(s_pXPlane->curPlane());
 }
 

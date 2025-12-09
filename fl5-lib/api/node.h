@@ -39,36 +39,37 @@ class FL5LIB_EXPORT Node : public Vector3d
     private:
         std::vector<int> m_TriangleIndex;         /** the array of indexes of panels of which this node is a vertex */
         std::vector<int> m_NeighbourIndex;        /** the array of neighbour node indexes */
-        Vector3d m_Normal;                    /** the node's normal */
-        int m_Index;                          /** the index of the node in the global node array */
-        bool m_bTrailing;                     /** true if the node is trailing, false otherwise */
-        xfl::enumSurfacePosition m_Position;  /** defines on which type of surface the node is positioned */
+        Vector3d m_Normal;                        /** the node's normal */
+        int m_Index;                              /** the index of the node in the global node array */
+        bool m_bTrailing;                         /** true if the node is trailing, false otherwise */
+        xfl::enumSurfacePosition m_Position;      /** defines on which type of surface the node is positioned */
+        int m_SurfaceIndex;                       /** defines to which surface the node belongs */
 
     public:
         Node() :
-            m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}
+            m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}, m_SurfaceIndex{-1}
         {
         }
 
         Node(double xx, double yy, double zz) :
-            Vector3d(xx,yy,zz), m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}
+            Vector3d(xx,yy,zz), m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}, m_SurfaceIndex{-1}
         {
         }
 
         Node(Vector3d const &v3d) :
-            Vector3d(v3d), m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}
+            Vector3d(v3d), m_Index{-1},  m_bTrailing{false}, m_Position{xfl::NOSURFACE}, m_SurfaceIndex{-1}
 
         {
         }
 
         Node(double xx, double yy, double zz, Vector3d const &N, int idx=-1, xfl::enumSurfacePosition pos=xfl::NOSURFACE) :
-            Vector3d(xx,yy,zz), m_Normal{N}, m_Index{idx}, m_bTrailing{false}, m_Position{pos}
+            Vector3d(xx,yy,zz), m_Normal{N}, m_Index{idx}, m_bTrailing{false}, m_Position{pos}, m_SurfaceIndex{-1}
         {
 
         }
 
         Node(Vector3d const &v3d, Vector3d const &N, int idx=-1, xfl::enumSurfacePosition pos=xfl::NOSURFACE) :
-            Vector3d(v3d), m_Normal{N}, m_Index{idx}, m_bTrailing{false}, m_Position{pos}
+            Vector3d(v3d), m_Normal{N}, m_Index{idx}, m_bTrailing{false}, m_Position{pos}, m_SurfaceIndex{-1}
 
         {
         }
@@ -162,6 +163,8 @@ class FL5LIB_EXPORT Node : public Vector3d
         xfl::enumSurfacePosition surfacePosition() const {return m_Position;}
         void setSurfacePosition(xfl::enumSurfacePosition pos) {m_Position=pos;}
 
+        int surfaceIndex() const {return m_SurfaceIndex;}
+        void setSurfaceIndex(int idx) {m_SurfaceIndex=idx;}
 
         // hide base operators
         Node operator +(Node const &V) const

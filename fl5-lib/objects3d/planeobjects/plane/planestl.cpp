@@ -375,7 +375,7 @@ bool PlaneSTL::intersectTriangles(Vector3d A, Vector3d B, Vector3d &I, bool bMul
 }
 
 
-bool PlaneSTL::connectTriMesh(bool bRefTriMesh, bool bConnectTE, bool, bool bMultiThreaded)
+bool PlaneSTL::connectTriMesh(bool bRefTriMesh, bool bConnectTE, bool bMultiThreaded)
 {
     bool bOK = true;
     if(bRefTriMesh)

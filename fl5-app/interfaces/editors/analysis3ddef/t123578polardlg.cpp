@@ -534,12 +534,12 @@ void T123578PolarDlg::setupLayout()
 
     pTabWt->addTab(pfrPolarType,   "Polar type");
     pTabWt->addTab(m_pfrMethod,    "Method");
+    pTabWt->addTab(m_pfrRefDims,   "Ref. dimensions");
+    pTabWt->addTab(m_pfrFluid,     "Fluid");
+    pTabWt->addTab(m_pfrInertia,   "Inertia");
     pTabWt->addTab(m_pfrViscosity, "Viscosity");
     pTabWt->addTab(m_pfrFlaps,     "Flaps");
     pTabWt->addTab(pfrAVLCtrls,    "AVL-type ctrls");
-    pTabWt->addTab(m_pfrInertia,   "Inertia");
-    pTabWt->addTab(m_pfrRefDims,   "Ref. dimensions");
-    pTabWt->addTab(m_pfrFluid,     "Fluid");
     pTabWt->addTab(m_pfrGround,    "Ground");
     pTabWt->addTab(m_pfrFuseDrag,  "Fuselage");
     pTabWt->addTab(m_pExtraDragWt, "Extra drag");

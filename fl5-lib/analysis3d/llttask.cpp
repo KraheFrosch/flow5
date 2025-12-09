@@ -526,8 +526,6 @@ int LLTTask::iterate(double &QInf, double Alpha)
             break;
         }
 
-        //  if(m_pCurve) m_pCurve->appendPoint(iter, m_Maxa);
-
         m_iter.push_back(iter);
         m_Max_a.push_back(maxa);
 
@@ -544,7 +542,7 @@ void LLTTask::initializeGeom()
     m_bConverged = false;
 
     if(m_pPlPolar->isFixedLiftPolar()) m_QInf0 = sqrt(2.*m_pPlPolar->mass()* 9.81 /m_pPlPolar->density()/m_pWing->planformArea());
-    else                              m_QInf0 = 0.0;
+    else                               m_QInf0 = 0.0;
 
     computeLLTChords(s_NLLTStations, m_Chord.data(), m_Offset.data(), m_Twist.data());
 
@@ -625,9 +623,8 @@ bool LLTTask::alphaLoop()
         strange = "Calculating " + ALPHAch + QString::asprintf(" = %5.2f", alpha) + DEGch + "...";
         traceLog(strange);
 
-        double vel;
-        int iter = iterate(vel, alpha);
-        m_pPlPolar->setVelocity(vel);
+        double QInf = m_pPlPolar->velocity();
+        int iter = iterate(QInf, alpha);
 
         if (iter==-1 && !isCancelled())
         {
@@ -646,7 +643,7 @@ bool LLTTask::alphaLoop()
             computeWing(m_pPlPolar->velocity(), alpha, str);// generates wing results,
             traceStdLog(str);
             if (m_bWingOut) m_bWarning = true;
-            PlaneOpp *pPOpp = createPlaneOpp(m_pPlPolar->velocity(), alpha, m_bWingOut);// Adds WOpp point and adds result to polar
+            PlaneOpp *pPOpp = createPlaneOpp(QInf, alpha, m_bWingOut);// Adds WOpp point and adds result to polar
 
 
             // store the results

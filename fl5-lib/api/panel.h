@@ -45,6 +45,9 @@ class FL5LIB_EXPORT Panel
         xfl::enumSurfacePosition surfacePosition() const {return m_Pos;}
         bool isOppositeSurface(xfl::enumSurfacePosition pos) const;
 
+        int surfaceIndex() const {return m_SurfaceIndex;}
+        void setSurfaceIndex(int idx) {m_SurfaceIndex=idx;}
+
         bool isTopPanel() const  {return m_Pos==xfl::TOPSURFACE;}
         bool isMidPanel() const  {return m_Pos==xfl::MIDSURFACE;}
         bool isBotPanel() const  {return m_Pos==xfl::BOTSURFACE;}
@@ -141,6 +144,8 @@ class FL5LIB_EXPORT Panel
         int m_iWakeColumn;       /**< index of the wake column shed by this panel, numbered from left tip to right tip, or -1 if none */
 
         double m_MaxSize;         /**< a measure of the panel's minimum cross length, for RFF estimations */
+
+        int m_SurfaceIndex;
 
         CartesianFrame m_CF;
 

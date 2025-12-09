@@ -293,7 +293,7 @@ void XPlaneLegendWt::onClickedWPolarBtn()
 
     s_pXPlane->setPlane(QString::fromStdString(pWPolar->planeName()));
     s_pXPlane->setPolar(pWPolar);
-    s_pXPlane->m_pPlaneExplorer->selectWPolar(pWPolar, false);
+    s_pXPlane->m_pPlaneExplorer->selectPlPolar(pWPolar, false);
     s_pXPlane->updateView();
 }
 

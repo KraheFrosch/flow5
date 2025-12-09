@@ -227,10 +227,13 @@ QString WPolarNameMaker::makeName(Plane const *pPlane, PlanePolar const *pWPolar
         }
         else
         {
-            if(pWPolar->isViscOnTheFly())
-                plrname += "-ViscOTF";
-            if(pWPolar->isViscInterpolated() && pWPolar->bViscousLoop())
-                plrname += "-ViscLoop";
+            if(!pWPolar->isLLTMethod())
+            {
+                if(pWPolar->isViscOnTheFly())
+                    plrname += "-ViscOTF";
+                if(pWPolar->isViscInterpolated() && pWPolar->bViscousLoop())
+                    plrname += "-ViscLoop";
+            }
         }
     }
 

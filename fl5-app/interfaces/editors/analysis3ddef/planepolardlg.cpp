@@ -183,7 +183,7 @@ void PlanePolarDlg::makeCommonControls()
                                 "</p>");
                     m_prbViscOnTheFly = new QRadioButton("XFoil on the fly");
                     m_prbViscOnTheFly->setToolTip(tip);
-                    m_prbViscInterpolated = new QRadioButton("Interpolated (xflr5 method)");
+                    m_prbViscInterpolated = new QRadioButton("Interpolated (xflr5 method) (LLT method)");
                     m_prbViscInterpolated->setToolTip(tip);
                     pbgMethod->addButton(m_prbViscOnTheFly);
                     pbgMethod->addButton(m_prbViscInterpolated);
@@ -401,7 +401,8 @@ void PlanePolarDlg::makeCommonControls()
             QLabel* plabNotes = new QLabel("Notes:\n"
                                            "\t(1) + sign means trailing edge down\n"
                                            "\t(2) Flaps are numbered from left tip to right tip\n"
-                                           "\t(3) Use in conjunction with XFoil on the fly calculations");
+                                           "\t(3) Use in conjunction with THIN surfaces\n"
+                                           "\t(4) Use in conjunction with XFoil on the fly calculations");
 
             QLabel *pFlow5Link = new QLabel;
             pFlow5Link->setText("<a href=https://flow5.tech/docs/flow5_doc/Analysis/Flaps.html>https://flow5.tech/docs/flow5_doc/Analysis/Flaps.html</a>");

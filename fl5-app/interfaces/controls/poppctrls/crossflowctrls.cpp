@@ -412,7 +412,7 @@ void CrossFlowCtrls::keyPressEvent(QKeyEvent *pEvent)
 
 void CrossFlowCtrls::makeXPlaneVelocityVectors()
 {
-    Polar3d const *pPolar3d = s_pXPlane->curWPolar();
+    Polar3d const *pPolar3d = s_pXPlane->curPlPolar();
     Opp3d const *pOpp3d = s_pXPlane->curPOpp();
     if(!pOpp3d) return;
 

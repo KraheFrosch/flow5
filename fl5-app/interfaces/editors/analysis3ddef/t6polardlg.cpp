@@ -638,12 +638,12 @@ void T6PolarDlg::setupLayout()
     {
         pTabWt->setMovable(true);
         pTabWt->addTab(m_pfrMethod,       "Method");
-        pTabWt->addTab(m_pfrViscosity,    "Viscosity");
         pTabWt->addTab(m_pfrRefDims,      "Ref. dimensions");
+        pTabWt->addTab(m_pfrFluid,        "Fluid");
+        pTabWt->addTab(m_pfrViscosity,    "Viscosity");
         pTabWt->addTab(pOppRangePage,     "Operating range");
         pTabWt->addTab(pMassControlPage,  "Mass and inertia");
         pTabWt->addTab(pAngleControlPage, "Angles");
-        pTabWt->addTab(m_pfrFluid,        "Fluid");
         pTabWt->addTab(m_pfrGround,       "Ground");
         pTabWt->addTab(m_pfrFuseDrag,     "Fuselage");
         pTabWt->addTab(m_pExtraDragWt,    "Extra drag");

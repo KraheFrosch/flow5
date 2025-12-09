@@ -24,6 +24,7 @@
 
 #define _MATH_DEFINES_DEFINED
 
+#include <QDebug>
 #include <QString>
 
 
@@ -686,6 +687,7 @@ void P3UniAnalysis::computeOnBodyCp(std::vector<Vector3d> const &VInf,
     for(int i3=0; i3<nPanels(); i3++)
     {
         Panel3 const &p3 = m_Panel3.at(i3);
+
         VStream = p3.globalToLocal(VInf.at(i3));
         QInf = VInf.at(i3).norm();
 

@@ -502,7 +502,7 @@ void TriMesh::connectMeshes(int i0, int n0, int i1, int n1)
 }
 
 
-void TriMesh::makeConnectionsFromNodePosition(int i0, int np0, double MERGEDISTANCE, bool bCheckSurfacePosition)
+void TriMesh::makeConnectionsFromNodePosition2(int i0, int np0, double MERGEDISTANCE)
 {
     if(i0+np0>nPanels())
     {
@@ -525,9 +525,14 @@ void TriMesh::makeConnectionsFromNodePosition(int i0, int np0, double MERGEDISTA
 
             if(p1.neighbourCount()==3) continue;  // no further connections for this panel
 
+            if(p0.isFlapPanel() || p1.isFlapPanel())
+            {
+                if(p0.surfaceIndex() != p1.surfaceIndex()) continue; // avoid connecting flap side panels
+            }
+
             if(p0.isTrailing())
             {
-                if(!bCheckSurfacePosition || (p1.surfacePosition()==p0.surfacePosition()))
+                if((p1.surfacePosition()==p0.surfacePosition()))
                 {
                     for(int iEdge=0; iEdge<3; iEdge++)
                     {

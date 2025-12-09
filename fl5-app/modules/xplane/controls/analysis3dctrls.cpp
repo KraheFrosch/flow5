@@ -133,7 +133,7 @@ void Analysis3dCtrls::showEvent(QShowEvent *pEvent)
 
 void Analysis3dCtrls::setParameterLabels()
 {
-    PlanePolar const*pWPolar = s_pXPlane->curWPolar();
+    PlanePolar const*pWPolar = s_pXPlane->curPlPolar();
     if(pWPolar)
     {
         switch(pWPolar->type())
@@ -229,7 +229,7 @@ std::vector<double> Analysis3dCtrls::oppList() const
 
 void Analysis3dCtrls::setAnalysisRange()
 {
-    PlanePolar const *pCurWPolar = s_pXPlane->curWPolar();
+    PlanePolar const *pCurWPolar = s_pXPlane->curPlPolar();
 
     if (!pCurWPolar)
     {
@@ -269,7 +269,7 @@ void Analysis3dCtrls::onOption()
 
 void Analysis3dCtrls::onSetControls()
 {
-    PlanePolar const *pCurWPolar = s_pXPlane->curWPolar();
+    PlanePolar const *pCurWPolar = s_pXPlane->curPlPolar();
 
     m_ppbAnalyze->setEnabled(pCurWPolar);
     m_pchStorePOpps->setEnabled(pCurWPolar);

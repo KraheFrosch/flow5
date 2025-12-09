@@ -177,6 +177,7 @@ class gl3dXflView : public gl3dView
         bool bPickNode()   const {return m_PickType==xfl::TRIANGLENODE||m_PickType==xfl::MESHNODE;}
         bool bPickVertex() const {return m_PickType==xfl::VERTEX;}
         bool bPickPanel3() const {return m_PickType==xfl::PANEL3;}
+        bool bPickPanel4() const {return m_PickType==xfl::PANEL4;}
         bool bPickFace()   const {return m_PickType==xfl::FACE;}
         void stopPicking() {m_PickType = xfl::NOPICK;}
 

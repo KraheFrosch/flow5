@@ -193,7 +193,7 @@ void Boat::makeConnections()
     for(int is=0; is<nSails(); is++)
     {
         Sail const*pSail = m_Sail[is];
-        m_RefTriMesh.makeConnectionsFromNodePosition(pSail->firstPanel3Index(), pSail->nPanel3(), 0.0001, true);
+        m_RefTriMesh.makeConnectionsFromNodePosition2(pSail->firstPanel3Index(), pSail->nPanel3(), 0.0001);
 //        m_RefTriMesh.makeConnectionsFromNodeIndexes(pSail->firstPanel3Index(), pSail->nPanel3(), pSail->firstPanel3Index(), pSail->nPanel3());
     }
 }

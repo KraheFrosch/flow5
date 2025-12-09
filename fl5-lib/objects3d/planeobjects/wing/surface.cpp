@@ -1248,8 +1248,16 @@ void Surface::makeTriPanels(std::vector<Panel3> &panel3list, std::vector<Node> &
 
     // the two tip nodes do not belong to any surface;
     // this is used in the analysis to set Cp=0 at these singular locations
-    if(bMakeLeftPatch)   nodes[nLeftTipRearNode].setSurfacePosition(xfl::NOSURFACE);
-    if(bMakeRightPatch)  nodes[nRightTipRearNode].setSurfacePosition(xfl::NOSURFACE);
+    if(bMakeLeftPatch)
+    {
+        nodes[nLeftTipRearNode].setSurfacePosition(xfl::NOSURFACE);
+        nodes[nLeftTipRearNode].setSurfaceIndex(m_Index);
+    }
+    if(bMakeRightPatch)
+    {
+        nodes[nRightTipRearNode].setSurfacePosition(xfl::NOSURFACE);
+        nodes[nRightTipRearNode].setSurfaceIndex(m_Index);
+    }
 
     int nNullTriangles=0;
     int nLA(0), nLB(0), nTA(0), nTB(0);
@@ -1312,6 +1320,7 @@ void Surface::makeTriPanels(std::vector<Panel3> &panel3list, std::vector<Node> &
                     panel3list.push_back(p3tup);
                     Panel3 &p3T = panel3list.back();
                     p3T.setSurfacePosition(xfl::SIDESURFACE);
+                    p3T.setSurfaceIndex(m_Index);
                     p3T.setIndex(ip3start++);
                     p3T.m_bIsLeftWingPanel  = true;
                     p3T.m_iPD = int(panel3list.size())-2;
@@ -1334,6 +1343,7 @@ void Surface::makeTriPanels(std::vector<Panel3> &panel3list, std::vector<Node> &
                     panel3list.push_back(p3tlw);
                     Panel3 &p3B = panel3list.back();
                     p3B.setSurfacePosition(xfl::SIDESURFACE);
+                    p3B.setSurfaceIndex(m_Index);
                     p3B.setIndex(ip3start++);
                     p3B.m_bIsLeftWingPanel  = true;
                     p3B.m_iPD = int(panel3list.size())-2;
@@ -1506,6 +1516,7 @@ void Surface::makeTriPanels(std::vector<Panel3> &panel3list, std::vector<Node> &
                 panel3list.push_back(p3Dtmp);
                 Panel3 &p3D = panel3list.back();
                 p3D.setSurfacePosition(side);
+                p3D.setSurfaceIndex(m_Index);
                 p3D.setIndex(ip3start++);
                 p3D.m_bIsInSymPlane  = m_bIsInSymPlane;
                 p3D.m_bIsLeftWingPanel  = m_bIsLeftSurf;
@@ -1537,6 +1548,7 @@ void Surface::makeTriPanels(std::vector<Panel3> &panel3list, std::vector<Node> &
                 panel3list.push_back(p3Utmp);
                 Panel3 &p3U = panel3list.back();
                 p3U.setSurfacePosition(side);
+                p3U.setSurfaceIndex(m_Index);
                 p3U.setIndex(ip3start++);
                 p3U.m_bIsInSymPlane  = m_bIsInSymPlane;
                 p3U.m_bIsLeftWingPanel  = m_bIsLeftSurf;
@@ -1633,6 +1645,7 @@ void Surface::makeTriPanels(std::vector<Panel3> &panel3list, std::vector<Node> &
                     panel3list.push_back(p3tup);
                     Panel3 &p3T = panel3list.back();
                     p3T.setSurfacePosition(xfl::SIDESURFACE);
+                    p3T.setSurfaceIndex(m_Index);
                     p3T.setIndex(ip3start++);
                     p3T.m_bIsLeftWingPanel  = true;
                     p3T.m_iPD = int(panel3list.size())-2;
@@ -1658,6 +1671,7 @@ void Surface::makeTriPanels(std::vector<Panel3> &panel3list, std::vector<Node> &
                     panel3list.push_back(p3tlw);
                     Panel3 &p3B = panel3list.back();
                     p3B.setSurfacePosition(xfl::SIDESURFACE);
+                    p3B.setSurfaceIndex(m_Index);
                     p3B.setIndex(ip3start++);
                     p3B.m_bIsLeftWingPanel  = true;
                     p3B.m_iPD = int(panel3list.size())-2;
@@ -1723,6 +1737,7 @@ int Surface::makeQuadPanels(std::vector<Panel4> &panel4list, int &nWakeColumn, b
                 panel4list.push_back(p4tmp);
                 Panel4 &p4T = panel4list.back();
                 p4T.setSurfacePosition(xfl::SIDESURFACE);
+                p4T.setSurfaceIndex(m_Index);
                 p4T.setIndex(int(panel4list.size())-1);
                 p4T.m_bIsLeftWingPanel  = true;
                 if(l>0)             p4T.m_iPD = int(panel4list.size())-2;
@@ -1761,12 +1776,13 @@ int Surface::makeQuadPanels(std::vector<Panel4> &panel4list, int &nWakeColumn, b
             Panel4 &p4 = panel4list.back();
             getPanel(k, l, side, LA, LB, TA, TB);
 
-            if(l==0)            p4.m_bIsTrailing = true;
-            if(l==NXPanels()-1) p4.m_bIsLeading  = true;
+            if(l==0)            p4.setTrailing(true);
+            if(l==NXPanels()-1) p4.setLeading(true);
 
             p4.m_bIsInSymPlane  = isInSymPlane();
 
             p4.setSurfacePosition(side);
+            p4.setSurfaceIndex(m_Index);
             p4.setIndex(n4_0 + n4);
             p4.m_bIsLeftWingPanel  = isLeftSurf();
 
@@ -1774,9 +1790,6 @@ int Surface::makeQuadPanels(std::vector<Panel4> &panel4list, int &nWakeColumn, b
                 p4.setPanelFrame(LA, LB, TA, TB);
             else if (side==xfl::BOTSURFACE)
                 p4.setPanelFrame(LB, LA, TB, TA);
-
-//            s_DebugPts.push_back(p4.m_CtrlPt);
-//            s_DebugVecs.push_back(p4.trailingVortex());
 
             // set neighbour panels
             // valid only for Panel 2-sided Analysis
@@ -1849,13 +1862,14 @@ int Surface::makeQuadPanels(std::vector<Panel4> &panel4list, int &nWakeColumn, b
                 Panel4 &p4 = panel4list.back();
                 getPanel(k,l,side, LA, LB, TA, TB);
 
-                if(l==0)            p4.m_bIsTrailing = true;
-                if(l==NXPanels()-1) p4.m_bIsLeading  = true;
+                if(l==0)            p4.setTrailing(true);
+                if(l==NXPanels()-1) p4.setLeading(true);
 
                 p4.m_bIsInSymPlane  = isInSymPlane();
 
 
                 p4.setSurfacePosition(side);
+                p4.setSurfaceIndex(m_Index);
                 p4.setIndex(n4_0 + n4);
                 p4.m_bIsLeftWingPanel  = isLeftSurf();
 
@@ -1879,7 +1893,7 @@ int Surface::makeQuadPanels(std::vector<Panel4> &panel4list, int &nWakeColumn, b
                 if(k==NYPanels()-1) p4.m_iPR = -1;
 
 
-                if(p4.m_bIsTrailing)
+                if(p4.isTrailing())
                 {
                     //                    p4.m_iWake = m_nWakePanel4;//next wake element
                     //                    p4.m_iWakeColumn = nWakeColumn;
@@ -1922,6 +1936,7 @@ int Surface::makeQuadPanels(std::vector<Panel4> &panel4list, int &nWakeColumn, b
                 panel4list.push_back(p4tmp); // avoids potential problems with side trailing panels in the fin if in sym plane
                 Panel4 &p4T = panel4list.back();
                 p4T.setSurfacePosition(xfl::SIDESURFACE);
+                p4T.setSurfaceIndex(m_Index);
                 p4T.setIndex(int(panel4list.size())-1);
                 p4T.m_bIsLeftWingPanel  = true;
 

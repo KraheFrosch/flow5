@@ -26,6 +26,7 @@
 #define _MATH_DEFINES_DEFINED
 
 #include <QString>
+#include <QDebug>
 
 #include <thread>
 #include <iostream>
@@ -1606,6 +1607,7 @@ void P4Analysis::computeOnBodyCp(const std::vector<Vector3d> &VInf,
     for (int i4=0; i4<nPanels(); i4++)
     {
         Panel4 const &p4 = m_Panel4.at(i4);
+
         Vl.x = VLocal.at(i4).x;
         Vl.y = VLocal.at(i4).y;
         Vl.z = m_Sigma.at(i4)*4.0*PI;

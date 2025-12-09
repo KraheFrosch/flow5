@@ -819,6 +819,9 @@ std::string Panel4::properties(bool bLong) const
     }
     props += strange;
 
+    strange = QString::asprintf("  Surface index= %d\n", m_SurfaceIndex);
+    props += strange;
+
     strange = QString::asprintf("  Neighbours: PU%4d  PD%4d  PL%4d  PR%4d\n", m_iPU, m_iPD, m_iPL, m_iPR);
     props += strange;
 

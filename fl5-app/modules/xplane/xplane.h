@@ -158,8 +158,8 @@ class XPlane : public QObject
         void resetCurves() {m_bResetCurves = true;}
         void resetGraphScales();
 
-        Plane * curPlane()  const {return m_pCurPlane;}
-        PlanePolar *curWPolar() const {return m_pCurPlPolar;}
+        Plane *curPlane() const {return m_pCurPlane;}
+        PlanePolar *curPlPolar() const {return m_pCurPlPolar;}
         PlaneOpp const *curPOpp() const {return m_pCurPOpp;}
 
         bool curPOppOnly() const {return m_bCurPOppOnly;}

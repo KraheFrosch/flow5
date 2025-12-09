@@ -1723,6 +1723,7 @@ void MainFrame::onLoadProjectFile()
 
     if(!onCloseProject()) return;
 
+
     onShowLogWindow(true);
     App = loadXflFile(PathName);
 
