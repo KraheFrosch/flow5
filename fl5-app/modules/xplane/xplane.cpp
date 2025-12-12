@@ -54,7 +54,7 @@
 #include <interfaces/controls/w3dprefs.h>
 #include <interfaces/editors/analysis3ddef/aerodatadlg.h>
 #include <interfaces/editors/analysis3ddef/extradragdlg.h>
-#include <interfaces/editors/analysis3ddef/t123578polardlg.h>
+#include <interfaces/editors/analysis3ddef/t1234578polardlg.h>
 #include <interfaces/editors/analysis3ddef/t6polardlg.h>
 #include <interfaces/editors/analysis3ddef/wpolarautonamedlg.h>
 #include <interfaces/editors/analysisseldlg.h>
@@ -130,7 +130,7 @@
 #include <api/wingopp.h>
 #include <api/planepolar.h>
 #include <api/planepolarext.h>
-#include <modules/xplane/analysis/wpolarnamemaker.h>
+#include <modules/xplane/analysis/plpolarnamemaker.h>
 #include <api/objects3d.h>
 #include <api/fuseocc.h>
 #include <api/fusesections.h>
@@ -1942,7 +1942,7 @@ void XPlane::onDefineT123578Polar()
 
     stopAnimate();
 
-    T123578PolarDlg wpDlg(s_pMainFrame);
+    T1234578PolarDlg wpDlg(s_pMainFrame);
     wpDlg.initPolar3dDlg(m_pCurPlane);
 
     int res = wpDlg.exec();
@@ -1952,7 +1952,7 @@ void XPlane::onDefineT123578Polar()
         //Then add the WPolar to the array
         emit projectModified();
         PlanePolar* pNewWPolar  = new PlanePolar;
-        pNewWPolar->duplicateSpec(&T123578PolarDlg::staticWPolar());
+        pNewWPolar->duplicateSpec(&T1234578PolarDlg::staticWPolar());
         pNewWPolar->setLineWidth(m_pCurPlane->theStyle().m_Width);
         pNewWPolar->setLineStipple(m_pCurPlane->theStyle().m_Stipple);
         pNewWPolar->setPointStyle(m_pCurPlane->theStyle().m_Symbol);
@@ -2002,7 +2002,7 @@ void XPlane::onDefineT7Polar()
 
     stopAnimate();
 
-    T123578PolarDlg wpDlg(s_pMainFrame);
+    T1234578PolarDlg wpDlg(s_pMainFrame);
     wpDlg.initPolar3dDlg(m_pCurPlane);
 
     wpDlg.setType7Polar();
@@ -2014,7 +2014,7 @@ void XPlane::onDefineT7Polar()
         //Then add the WPolar to the array
         emit projectModified();
         PlanePolar* pNewWPolar  = new PlanePolar;
-        pNewWPolar->duplicateSpec(&T123578PolarDlg::staticWPolar());
+        pNewWPolar->duplicateSpec(&T1234578PolarDlg::staticWPolar());
         pNewWPolar->setLineWidth(m_pCurPlane->theStyle().m_Width);
         pNewWPolar->setLineStipple(m_pCurPlane->theStyle().m_Stipple);
         pNewWPolar->setPointStyle(m_pCurPlane->theStyle().m_Symbol);
@@ -2508,7 +2508,7 @@ void XPlane::onDeleteCurPlPolar()
 
     PlanePolar *pWPolarDel = m_pCurPlPolar; // in case of unfortunate signal/slot to setWPolar;
     QString nextWPolarName = m_pPlaneExplorer->removeWPolar(m_pCurPlPolar);
-    Objects3d::deleteWPolar(pWPolarDel);
+    Objects3d::deletePlPolar(pWPolarDel);
 
     m_pCurPOpp = nullptr;
     m_pCurPlPolar = nullptr;
@@ -3830,7 +3830,7 @@ void XPlane::onEditCurPlPolar()
 
     if(m_pCurPlPolar->isStabilityPolar())
     {
-        T123578PolarDlg dlg(s_pMainFrame);
+        T1234578PolarDlg dlg(s_pMainFrame);
         dlg.initPolar3dDlg(m_pCurPlane, m_pCurPlPolar);
         res = dlg.exec();
         pNewWPolar->duplicateSpec(&PlanePolarDlg::staticWPolar());
@@ -3846,7 +3846,7 @@ void XPlane::onEditCurPlPolar()
     }
     else
     {
-        T123578PolarDlg dlg(s_pMainFrame);
+        T1234578PolarDlg dlg(s_pMainFrame);
         dlg.initPolar3dDlg(m_pCurPlane, m_pCurPlPolar);
 
         res = dlg.exec();
@@ -6832,7 +6832,7 @@ PlanePolar *XPlane::importAnalysisFromXML(QFile &xmlFile)
     }
 
     if(pWPolar->name().length()==0)
-        pWPolar->setName(WPolarNameMaker::makeName(pPlane, pWPolar).toStdString());
+        pWPolar->setName(PlPolarNameMaker::makeName(pPlane, pWPolar).toStdString());
 
     PlaneXfl const*pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pCurPlane);
     if(pPlaneXfl)

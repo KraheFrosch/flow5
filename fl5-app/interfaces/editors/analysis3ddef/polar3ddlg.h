@@ -80,7 +80,7 @@ class Polar3dDlg : public QDialog
 
     protected:
 
-        virtual void resizeColumns();
+        virtual void resizeColumns() {}
         virtual void readData() = 0;
 
         void disableVortonWake(Polar3d &polar3d);

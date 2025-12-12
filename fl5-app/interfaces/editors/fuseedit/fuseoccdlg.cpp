@@ -92,7 +92,7 @@ void FuseOccDlg::initDialog(Fuse*pFuse)
     m_pFuseOcc = pFuseOcc;
 
     m_pMesherWt->initWt(m_pFuseOcc->shells(), m_pFuseOcc->maxElementSize(), false, false);
-    m_pGMesherWt->initWt(m_pFuseOcc, false);
+    m_pGMesherWt->initWt(m_pFuseOcc, false, false);
     m_pglFuseView->setFuse(m_pFuseOcc);
 
     updateProperties();
@@ -496,7 +496,7 @@ void FuseOccDlg::onShapeFix()
     m_pglFuseView->update();
 
     m_pMesherWt->initWt(m_pFuseOcc->shells(), m_pFuseOcc->maxElementSize(), false, false);
-    m_pGMesherWt->initWt(m_pFuseOcc, false);
+    m_pGMesherWt->initWt(m_pFuseOcc, false, false);
 
     m_bChanged = true;
     QApplication::restoreOverrideCursor();

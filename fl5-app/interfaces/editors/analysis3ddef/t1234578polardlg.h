@@ -45,12 +45,12 @@ class CPTableView;
 class CtrlTableModel;
 
 
-class T123578PolarDlg : public PlanePolarDlg
+class T1234578PolarDlg : public PlanePolarDlg
 {
     Q_OBJECT
 
     public:
-        T123578PolarDlg(QWidget *pParent);
+        T1234578PolarDlg(QWidget *pParent);
         void initPolar3dDlg(Plane const *pPlane, PlanePolar const *pWPolar=nullptr) override;
         void setType7Polar();
 
@@ -60,6 +60,7 @@ class T123578PolarDlg : public PlanePolarDlg
 
         void readData() override;
         void enableControls() override;
+        void resizeColumns() override;
 
         void setReynolds();
         void setupLayout();
@@ -88,7 +89,7 @@ class T123578PolarDlg : public PlanePolarDlg
     private:
 
         FloatEdit *m_pfeQInf;
-        FloatEdit *m_pdeAlphaSpec, *m_pdePhiSpec;
+        FloatEdit *m_pfeAlphaSpec, *m_pfePhiSpec;
 
         QRadioButton *m_prbType1, *m_prbType2, *m_prbType3, *m_prbType4, *m_prbType5, *m_prbType7, *m_prbType8;
 

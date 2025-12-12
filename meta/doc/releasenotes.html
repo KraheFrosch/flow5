@@ -33,6 +33,7 @@
                         <ul>
                             <li>all meshing interfaces modified to use the Gmsh library in addition to the built-in custom mesher</li>
                             <li>added an option to build fuse meshes conforming to the wings mid-camber line</li>
+                            <li>removed panel connections at the edges of flaps</li>
                             <li>removed IGES import and export options due to changes of symbol names in the OCC library</li>
                             <li>changed the evaluation of inertia properties in the case of an xfl-type fuselage to use OCC instead of the built-in custom evaluator; minor impact on evaluations</li>
                             <li>minor improvements to the export of wings to AVL</li>
@@ -41,6 +42,8 @@
                     </li>
                     <li>Analysis
                         <ul>
+                            <li>fixed issues with the velocity parameter in LLT calculations</li>
+                            <li>removed the option to tilt the wings from AVL controls in linear polars; controls will need to be rebuilt</li>
                         </ul>
                     </li>
                     <li>Post-processing
@@ -67,10 +70,9 @@
                 <ul>
                     <li>General
                         <ul>
-                            <li>FOSS</li>
+                            <li>flow5 is FOSS</li>
                             <li>the format of the .fl5 project file has been modified; NEWLY SAVED FILES WILL NOT BE READABLE BY VERSIONS OLDER THAN v7.53</li>
                             <li>set the default OpenGL context to 4.6 instead of 3.3</li>
-                            <li>last binary package for MacOS x86</li>
                         </ul>
                     </li>
                     <li>Modelling/Meshing

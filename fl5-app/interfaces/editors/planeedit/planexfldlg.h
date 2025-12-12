@@ -61,7 +61,6 @@ class WingSection;
 class Surface;
 class FloatEdit;
 class IntEdit;
-class PlainTextOutput;
 
 class MesherWt;
 class GMesherWt;
@@ -128,7 +127,7 @@ class PlaneXflDlg : public PlaneDlg
 
         bool makeFragments();
 
-        QVector<WingXfl*> thinWingList() const;
+        QVector<WingXfl> thinWingList() const;
 
     protected slots:
         void onButton(QAbstractButton *pButton) override;
@@ -156,7 +155,6 @@ class PlaneXflDlg : public PlaneDlg
         void onInsertWing();
         void onInsertWingFromXml();
         void onInsertWingFromVSP();
-        void onThickListClick();
         void onThinListClick();
         void onMovePartDown();
         void onMovePartUp();
@@ -164,7 +162,6 @@ class PlaneXflDlg : public PlaneDlg
         void onOK(int iExitCode=QDialog::Accepted) override;
         void onPartInertia();
         void onPartItemClicked(QModelIndex index);
-        void onPartListClicked(QModelIndex);
         void onPlaneInertia() override;
         void onUpdatePlane() override;
         void onRemovePart();
@@ -185,9 +182,6 @@ class PlaneXflDlg : public PlaneDlg
 
         void onMergeNodes(bool bIsMerging);
 
-        void onSelMesher();
-
-
         void onSelectPanels(bool bSelect);
         void onDeleteP3Selection();
 
@@ -207,11 +201,8 @@ class PlaneXflDlg : public PlaneDlg
 
         QPushButton *m_ppbExportBody;
 
-        QPushButton *m_ppbCutFuse;
         QAction *m_pResetFuse, *m_pTessellation;
 
-        QRadioButton *m_prbfl5Mesher, *m_prbGMesher;
-        MesherWt *m_pMesherWt;
         GMesherWt *m_pGMesherWt;
         QAction *m_pRestoreFuseMesh, *m_pFuseMesher;
 
@@ -227,8 +218,6 @@ class PlaneXflDlg : public PlaneDlg
         QList<TriMesh> m_UndoStack;      /**< the stack of incremental modifications to the SplineFoil;
                                               we can't use the QStack though, because we need to access
                                               any point in the case of multiple undo operations */
-
-        FloatEdit *m_pfeStitchPrecision;
 
         QComboBox *m_pcbStepFormat;
 
@@ -250,10 +239,8 @@ class PlaneXflDlg : public PlaneDlg
 
         QSplitter *m_pHSplitter;
 
-        QStackedWidget *m_pswThinThick;
         QRadioButton *m_prbThin, *m_prbThick;
-        QListWidget *m_plwThinWings;
-        QListWidget *m_plwFuseListWt, *m_plwThickWings;
+        QListWidget *m_plwWings;
 
         QSplitter *m_pPartSplitter;
 

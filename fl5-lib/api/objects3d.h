@@ -61,7 +61,7 @@ namespace Objects3d
     FL5LIB_EXPORT  void deletePlaneResults(const Plane *pPlane, bool bDeletePolars=false);
     FL5LIB_EXPORT  void deleteExternalPolars(Plane const*pPlane);
     FL5LIB_EXPORT  void deleteWPolarResults(PlanePolar *pWPolar);
-    FL5LIB_EXPORT  void deleteWPolar(PlanePolar *pWPolar);
+    FL5LIB_EXPORT  void deletePlPolar(PlanePolar *pPlPolar);
     FL5LIB_EXPORT  void deletePlaneOpp(PlaneOpp *pPOpp);
     FL5LIB_EXPORT  Plane* plane(const std::string &PlaneName);
     FL5LIB_EXPORT  Plane const* planeAt(const std::string &PlaneName);

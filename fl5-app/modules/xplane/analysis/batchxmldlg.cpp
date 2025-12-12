@@ -54,7 +54,7 @@
 #include <core/xflcore.h>
 #include <interfaces/controls/analysisrangetable.h>
 #include <interfaces/controls/t8rangetable.h>
-#include <interfaces/editors/analysis3ddef/t123578polardlg.h>
+#include <interfaces/editors/analysis3ddef/t1234578polardlg.h>
 #include <interfaces/editors/analysis3ddef/t6polardlg.h>
 #include <interfaces/script/xflexecutor.h>
 #include <interfaces/widgets/customdlg/newnamedlg.h>
@@ -820,7 +820,7 @@ void BatchXmlDlg::onEditAnalysis()
     }
     else
     {
-        T123578PolarDlg dlg(this);
+        T1234578PolarDlg dlg(this);
         dlg.initPolar3dDlg(nullptr, pWPolar);
 
         res = dlg.exec();
@@ -1005,7 +1005,7 @@ void BatchXmlDlg::onDefineWPolar()
     {
         case 0:
         {
-            T123578PolarDlg *pWDlg = new T123578PolarDlg(this);
+            T1234578PolarDlg *pWDlg = new T1234578PolarDlg(this);
             pWDlg->initPolar3dDlg(nullptr);
             pDlg = pWDlg;
             break;

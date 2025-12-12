@@ -76,6 +76,8 @@ GMesherWt::GMesherWt(QWidget *pParent) : QFrame{pParent}
     m_pFuse = nullptr;
     m_pSail = nullptr;
     m_iLoggerStack = 0;
+
+    m_bThickSurfaces   = false;
     m_bMakexzSymmetric = false;
     m_bIsMeshing       = false;
 
@@ -253,11 +255,13 @@ bool GMesherWt::readMeshSize()
 }
 
 
-void GMesherWt::initWt(Fuse *pFuse, bool bMakexzSymmetric)
+void GMesherWt::initWt(Fuse *pFuse, bool bMakexzSymmetric, bool bThickSurfaces)
 {
     m_pFuse = pFuse;
 
+    m_bThickSurfaces = bThickSurfaces;
     m_bMakexzSymmetric = bMakexzSymmetric;
+
     GmshParams m_GmshParams = pFuse->gmshParams();
     m_pfeMinSize->setValue(m_GmshParams.m_MinSize*Units::mtoUnit());
     m_pfeMaxSize->setValue(m_GmshParams.m_MaxSize*Units::mtoUnit());
@@ -716,11 +720,13 @@ void GMesherWt::meshOccSail()
 }
 
 
-void GMesherWt::meshFuseShells()
+void GMesherWt::meshFuseShellsThinSurfaces()
 {
     if(!m_pFuse) return;
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
+//    const int DIM0 = 0; // points
+//    const int DIM1 = 1; // lines
     const int DIM2 = 2; // faces
 
     m_Triangles.clear();
@@ -746,78 +752,205 @@ void GMesherWt::meshFuseShells()
     gmesh::BRepstoGmsh(brepstr);
 
 
-    // get all the fuse faces
-    gmsh::vectorpair fusedimtags;
-    gmsh::model::occ::getEntities(fusedimtags, DIM2);
-
-    // embed wings
-    // make the fragmenting tools
-    gmsh::vectorpair wingDimTags;
-
-    for (int iw=0; iw<m_Wings.size(); iw++)
+    if(!m_Wings.size())
     {
-        WingXfl const *pWing = m_Wings.at(iw);
-
-//        Vector3d wingLE = pWing->position(); // no need, surfaces are built in position
-        Vector3d fuseLE = m_pFuse->position();
-        Vector3d t = Vector3d()-fuseLE;
-
-        std::vector<int> wiretags;
-        std::vector<std::vector<Node>> midwires;
-        pWing->makeMidWires(midwires);
-
-        for(std::vector<Node> const &wire : midwires)
-        {
-            std::vector<int> pointtags;
-            for(Node const &nd : wire)
-            {
-                pointtags.push_back(gmsh::model::occ::addPoint(nd.x+t.x, nd.y+t.y, nd.z+t.z));
-            }
-
-            std::vector<int> linetags;
-            for(uint it=0; it<pointtags.size()-1; it++)
-            {
-                linetags.push_back(gmsh::model::occ::addLine(pointtags.at(it), pointtags.at(it+1)));
-            }
-
-            wiretags.push_back(gmsh::model::occ::addWire(linetags));
-        }
-
-        gmsh::vectorpair surfDimTags;
-        gmsh::model::occ::addThruSections(wiretags, surfDimTags, -1, false);
-
-        for(std::pair<int,int> pair : surfDimTags)
-            wingDimTags.push_back(pair);
     }
-
-
-    gmsh::vectorpair outDimTags;
-    std::vector<gmsh::vectorpair> outDimTagsMap;
-
-    // Fragment and embed automatically
-    // Note: remove tools does not remove the wings from the model, needs manual removal
-    gmsh::model::occ::fragment(fusedimtags, wingDimTags, outDimTags, outDimTagsMap, -1, true, true);
-
-    // Remove all dim 2 objects except the original fuse faces.
-    gmsh::vectorpair RedundantDimTags;
-    for(std::pair<int,int> dimtag : outDimTags)
+    else
     {
-        if(dimtag.first==DIM2)
+        // get all the fuse faces
+        gmsh::vectorpair fusedimtags;
+        gmsh::model::occ::getEntities(fusedimtags, DIM2);
+
+        // embed wings
+        // make the fragmenting tools
+
+        gmsh::vectorpair wingDimTags;
+
+        for (int iw=0; iw<m_Wings.size(); iw++)
         {
-            bool bIsFuseDimTag = false;
-            for(uint kf=0; kf<fusedimtags.size(); kf++)
+            WingXfl const &wing = m_Wings.at(iw);
+
+    //        Vector3d wingLE = pWing->position(); // no need, surfaces are built in position
+            Vector3d fuseLE = m_pFuse->position();
+            Vector3d t = Vector3d()-fuseLE;
+
+            std::vector<int> wiretags;
+            std::vector<std::vector<Node>> midwires;
+            wing.makeMidWires(midwires);
+
+            for(std::vector<Node> const &wire : midwires)
             {
-                if(dimtag.second==fusedimtags.at(kf).second)
+                std::vector<int> pointtags;
+                for(Node const &nd : wire)
                 {
-                    bIsFuseDimTag = true;
-                    break;
+                    pointtags.push_back(gmsh::model::occ::addPoint(nd.x+t.x, nd.y+t.y, nd.z+t.z));
                 }
+
+                std::vector<int> linetags;
+                for(uint it=0; it<pointtags.size()-1; it++)
+                {
+                    linetags.push_back(gmsh::model::occ::addLine(pointtags.at(it), pointtags.at(it+1)));
+                }
+
+                wiretags.push_back(gmsh::model::occ::addWire(linetags));
             }
 
-            if(!bIsFuseDimTag) RedundantDimTags.push_back(dimtag);
+            gmsh::vectorpair surfDimTags;
+            gmsh::model::occ::addThruSections(wiretags, surfDimTags, -1, false, true);
+
+            for(std::pair<int,int> pair : surfDimTags)
+                wingDimTags.push_back(pair);
         }
+
+        gmsh::vectorpair outDimTags;
+        std::vector<gmsh::vectorpair> outDimTagsMap;
+
+        // Fragment and embed automatically
+        // Note: remove tools does not remove the wings from the model, needs manual removal
+        gmsh::model::occ::fragment(fusedimtags, wingDimTags, outDimTags, outDimTagsMap, -1, true, true);
+
+        // Remove all dim 2 objects except the original fuse faces.
+        gmsh::vectorpair RedundantDimTags;
+        for(std::pair<int,int> dimtag : outDimTags)
+        {
+            if(dimtag.first==DIM2)
+            {
+                bool bIsFuseDimTag = false;
+                for(uint kf=0; kf<fusedimtags.size(); kf++)
+                {
+                    if(dimtag.second==fusedimtags.at(kf).second)
+                    {
+                        bIsFuseDimTag = true;
+                        break;
+                    }
+                }
+
+                if(!bIsFuseDimTag) RedundantDimTags.push_back(dimtag);
+            }
+        }
+        gmsh::model::occ::remove(RedundantDimTags, true);
     }
-    gmsh::model::occ::remove(RedundantDimTags, true);
+
+    gmsh::model::occ::synchronize();
+
+    emit outputMsg("Starting G-mesher in a separate thread...\n");
+    emit meshCurrent();
+
+}
+
+
+void GMesherWt::meshFuseShellsThickSurfaces()
+{
+    if(!m_pFuse) return;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+//    const int DIM0 = 0; // points
+//    const int DIM1 = 1; // lines
+    const int DIM2 = 2; // faces
+
+    m_Triangles.clear();
+    gmsh::logger::start();
+    m_iLoggerStack = 0;
+
+    gmsh::clear();
+    gmsh::model::mesh::clear();
+
+    gmsh::model::add("Occ Surfaces");
+
+    gmsh::option::setNumber("Mesh.Algorithm", meshAlgo());
+
+    onCheckLogger();
+
+    // converting to BREP and export+import
+    TopoDS_ListOfShape const *pShells(nullptr);
+    FuseXfl const*pFuseXfl = dynamic_cast<FuseXfl const*>(m_pFuse);
+    if(pFuseXfl) pShells = &pFuseXfl->rightSideShells();
+    else         pShells = &m_pFuse->shells();
+    std::vector<std::string> brepstr;
+    occ::shapesToBreps(*pShells, brepstr);
+    gmesh::BRepstoGmsh(brepstr);
+
+
+    if(!m_Wings.size())
+    {
+        // the fuselage has been cut, no need to embed the wings
+    }
+    else
+    {
+        // get all the fuse faces
+        gmsh::vectorpair fusedimtags;
+        gmsh::model::occ::getEntities(fusedimtags, DIM2);
+
+        // embed wings
+        // make the cutting tools
+
+        gmsh::vectorpair wingDimTags;
+
+        for (int iw=0; iw<m_Wings.size(); iw++)
+        {
+            WingXfl const &wing = m_Wings.at(iw);
+
+    //        Vector3d wingLE = pWing->position(); // no need, surfaces are built in position
+            Vector3d fuseLE = m_pFuse->position();
+            Vector3d t = Vector3d()-fuseLE;
+
+            std::vector<int> wiretags;
+            std::vector<std::vector<Node>> sectionwires;
+            wing.makeTopBotWires(sectionwires);
+
+            for(std::vector<Node> const &wire : sectionwires)
+            {
+                std::vector<int> pointtags;
+                for(Node const &nd : wire)
+                {
+                    pointtags.push_back(gmsh::model::occ::addPoint(nd.x+t.x, nd.y+t.y, nd.z+t.z));
+                }
+
+                std::vector<int> linetags;
+                for(uint it=0; it<pointtags.size()-1; it++)
+                {
+                    linetags.push_back(gmsh::model::occ::addLine(pointtags.at(it), pointtags.at(it+1)));
+                }
+
+                wiretags.push_back(gmsh::model::occ::addCurveLoop(linetags));
+            }
+
+            gmsh::vectorpair surfDimTags;
+//            gmsh::model::occ::addThruSections(wiretags, surfDimTags, -1, true, true, -1, "C0");
+            gmsh::model::occ::addThruSections(wiretags, surfDimTags, -1, true, true);
+
+            for(std::pair<int,int> pair : surfDimTags)
+                wingDimTags.push_back(pair);
+        }
+
+        gmsh::vectorpair outDimTags;
+        std::vector<gmsh::vectorpair> outDimTagsMap;
+
+        // Fragment and embed automatically
+        // Note: remove tools does not remove the wings from the model, needs manual removal
+        gmsh::model::occ::cut(fusedimtags, wingDimTags, outDimTags, outDimTagsMap, -1, true, true);
+
+        // Remove all dim 2 objects except the original fuse faces.
+        gmsh::vectorpair RedundantDimTags;
+        for(std::pair<int,int> dimtag : outDimTags)
+        {
+            if(dimtag.first==DIM2)
+            {
+                bool bIsFuseDimTag = false;
+                for(uint kf=0; kf<fusedimtags.size(); kf++)
+                {
+                    if(dimtag.second==fusedimtags.at(kf).second)
+                    {
+                        bIsFuseDimTag = true;
+                        break;
+                    }
+                }
+
+                if(!bIsFuseDimTag) RedundantDimTags.push_back(dimtag);
+            }
+        }
+        gmsh::model::occ::remove(RedundantDimTags, true);
+    }
 
     gmsh::model::occ::synchronize();
 
@@ -834,7 +967,10 @@ void GMesherWt::onMesh()
     setEnabled(false);
     if(m_pFuse)
     {
-        meshFuseShells();
+        if(m_bThickSurfaces)
+            meshFuseShellsThickSurfaces();
+        else
+            meshFuseShellsThinSurfaces();
     }
     else if(m_pSail)
     {

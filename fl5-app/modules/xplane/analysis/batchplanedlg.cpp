@@ -55,7 +55,7 @@
 #include <core/xflcore.h>
 #include <interfaces/controls/analysisrangetable.h>
 #include <interfaces/controls/t8rangetable.h>
-#include <interfaces/editors/analysis3ddef/t123578polardlg.h>
+#include <interfaces/editors/analysis3ddef/t1234578polardlg.h>
 #include <interfaces/editors/analysis3ddef/t6polardlg.h>
 #include <interfaces/script/xflexecutor.h>
 #include <interfaces/widgets/customdlg/newnamedlg.h>
@@ -411,7 +411,7 @@ void BatchPlaneDlg::onEditAnalysis()
     }
     else
     {
-        T123578PolarDlg dlg(this);
+        T1234578PolarDlg dlg(this);
         dlg.initPolar3dDlg(nullptr, pWPolar);
         res = dlg.exec();
     }

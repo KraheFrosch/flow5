@@ -1154,7 +1154,8 @@ void occ::makeWingShape(WingXfl const *pWing, double stitchprecision, TopoDS_Sha
         // ruled surfaces or to false (the default value) if they are smoothed out by approximation,
         // pres3d defines the precision criterion used by the approximation algorithm;
         // the default value is 1.0e-6.
-        BRepOffsetAPI_ThruSections TopSweeper;
+        BRepOffsetAPI_ThruSections TopSweeper(false, true);
+        TopSweeper.SetContinuity(GeomAbs_C0);
         TopSweeper.AddWire(TopLeftWire);
         TopSweeper.AddWire(TopRightWire);
         try
@@ -1182,7 +1183,8 @@ void occ::makeWingShape(WingXfl const *pWing, double stitchprecision, TopoDS_Sha
             stitcher.Add(aSub);
         }
 
-        BRepOffsetAPI_ThruSections BotSweeper;
+        BRepOffsetAPI_ThruSections BotSweeper(false, true);
+        BotSweeper.SetContinuity(GeomAbs_C0);
         BotSweeper.AddWire(BotLeftWire);
         BotSweeper.AddWire(BotRightWire);
         try
@@ -3056,7 +3058,7 @@ bool occ::makeWingSplineSweep(WingXfl const *pWing, double stitchprecision, int 
         }
 
         // Top sweep
-        BRepOffsetAPI_ThruSections TopSweeper(false, false, 1.0e-4);
+        BRepOffsetAPI_ThruSections TopSweeper(false, true);
 //        qDebug()<<"topsweeeper"<<TopSweeper.ParType()<<TopSweeper.MaxDegree()<<TopSweeper.UseSmoothing()<<TopSweeper.Continuity();
 /*        TopSweeper.CheckCompatibility(true);
         TopSweeper.SetSmoothing(false);

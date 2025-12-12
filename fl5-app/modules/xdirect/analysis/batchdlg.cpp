@@ -187,7 +187,7 @@ void BatchDlg::makeCommonWts()
                     connect(ppbClearBtn, SIGNAL(clicked()), m_ppto, SLOT(clear()));
                     m_pButtonBox->addButton(ppbClearBtn, QDialogButtonBox::ActionRole);
 
-                    m_ppbAnalyze   = new QPushButton("Analyze");
+                    m_ppbAnalyze   = new QPushButton("Calculate");
                     m_pButtonBox->addButton(m_ppbAnalyze, QDialogButtonBox::ActionRole);
 
                     connect(m_pButtonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(onButton(QAbstractButton*)));
@@ -220,7 +220,7 @@ void BatchDlg::cleanUp()
         m_pXFile->close();
     }
     m_pButtonBox->button(QDialogButtonBox::Close)->setEnabled(true);
-    m_ppbAnalyze->setText("Analyze");
+    m_ppbAnalyze->setText("Calculate");
     m_bIsRunning = false;
     m_bCancel    = false;
     XFoil::setCancel(false);

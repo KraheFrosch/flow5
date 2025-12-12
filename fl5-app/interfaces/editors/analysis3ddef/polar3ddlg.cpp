@@ -43,7 +43,7 @@
 #include <interfaces/widgets/customwts/ctrltabledelegate.h>
 #include <interfaces/widgets/customwts/floatedit.h>
 #include <interfaces/widgets/customwts/intedit.h>
-#include <modules/xplane/analysis/wpolarnamemaker.h>
+#include <modules/xplane/analysis/plpolarnamemaker.h>
 
 QByteArray Polar3dDlg::s_Geometry;
 
@@ -98,7 +98,7 @@ void Polar3dDlg::makeBaseCommonControls()
         {
             QVBoxLayout *pAreaTypeLayout = new QVBoxLayout;
             {
-                m_prbArea1 = new QRadioButton("Wing planform");
+                m_prbArea1 = new QRadioButton("Wing planform (deprecated)");
                 m_prbArea2 = new QRadioButton("Wing planform projected on xy plane");
                 m_prbArea3 = new QRadioButton("Custom");
 
@@ -503,12 +503,6 @@ void Polar3dDlg::hideEvent(QHideEvent *pEvent)
 void Polar3dDlg::resizeEvent(QResizeEvent *)
 {
     resizeColumns();
-}
-
-
-void Polar3dDlg::resizeColumns()
-{
-//    m_pExtraDragWt->resizeColumns();
 }
 
 

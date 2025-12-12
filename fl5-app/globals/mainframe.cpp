@@ -61,7 +61,7 @@
 #include <interfaces/controls/splinectrl/splinectrl.h>
 #include <interfaces/controls/w3dprefs.h>
 #include <interfaces/editors/analysis2ddef/foilpolardlg.h>
-#include <interfaces/editors/analysis3ddef/t123578polardlg.h>
+#include <interfaces/editors/analysis3ddef/t1234578polardlg.h>
 #include <interfaces/editors/analysis3ddef/t6polardlg.h>
 #include <interfaces/editors/boatedit/saildlg.h>
 #include <interfaces/editors/editplrdlg.h>

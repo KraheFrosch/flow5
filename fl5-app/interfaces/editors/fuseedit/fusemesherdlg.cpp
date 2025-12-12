@@ -288,7 +288,7 @@ void FuseMesherDlg::initDialog(Fuse *pFuse)
     {
         m_pMesherWt->initWt(pFuse->shells(), pFuse->maxElementSize(), false, false);
     }
-    m_pGMesherWt->initWt(m_pFuse, pFuse->isXflType());
+    m_pGMesherWt->initWt(m_pFuse, pFuse->isXflType(), false);
 
     m_ptabViewWt->setCurrentIndex(s_ViewIndex);
 

@@ -33,12 +33,12 @@ class Plane;
 class PlaneXfl;
 class PlanePolar;
 
-class WPolarNameMaker
+class PlPolarNameMaker
 {
     friend class  WPolarAutoNameDlg;
 
     public:
-        WPolarNameMaker();
+        PlPolarNameMaker();
         static QString makeName(const Plane *pPlane, const PlanePolar *pWPolar);
         static QString rangeControlNames(const PlaneXfl *pPlane, const PlanePolar *pWPolar);
         static QString stabilityControlNames(PlaneXfl const *pPlane, PlanePolar const *pWPolar);

@@ -34,7 +34,7 @@
 #include <api/planepolar.h>
 #include <api/planexfl.h>
 #include <api/units.h>
-#include <modules/xplane/analysis/wpolarnamemaker.h>
+#include <modules/xplane/analysis/plpolarnamemaker.h>
 
 
 
@@ -186,17 +186,17 @@ void WPolarAutoNameDlg::initDialog(PlanePolar const &wPolar)
     else if(m_pWPolar->isControlPolar())    m_prbType6->setChecked(true);
     else if(m_pWPolar->isStabilityPolar())  m_prbType7->setChecked(true);
 
-    m_pchType->setChecked(WPolarNameMaker::s_bType);
-    m_pchMethod->setChecked(WPolarNameMaker::s_bMethod);
-    m_pchSurfaces->setChecked(WPolarNameMaker::s_bSurfaces);
-    m_pchControls->setChecked(WPolarNameMaker::s_bControls);
-    m_pchViscosity->setChecked(WPolarNameMaker::s_bViscosity);
-    m_pchInertia->setChecked(WPolarNameMaker::s_bInertia);
-    m_pchExtraDrag->setChecked(WPolarNameMaker::s_bExtraDrag);
-    m_pchFuseDrag->setChecked(WPolarNameMaker::s_bFuseDrag);
-    m_pchGround->setChecked(WPolarNameMaker::s_bGround);
+    m_pchType->setChecked(PlPolarNameMaker::s_bType);
+    m_pchMethod->setChecked(PlPolarNameMaker::s_bMethod);
+    m_pchSurfaces->setChecked(PlPolarNameMaker::s_bSurfaces);
+    m_pchControls->setChecked(PlPolarNameMaker::s_bControls);
+    m_pchViscosity->setChecked(PlPolarNameMaker::s_bViscosity);
+    m_pchInertia->setChecked(PlPolarNameMaker::s_bInertia);
+    m_pchExtraDrag->setChecked(PlPolarNameMaker::s_bExtraDrag);
+    m_pchFuseDrag->setChecked(PlPolarNameMaker::s_bFuseDrag);
+    m_pchGround->setChecked(PlPolarNameMaker::s_bGround);
 
-    m_plePolarName->setText(WPolarNameMaker::makeName(m_pPlane, m_pWPolar));
+    m_plePolarName->setText(PlPolarNameMaker::makeName(m_pPlane, m_pWPolar));
 }
 
 
@@ -207,22 +207,22 @@ void WPolarAutoNameDlg::readData()
     else if(m_prbType6->isChecked()) m_pWPolar->setType(xfl::T6POLAR);
     else if(m_prbType7->isChecked()) m_pWPolar->setType(xfl::T7POLAR);
 
-    WPolarNameMaker::s_bType      = m_pchType->isChecked();
-    WPolarNameMaker::s_bMethod    = m_pchMethod->isChecked();
-    WPolarNameMaker::s_bSurfaces  = m_pchSurfaces->isChecked();
-    WPolarNameMaker::s_bControls  = m_pchControls->isChecked();
-    WPolarNameMaker::s_bViscosity = m_pchViscosity->isChecked();
-    WPolarNameMaker::s_bInertia   = m_pchInertia->isChecked();
-    WPolarNameMaker::s_bExtraDrag = m_pchExtraDrag->isChecked();
-    WPolarNameMaker::s_bFuseDrag  = m_pchFuseDrag->isChecked();
-    WPolarNameMaker::s_bGround    = m_pchGround->isChecked();
+    PlPolarNameMaker::s_bType      = m_pchType->isChecked();
+    PlPolarNameMaker::s_bMethod    = m_pchMethod->isChecked();
+    PlPolarNameMaker::s_bSurfaces  = m_pchSurfaces->isChecked();
+    PlPolarNameMaker::s_bControls  = m_pchControls->isChecked();
+    PlPolarNameMaker::s_bViscosity = m_pchViscosity->isChecked();
+    PlPolarNameMaker::s_bInertia   = m_pchInertia->isChecked();
+    PlPolarNameMaker::s_bExtraDrag = m_pchExtraDrag->isChecked();
+    PlPolarNameMaker::s_bFuseDrag  = m_pchFuseDrag->isChecked();
+    PlPolarNameMaker::s_bGround    = m_pchGround->isChecked();
 }
 
 
 void WPolarAutoNameDlg::onOptionChanged()
 {
     readData();
-    QString name = WPolarNameMaker::makeName(m_pPlane, m_pWPolar);
+    QString name = PlPolarNameMaker::makeName(m_pPlane, m_pWPolar);
     m_plePolarName->setText(name);
 }
 
@@ -231,16 +231,16 @@ void WPolarAutoNameDlg::loadSettings(QSettings &settings)
 {
     settings.beginGroup("WPolarAutoName");
     {
-        WPolarNameMaker::s_bType       = settings.value("Type", true).toBool();
-        WPolarNameMaker::s_bMethod     = settings.value("Method", true).toBool();
-        WPolarNameMaker::s_bSurfaces   = settings.value("Surfaces", true).toBool();
-        WPolarNameMaker::s_bBC         = settings.value("BC", false).toBool();
-        WPolarNameMaker::s_bControls   = settings.value("Controls", true).toBool();
-        WPolarNameMaker::s_bViscosity  = settings.value("Viscosity", true).toBool();
-        WPolarNameMaker::s_bInertia    = settings.value("Inertia", true).toBool();
-        WPolarNameMaker::s_bExtraDrag  = settings.value("ExtraDrag", false).toBool();
-        WPolarNameMaker::s_bFuseDrag   = settings.value("FuseDrag", false).toBool();
-        WPolarNameMaker::s_bGround     = settings.value("GroundFS", false).toBool();
+        PlPolarNameMaker::s_bType       = settings.value("Type", true).toBool();
+        PlPolarNameMaker::s_bMethod     = settings.value("Method", true).toBool();
+        PlPolarNameMaker::s_bSurfaces   = settings.value("Surfaces", true).toBool();
+        PlPolarNameMaker::s_bBC         = settings.value("BC", false).toBool();
+        PlPolarNameMaker::s_bControls   = settings.value("Controls", true).toBool();
+        PlPolarNameMaker::s_bViscosity  = settings.value("Viscosity", true).toBool();
+        PlPolarNameMaker::s_bInertia    = settings.value("Inertia", true).toBool();
+        PlPolarNameMaker::s_bExtraDrag  = settings.value("ExtraDrag", false).toBool();
+        PlPolarNameMaker::s_bFuseDrag   = settings.value("FuseDrag", false).toBool();
+        PlPolarNameMaker::s_bGround     = settings.value("GroundFS", false).toBool();
     }
     settings.endGroup();
 }
@@ -251,16 +251,16 @@ void WPolarAutoNameDlg::saveSettings(QSettings &settings)
 {
     settings.beginGroup("WPolarAutoName");
     {
-        settings.setValue("Type", WPolarNameMaker::s_bType);
-        settings.setValue("Method", WPolarNameMaker::s_bMethod);
-        settings.setValue("Surfaces", WPolarNameMaker::s_bSurfaces);
-        settings.setValue("BC", WPolarNameMaker::s_bBC);
-        settings.setValue("Controls", WPolarNameMaker::s_bControls);
-        settings.setValue("Viscosity", WPolarNameMaker::s_bViscosity);
-        settings.setValue("Inertia", WPolarNameMaker::s_bInertia);
-        settings.setValue("ExtraDrag", WPolarNameMaker::s_bExtraDrag);
-        settings.setValue("FuseDrag", WPolarNameMaker::s_bFuseDrag);
-        settings.setValue("GroundFS", WPolarNameMaker::s_bGround);
+        settings.setValue("Type", PlPolarNameMaker::s_bType);
+        settings.setValue("Method", PlPolarNameMaker::s_bMethod);
+        settings.setValue("Surfaces", PlPolarNameMaker::s_bSurfaces);
+        settings.setValue("BC", PlPolarNameMaker::s_bBC);
+        settings.setValue("Controls", PlPolarNameMaker::s_bControls);
+        settings.setValue("Viscosity", PlPolarNameMaker::s_bViscosity);
+        settings.setValue("Inertia", PlPolarNameMaker::s_bInertia);
+        settings.setValue("ExtraDrag", PlPolarNameMaker::s_bExtraDrag);
+        settings.setValue("FuseDrag", PlPolarNameMaker::s_bFuseDrag);
+        settings.setValue("GroundFS", PlPolarNameMaker::s_bGround);
     }
     settings.endGroup();
 }

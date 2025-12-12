@@ -49,7 +49,7 @@
 #include <api/units.h>
 #include <core/displayoptions.h>
 #include <core/xflcore.h>
-#include <interfaces/editors/analysis3ddef/t123578polardlg.h>
+#include <interfaces/editors/analysis3ddef/t1234578polardlg.h>
 #include <interfaces/editors/editobjectdelegate.h>
 #include <interfaces/graphs/containers/graphwt.h>
 #include <interfaces/graphs/controls/graphoptions.h>
@@ -1582,14 +1582,14 @@ void OptimPlaneDlg::readVariables(int &nActive, QString &log, QString const &pre
 
 void OptimPlaneDlg::onAnalysisDef()
 {
-    T123578PolarDlg wpDlg(this);
+    T1234578PolarDlg wpDlg(this);
     wpDlg.initPolar3dDlg(nullptr);
 
     int res = wpDlg.exec();
 
     if (res == QDialog::Accepted)
     {
-        PSOTaskPlane::setStaticPolar(T123578PolarDlg::staticWPolar());
+        PSOTaskPlane::setStaticPolar(T1234578PolarDlg::staticWPolar());
     }
 
     std::string props;

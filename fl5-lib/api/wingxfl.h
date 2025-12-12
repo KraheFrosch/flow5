@@ -298,6 +298,7 @@ class FL5LIB_EXPORT WingXfl : public Part
         bool hasCenterGap() const;
 
         void makeMidWires(std::vector<std::vector<Node> > &midwires) const;
+        void makeTopBotWires(std::vector<std::vector<Node> > &midwires) const;
 
         static double minSurfaceLength() {return s_MinSurfaceLength;}
         static void setMinSurfaceLength(double size) {s_MinSurfaceLength=size;}

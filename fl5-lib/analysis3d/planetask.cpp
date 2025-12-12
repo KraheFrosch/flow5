@@ -1946,7 +1946,7 @@ bool PlaneTask::T7Loop()
     // next find the balanced and trimmed conditions
     double AlphaEq(0), u0(0);
 
-    traceStdLog("      Computing trimmed conditions\n");
+    traceStdLog("      Calculating trimmed conditions\n");
 
     if(!m_pPA->computeTrimmedConditions(mass, CoG, AlphaEq, u0, m_pPlPolar->bFuseMi()))
     {
@@ -1993,15 +1993,17 @@ bool PlaneTask::computeStability(PlaneOpp *pPOpp, bool bOutput)
 {
     std::string str;
     // Compute stability and control derivatives in stability axes
+    traceStdLog("             Calculating stability derivatives\n");
     m_pPA->computeStabilityDerivatives(pPOpp->alpha(), pPOpp->QInf(), pPOpp->cog(), m_pPlPolar->bFuseMi(), pPOpp->m_SD, m_Force0, m_Moment0);
     if(isCancelled()) return true;
 
     pPOpp->m_SD.resizeControlDerivatives(m_pPlPolar->nAVLCtrls());
 
     if(m_pPlPolar->hasActiveAVLControl())
+    {
         computeControlDerivatives(m_Ctrl, pPOpp->alpha(), pPOpp->QInf(), pPOpp->m_SD); //single derivative, w.r.t. the polar's control variable
+    }
     if(isCancelled()) return true;
-
 
 
     pPOpp->m_SD.setMetaData(m_pPlPolar->referenceSpanLength(), m_pPlPolar->referenceChordLength(), m_pPlPolar->referenceArea(),
@@ -2017,6 +2019,7 @@ bool PlaneTask::computeStability(PlaneOpp *pPOpp, bool bOutput)
     }
     else
     {
+        traceStdLog("          Calculating eigenthings\n");
         // Compute inertia in stability axes
         m_pPlPolar->Ixx();
 
@@ -2179,7 +2182,10 @@ bool PlaneTask::T123458Loop()
         if (isCancelled()) return true;
 
         if(m_bDerivatives)
+        {
+            traceStdLog("          Calculating derivatives and eigenthings\n");
             computeStability(pPOpp, true);
+        }
         else
         {
             traceStdLog("          Skipping derivatives and eigenthings\n");
@@ -2324,7 +2330,7 @@ void PlaneTask::computeControlDerivatives(double t7ctrl, double alphaeq, double 
 
     for(int ie=0; ie<m_pPlPolar->nAVLCtrls(); ie++)
     {
-        traceStdLog("      Processing control set " + m_pPlPolar->AVLCtrl(ie).name() + EOLstr);
+        traceStdLog("             Processing control set " + m_pPlPolar->AVLCtrl(ie).name() + EOLstr);
         SD.ControlNames[ie] = m_pPlPolar->AVLCtrl(ie).name();
         if(!m_pPlPolar->AVLCtrl(ie).hasActiveAngle())
         {
@@ -2351,7 +2357,7 @@ void PlaneTask::computeControlDerivatives(double t7ctrl, double alphaeq, double 
         m_pPA->makeWakePanels(objects::windDirection(0,0), false);
 
         //create the RHS
-        traceStdLog("         Making the unit RHS vectors...\n");
+//        traceStdLog("         Making the unit RHS vectors...\n");
         std::vector<Vector3d> VField(N, V0);
 //        Vector3d Omega;
 //        m_pPA->makeUnitRHSVectors(); // could also use one RHS
@@ -2359,8 +2365,8 @@ void PlaneTask::computeControlDerivatives(double t7ctrl, double alphaeq, double 
 
         m_pPA->makeRHS(VField, m_pPA->m_cRHS, nullptr);
 
-        std::string strong = "         Calculating the control derivatives\n\n";
-        traceStdLog(strong);
+/*        std::string strong = "         Calculating the control derivatives\n\n";
+        traceStdLog(strong);*/
 
         //LU solve
         m_pPA->backSubRHS(m_pPA->m_cRHS);
@@ -2418,9 +2424,7 @@ void PlaneTask::setControlPositions(PlaneXfl const*pPlaneXfl, PlanePolar const*p
                                     std::string &outstring)
 {
     QString outstr;
-    Vector3d H, Origin;
-    Vector3d YVector(0.0, 1.0, 0.0);
-    QString strange, strong;
+    QString strange;
     double totalAngle=0.0, deltaangle = 0.0;
     double gain = 0.0;
 
@@ -2430,40 +2434,13 @@ void PlaneTask::setControlPositions(PlaneXfl const*pPlaneXfl, PlanePolar const*p
     {
         WingXfl const *pWing = pPlaneXfl->wingAt(iw);
         int iCtrl=0;
-        if(iAVLCtrl>=0 && iAVLCtrl<pWPolar->nAVLCtrls()) gain = pWPolar->AVLGain(iAVLCtrl, nCtrl);
-        else                                                gain = 0.0;
-        deltaangle = deltactrl * gain; // degrees
-
-        // first control value is the overall Y rotation
-        if (fabs(deltaangle)>ANGLEPRECISION)
-        {
-            //rotate the normals and control point positions
-            H.set(0.0, 1.0, 0.0);
-
-            totalAngle = pPlaneXfl->ryAngle(iw) + deltaangle;
-            strange = "   Rotating " + QString::fromStdString(pWing->name());
-            strong = QString::asprintf(" by %f°, total angle is %f°\n", deltaangle, totalAngle);
-            outstr += strange + strong;
-
-            Origin = pPlaneXfl->wingLE(iw);
-
-            for(int i=0; i<pWing->nPanel4(); i++)
-            {
-                int p = pWing->firstPanel4Index() + i;
-                panel4[p].rotate(Origin, YVector, deltaangle);
-            }
-        }
-
-        // following control values are for the flaps
-        iCtrl++;
-        nCtrl++;
         for (int jSurf=0; jSurf<pWing->nSurfaces(); jSurf++)
         {
             Surface const &surf = pWing->surfaceAt(jSurf);
             if(surf.hasTEFlap())
             {
                 if(iAVLCtrl>=0 && iAVLCtrl<pWPolar->nAVLCtrls()) gain = pWPolar->AVLGain(iAVLCtrl, nCtrl);
-                else                                                gain = 0.0;
+                else                                             gain = 0.0;
                 deltaangle = deltactrl * gain; // degrees
 
                 if (fabs(deltaangle)>ANGLEPRECISION)
@@ -2498,127 +2475,12 @@ void PlaneTask::setControlPositions(PlaneXfl const*pPlaneXfl, PlanePolar const*p
 }
 
 
-/** Sets the angle positions of wings and flap for a stability analysis
- * @param  iAVLCtrl the index of the AVL-type control, e.g. aileron, rudder, elevator
- * @param deltactrtl the amplitude of the control
- */
-void PlaneTask::makeControlBC(PlaneXfl const*pPlaneXfl, PlanePolar const*pWPolar,
-                              Vector3d *normals, double deltactrl, int iAVLCtrl,
-                              std::string &outstring)
-{
-    QString outstr;
-    Vector3d H, Origin;
-    QString strange, strong;
-    double totalangle(0.0), deltaangle(0.0);
-    double gain(0.0);
-
-    int nCtrl = 0;
-
-    for(int iw=0; iw<pPlaneXfl->nWings(); iw++)
-    {
-        WingXfl const *pWing = pPlaneXfl->wingAt(iw);
-        int iCtrl=0;
-        if(iAVLCtrl>=0 && iAVLCtrl<pWPolar->nAVLCtrls()) gain = pWPolar->AVLGain(iAVLCtrl, nCtrl);
-        else                                                gain = 0.0;
-        deltaangle = deltactrl * gain; // degrees
-
-        // first control value is the overall Y rotation
-        if (fabs(deltaangle)>ANGLEPRECISION)
-        {
-            //rotate the normals and control point positions
-            H.set(0.0, 1.0, 0.0);
-
-            totalangle = pPlaneXfl->ryAngle(iw) + deltaangle;
-            strange = "   Rotating " + QString::fromStdString(pWing->name());
-            strong = QString::asprintf(" by %f°, total angle is %f°\n", deltaangle, totalangle);
-            outstr += strange + strong;
-
-            Origin = pPlaneXfl->wingLE(iw);
-
-            Quaternion qt(deltaangle, H);
-
-            if(pWPolar->isQuadMethod())
-            {
-                for(int i=0; i<pWing->nPanel4(); i++)
-                {
-                    int p = pWing->firstPanel4Index() + i;
-                    qt.conjugate(normals[p]);
-                }
-            }
-            else if(pWPolar->isTriangleMethod())
-            {
-                for(int i=0; i<pWing->nPanel3(); i++)
-                {
-                    int p = pWing->firstPanel3Index() + i;
-                    qt.conjugate(normals[p]);
-                }
-            }
-        }
-
-        // following control values are for the flaps
-        iCtrl++;
-        nCtrl++;
-        for (int jSurf=0; jSurf<pWing->nSurfaces(); jSurf++)
-        {
-            Surface const &surf = pWing->surfaceAt(jSurf);
-            if(surf.hasTEFlap())
-            {
-                if(iAVLCtrl>=0 && iAVLCtrl<pWPolar->nAVLCtrls()) gain = pWPolar->AVLGain(iAVLCtrl, nCtrl);
-                else                                                gain = 0.0;
-                deltaangle = deltactrl * gain; // degrees
-
-                if (fabs(deltaangle)>ANGLEPRECISION)
-                {
-                    //Add delta rotations to initial control setting and to wing or flap delta rotation
-                    if(fabs(surf.foilA()->TEFlapAngle())>0.0 && fabs(surf.foilB()->TEFlapAngle())>0.0)
-                        totalangle = deltaangle + (surf.foilA()->TEFlapAngle() + surf.foilB()->TEFlapAngle())/2.0;
-                    else
-                        totalangle = deltaangle;
-
-                    strange = QString::asprintf("- rotating flap %d by %g°, total flap angle is %g", iCtrl, deltaangle, totalangle) + DEGch;
-
-                    strange = "      " + QString::fromStdString(pWing->name()) + strange + EOLch;
-                    outstr += strange;
-
-                    Quaternion qt(deltaangle, surf.hingeVector());
-                    for(int ip=0; ip<m_pPA->nPanels(); ip++)
-                    {
-                        if(pWPolar->isQuadMethod())
-                        {
-                            if(surf.hasFlapPanel4(ip))
-                            {
-                                qt.conjugate(normals[ip]);
-                            }
-                        }
-                        else if(pWPolar->isTriangleMethod())
-                        {
-                            if(surf.hasFlapPanel3(ip))
-                            {
-                                qt.conjugate(normals[ip]);
-                            }
-                        }
-                    }
-                }
-                iCtrl++;
-                nCtrl++;
-            }
-        }
-    }
-
-    outstr  +="\n";
-
-    outstring = outstr.toStdString();
-}
-
-
 /** Sets the angle positions of wings and flap for a stability analysis */
 void PlaneTask::setControlPositions(PlaneXfl const *pPlaneXfl, PlanePolar const *pWPolar,
                                     std::vector<Panel3> &panel3, std::vector<Node> const &refnodes, double deltactrl, int iAVLCtrl,
                                     std::string &outstring)
 {
-    Vector3d H, Origin;
-    Vector3d YVector(0.0, 1.0, 0.0);
-    QString strange, strong;
+    QString strange;
     QString outstr;
     double totalAngle(0.0), deltaangle(0);
     double gain(0);
@@ -2630,36 +2492,13 @@ void PlaneTask::setControlPositions(PlaneXfl const *pPlaneXfl, PlanePolar const 
         WingXfl const *pWing = pPlaneXfl->wingAt(iw);
         int iCtrl=0;
 
-        if(iAVLCtrl>=0 && iAVLCtrl<pWPolar->nAVLCtrls()) gain = pWPolar->AVLGain(iAVLCtrl, nCtrl);
-        else                                                gain = 0;
-        deltaangle = gain * deltactrl; // degrees
-
-        // first control value is the overall Y rotation
-        if(fabs(deltaangle)>ANGLEPRECISION)
-        {
-            //rotate the normals and control point positions
-            H.set(0.0, 1.0, 0.0);
-
-            totalAngle = pPlaneXfl->ryAngle(iw) + deltaangle;
-            strange = "   Rotating " + QString::fromStdString(pWing->name());
-            strong = QString::asprintf(" by %f°, total angle is %f°\n", deltaangle, totalAngle);
-            outstr += strange + strong;
-
-            Origin = pPlaneXfl->wingLE(iw);
-
-            pPlaneXfl->rotateWingNodes(panel3, node, pWing, Origin, YVector, deltaangle);
-        }
-
-        // following control values are for the flaps
-        iCtrl++;
-        nCtrl++;
         for (int jSurf=0; jSurf<pWing->nSurfaces(); jSurf++)
         {
             Surface const &surf = pWing->surfaceAt(jSurf);
             if(surf.hasTEFlap())
             {
                 if(iAVLCtrl>=0 && iAVLCtrl<pWPolar->nAVLCtrls()) gain = pWPolar->AVLGain(iAVLCtrl, nCtrl);
-                else                                                gain = 0;
+                else                                             gain = 0;
                 deltaangle = gain * deltactrl; // degrees
 
                 if(fabs(deltaangle)>ANGLEPRECISION)

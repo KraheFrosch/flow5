@@ -49,6 +49,7 @@
 #include <interfaces/widgets/customwts/floatedit.h>
 #include <interfaces/widgets/customwts/intedit.h>
 #include <interfaces/widgets/customwts/plaintextoutput.h>
+#include <interfaces/widgets/customwts/formattextoutput.h>
 
 #include <api/planestl.h>
 #include <api/units.h>

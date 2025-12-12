@@ -1336,7 +1336,7 @@ void PlaneXfl::makeQuadMesh(bool bThickSurfaces, bool bIgnoreFusePanels)
                     FuseXfl *pFuseXfl = dynamic_cast<FuseXfl*>(fuse(ifuse));
                     int i40=m_RefQuadMesh.nPanels();
                     pFuseXfl->setFirstPanel4Index(i40);
-//                    Nel = pFuseXfl->makeQuadMesh(m_RefQuadMesh.nPanels(), Vector3d());
+
                     for(int i4f=0; i4f<pFuseXfl->nPanel4(); i4f++)
                     {
                         Panel4 p4 = pFuseXfl->panel4(i4f);
@@ -1354,7 +1354,7 @@ void PlaneXfl::makeQuadMesh(bool bThickSurfaces, bool bIgnoreFusePanels)
                     FuseSections *pFuseSections = dynamic_cast<FuseSections*>(fuse(ifuse));
                     int i40=m_RefQuadMesh.nPanels();
                     pFuseSections->setFirstPanel4Index(i40);
-//                    Nel = pFuseSections->makeQuadMesh(m_RefQuadMesh.nPanels(), Vector3d());
+
                     for(int i4f=0; i4f<pFuseSections->nPanel4(); i4f++)
                     {
                         Panel4 p4 = pFuseSections->panel4(i4f);
@@ -1914,7 +1914,6 @@ int PlaneXfl::nAVLGains() const
     for(int iw=0; iw<nWings(); iw++)
     {
         WingXfl const &wing = m_Wing.at(iw);
-        iCtrl++; // the wing's tilt angle
 
         for(int ic=0; ic<wing.nFlaps(); ic++)
         {
@@ -2006,9 +2005,6 @@ std::string PlaneXfl::controlSurfaceName(int iCtrl) const
     for(int iw=0; iw<nWings(); iw++)
     {
         WingXfl const &wing = m_Wing.at(iw);
-        if(iCtrl==ic) return wing.name() + "_tilt";
-        ic++;
-
         for(int iflap=0; iflap<wing.nFlaps(); iflap++)
         {
             if(iCtrl==ic) return wing.name() + QString::asprintf("_flap_%d", iflap+1).toStdString();

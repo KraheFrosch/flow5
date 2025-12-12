@@ -3052,9 +3052,60 @@ void WingXfl::makeMidWires(std::vector<std::vector<Node>> &midwires) const
     for(int jsurf=0; jsurf<nSurfaces(); jsurf++)
     {
         Surface const &surf = surfaceAt(jsurf);
-        midwires.push_back(surf.m_SideA);
+        if(surf.isLeftSurf() && surf.isCenterSurf())
+        {
+            midwires.push_back(surf.m_SideA);
+            midwires.push_back(surf.m_SideB);
+        }
+        else if(surf.isRightSurf() && surf.isCenterSurf())
+            midwires.push_back(surf.m_SideB);
+
     }
-    midwires.push_back(lastSurface().m_SideB);
+}
+
+
+void WingXfl::makeTopBotWires(std::vector<std::vector<Node>> &midwires) const
+{
+    for(int jsurf=0; jsurf<nSurfaces(); jsurf++)
+    {
+        Surface const &surf = surfaceAt(jsurf);
+        if(surf.isLeftSurf() && surf.isCenterSurf())
+        {
+            std::vector<Node> leftwire;
+            for(uint k=0; k<surf.m_SideA_Bot.size()-1; k++)
+                leftwire.push_back(surf.m_SideA_Bot.at(k));
+            for(int k=surf.m_SideA_Top.size()-1; k>=0; k--)
+                leftwire.push_back(surf.m_SideA_Top.at(k));
+
+            std::vector<Node> midwire;
+            for(uint k=0; k<surf.m_SideB_Bot.size()-1; k++)
+                midwire.push_back(surf.m_SideB_Bot.at(k));
+            for(int k=surf.m_SideB_Top.size()-1; k>=0; k--)
+                midwire.push_back(surf.m_SideB_Top.at(k));
+
+
+            midwires.push_back(leftwire);
+            midwires.push_back(midwire);
+
+/*            for(uint i=0; i<leftwire.size(); i++)
+            {
+                Node const &nd = leftwire.at(i);
+                qDebug("%13g   %13g   %13g", nd.x, nd.y, nd.z);
+            }
+            qDebug("__________");*/
+        }
+        else if(surf.isRightSurf() && surf.isCenterSurf())
+        {
+            std::vector<Node> rightwire;
+            for(uint k=0; k<surf.m_SideB_Bot.size()-1; k++)
+                rightwire.push_back(surf.m_SideB_Bot.at(k));
+            for(int k=surf.m_SideB_Top.size()-1; k>=0; k--)
+                rightwire.push_back(surf.m_SideB_Top.at(k));
+
+            midwires.push_back(rightwire);
+        }
+    }
+
 }
 
 

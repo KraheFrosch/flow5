@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/IBL.png</file>
         <file>images/flow5_873x267.png</file>
         <file>images/flow5_371x145.png</file>
         <file>images/flow5_651x212.png</file>
@@ -37,6 +36,5 @@
         <file>images/HH.png</file>
         <file>images/HH_inv.png</file>
         <file>images/sizegrip.png</file>
-        <file>images/handle.png</file>
     </qresource>
 </RCC>

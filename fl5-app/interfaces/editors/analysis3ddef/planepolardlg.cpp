@@ -47,7 +47,7 @@
 #include <interfaces/widgets/customwts/ctrltabledelegate.h>
 #include <interfaces/widgets/customwts/floatedit.h>
 #include <interfaces/widgets/customwts/intedit.h>
-#include <modules/xplane/analysis/wpolarnamemaker.h>
+#include <modules/xplane/analysis/plpolarnamemaker.h>
 
 PlanePolar PlanePolarDlg::s_WPolar;
 
@@ -526,9 +526,8 @@ void PlanePolarDlg::initPolar3dDlg(const Plane *pPlane, PlanePolar const *pWPola
 
     if(pWPolar)
     {
-//        m_bAutoName = false;
-       m_pchAutoName->setChecked(true);
-        m_plePolarName->setText(QString::fromStdString(pWPolar->name()));
+        m_bAutoName = false;
+        m_pchAutoName->setChecked(false);
         s_WPolar.duplicateSpec(pWPolar);
         s_WPolar.setName(pWPolar->name());
         s_WPolar.setPlaneName(pWPolar->planeName());
@@ -936,7 +935,7 @@ void PlanePolarDlg::enableControls()
 void PlanePolarDlg::setPolar3dName()
 {
     if(!m_bAutoName) return;
-    s_WPolar.setName(WPolarNameMaker::makeName(m_pPlane, &s_WPolar).toStdString());
+    s_WPolar.setName(PlPolarNameMaker::makeName(m_pPlane, &s_WPolar).toStdString());
     m_plePolarName->setText(QString::fromStdString(s_WPolar.name()));
 }
 

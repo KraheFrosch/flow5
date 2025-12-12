@@ -66,7 +66,7 @@ void Analysis2dCtrls::setupLayout()
     QVBoxLayout *pAnalysisGroupLayout = new QVBoxLayout;
     {
         m_pchStoreOpp = new QCheckBox("Store operating points");
-        m_ppbAnalyze  = new QPushButton("Analyze");
+        m_ppbAnalyze  = new QPushButton("Calculate");
 
         m_ppbAnalyze->setToolTip("Start the analysis\t(Ctrl+A)");
 

@@ -115,7 +115,6 @@ class FL5LIB_EXPORT PlaneTask : public Task3d
 
         void setControlPositions(PlaneXfl const*pPlaneXfl, PlanePolar const*pWPolar, std::vector<Panel4> &panel4, double deltactrl, int iAVLCtrl, std::string &outstring);
         void setControlPositions(PlaneXfl const *pPlaneXfl, PlanePolar const *pWPolar, std::vector<Panel3> &panel3, const std::vector<Node> &refnodes, double deltactrl, int iAVLCtrl, std::string &outstring);
-        void makeControlBC(PlaneXfl const*pPlaneXfl, PlanePolar const*pWPolar, Vector3d *normals, double deltactrl, int iAVLCtrl, std::string &outstring);
 
         void makeVortonRow(int qrhs) override;
 
@@ -133,7 +132,7 @@ class FL5LIB_EXPORT PlaneTask : public Task3d
         PlanePolar *m_pPlPolar;
         std::vector<PlaneOpp*> m_PlaneOppList;
 
-        bool m_bDerivatives;       /**< if true, computes the eigenthings when running a T12358 polar */
+        bool m_bDerivatives;       /**< if true, computes the eigenthings when running a T123458 polar */
 
         double m_Ctrl;             /**< the oppoint currently calculated */
         double m_Alpha;            /**< the aoa currently calculated */

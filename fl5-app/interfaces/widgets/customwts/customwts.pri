@@ -7,6 +7,7 @@ HEADERS += \
     $$PWD/ctrltabledelegate.h \
     $$PWD/exponentialslider.h \
     $$PWD/floatedit.h \
+    $$PWD/formattextoutput.h \
     $$PWD/gridcontrol.h \
     $$PWD/intedit.h \
     $$PWD/logwt.h \
@@ -24,6 +25,7 @@ SOURCES += \
     $$PWD/ctrltabledelegate.cpp \
     $$PWD/exponentialslider.cpp \
     $$PWD/floatedit.cpp \
+    $$PWD/formattextoutput.cpp \
     $$PWD/gridcontrol.cpp \
     $$PWD/intedit.cpp \
     $$PWD/logwt.cpp \

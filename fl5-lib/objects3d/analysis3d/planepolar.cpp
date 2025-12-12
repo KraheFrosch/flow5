@@ -878,6 +878,28 @@ bool PlanePolar::hasActiveAVLControl() const
 }
 
 
+std::string PlanePolar::AVLCtrlName(int ic) const
+{
+    if(ic>=0 && ic<int(m_AVLControls.size()))
+        return m_AVLControls.at(ic).name(); else return std::string();
+}
+
+
+double PlanePolar::AVLGain(int iAVLCtrl, int iCtrlSurf) const
+{
+    if(iAVLCtrl>=0 && iAVLCtrl<int(m_AVLControls.size()))
+        return m_AVLControls.at(iAVLCtrl).value(iCtrlSurf);
+    else return 0.0;
+}
+
+
+void PlanePolar::setGain(int iAVLCtrl, int iCtrlSurf, double g)
+{
+    if(iAVLCtrl>=0 && iAVLCtrl<int(m_AVLControls.size()))
+        m_AVLControls[iAVLCtrl].setValue(iCtrlSurf, g);
+}
+
+
 void PlanePolar::clearAngleRangeList()
 {
     for(uint iw=0; iw<m_AngleRange.size(); iw++)
@@ -916,7 +938,7 @@ CtrlRange PlanePolar::angleRange(int iWing, int iCtrl) const
 /**
  * Checks if the number of controls has changed, and if so reset all values to defaults
  */
-void PlanePolar::resetAngleRanges(const Plane *pPlane)
+void PlanePolar::resetAngleRanges(Plane const *pPlane)
 {
     if(!pPlane || !pPlane->isXflType()) return;
     PlaneXfl const * pPlaneXfl = dynamic_cast<PlaneXfl const*>(pPlane);
@@ -959,7 +981,7 @@ void PlanePolar::resetAngleRanges(const Plane *pPlane)
 }
 
 
-void PlanePolar::resizeFlapCtrls(const PlaneXfl *pPlaneXfl)
+void PlanePolar::resizeFlapCtrls(PlaneXfl const *pPlaneXfl)
 {
     if(!pPlaneXfl) return;
 
@@ -973,7 +995,6 @@ void PlanePolar::resizeFlapCtrls(const PlaneXfl *pPlaneXfl)
 
     if(isType123458() || isType7())
     {
-        // T7 polar
         for(int ie=0; ie<nAVLCtrls(); ie++)
             m_AVLControls[ie].resizeValues(pPlaneXfl->nAVLGains());
     }
@@ -1362,7 +1383,7 @@ bool PlanePolar::serializeFl5v726(QDataStream &ar, bool bIsStoring)
             m_AVLControls.resize(n);
             for(int ic=0; ic<nAVLCtrls(); ic++) m_AVLControls[ic].serializeFl5(ar, bIsStoring);
 
-            if(m_Type!=xfl::T6POLAR) m_AVLControls.clear(); // cleaning up
+//            if(m_Type!=xfl::T6POLAR) m_AVLControls.clear(); // cleaning up
         }
 
         //STABILITY POLAR ANGLE AND INERTIA GAINS

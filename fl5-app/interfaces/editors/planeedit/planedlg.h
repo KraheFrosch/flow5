@@ -46,7 +46,7 @@ class PlaneStl;
 class FloatEdit;
 class IntEdit;
 class ColorMenuBtn;
-class PlainTextOutput;
+class FormatTextOutput;
 
 class PlaneDlg : public XflDialog
 {
@@ -107,7 +107,7 @@ class PlaneDlg : public XflDialog
 
 
 
-        PlainTextOutput *m_ppto;
+        FormatTextOutput *m_ppto;
 
         Plane *m_pPlane;
 

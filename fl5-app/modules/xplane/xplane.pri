@@ -5,8 +5,8 @@ HEADERS += \
     $$PWD/analysis/batchxmldlg.h \
     $$PWD/analysis/lltanalysisdlg.h \
     $$PWD/analysis/planeanalysisdlg.h \
+    $$PWD/analysis/plpolarnamemaker.h \
     $$PWD/analysis/streamlinemaker.h \
-    $$PWD/analysis/wpolarnamemaker.h \
     $$PWD/controls/analysis3dctrls.h \
     $$PWD/controls/planeexplorer.h \
     $$PWD/controls/popp3dctrls.h \
@@ -31,8 +31,8 @@ SOURCES += \
     $$PWD/analysis/batchxmldlg.cpp \
     $$PWD/analysis/lltanalysisdlg.cpp \
     $$PWD/analysis/planeanalysisdlg.cpp \
+    $$PWD/analysis/plpolarnamemaker.cpp \
     $$PWD/analysis/streamlinemaker.cpp \
-    $$PWD/analysis/wpolarnamemaker.cpp \
     $$PWD/controls/analysis3dctrls.cpp \
     $$PWD/controls/planeexplorer.cpp \
     $$PWD/controls/popp3dctrls.cpp \

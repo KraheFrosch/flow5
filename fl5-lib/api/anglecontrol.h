@@ -78,6 +78,6 @@ class FL5LIB_EXPORT AngleControl
     private:
 
         std::string m_Name;     /**< The control's name which serves as its unique identifier */
-        std::vector<double> m_Value; /**< The flap angles in degrees in the case of a T12358 polar; the gain angles in degrees in the case of a T7 polar.*/
+        std::vector<double> m_Value; /**< The flap angles in degrees or the gains in degrees/ctrl unit depending on the use.*/
 };
 

@@ -420,7 +420,7 @@ PlanePolar* Objects3d::insertNewPolar(PlanePolar *pNewWPolar, Plane const*pCurPl
         if(pWPolar)
         {
             //remove and delete its children POpps from the array
-            deleteWPolar(pWPolar);
+            deletePlPolar(pWPolar);
 /*            for (int l=nPOpps()-1;l>=0; l--)
             {
                 PlaneOpp *pPOpp = POppAt(l);
@@ -525,7 +525,7 @@ void Objects3d::renamePlPolar(PlanePolar *pWPolar, Plane const *pPlane)
             pOldWPolar = Objects3d::plPolarAt(ipb);
             if(pOldWPolar->name()==dlg.newName().toStdString() && pOldWPolar->planeName()==pPlane->name())
             {
-                Objects3d::deleteWPolar(pOldWPolar);
+                Objects3d::deletePlPolar(pOldWPolar);
                 break;
             }
         }

@@ -318,17 +318,17 @@ void Objects3d::deletePlane(Plane *pPlane, bool bDeleteResults)
 
 /**
  * Deletes the WPolar and its PlaneOpp objects.
- * @param pWPolar a pointer to the WPolar object which will be deleted
+ * @param pPlPolar a pointer to the WPolar object which will be deleted
  */
-void Objects3d::deleteWPolar(PlanePolar *pWPolar)
+void Objects3d::deletePlPolar(PlanePolar *pPlPolar)
 {
     //remove and delete its children POpps from the array
-    if(!pWPolar)return;
+    if(!pPlPolar)return;
 
     for (int l=nPOpps()-1;l>=0; l--)
     {
         PlaneOpp *pPOpp = s_oaPlaneOpp.at(l);
-        if (pPOpp->planeName()==pWPolar->planeName() && pPOpp->polarName()==pWPolar->name())
+        if (pPOpp->planeName()==pPlPolar->planeName() && pPOpp->polarName()==pPlPolar->name())
         {
             s_oaPlaneOpp.erase(s_oaPlaneOpp.begin()+l);
             delete pPOpp;
@@ -338,10 +338,10 @@ void Objects3d::deleteWPolar(PlanePolar *pWPolar)
     for(int ipb=0; ipb<nPolars(); ipb++)
     {
         PlanePolar *pOldWPolar = s_oaPlanePolar.at(ipb);
-        if(pOldWPolar==pWPolar)
+        if(pOldWPolar==pPlPolar)
         {
             s_oaPlanePolar.erase(s_oaPlanePolar.begin()+ipb);
-            delete pWPolar;
+            delete pPlPolar;
             break;
         }
     }
@@ -832,7 +832,7 @@ void Objects3d::cleanObjects(std::string &log)
         {
             log += "Deleting the orphan plane polar " +
                     pOldWPolar->name() + "\n";
-            deleteWPolar(pOldWPolar);
+            deletePlPolar(pOldWPolar);
         }
     }
 }
@@ -847,7 +847,7 @@ void Objects3d::updatePlPolarstoV750()
         if(!pPlane)
         {
             // redundant safety check
-            deleteWPolar(pOldWPolar);
+            deletePlPolar(pOldWPolar);
         }
         else
         {

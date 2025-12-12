@@ -9,6 +9,7 @@
 
 
 HEADERS += \
+    $$PWD/analysis3ddef/t1234578polardlg.h \
     $$PWD/boatedit/sailnurbsdlg.h \
     $$PWD/boatedit/sailoccdlg.h \
     $$PWD/boatedit/sailsplinedlg.h \
@@ -26,7 +27,6 @@ HEADERS += \
     $$PWD/analysis3ddef/extradragwt.h \
     $$PWD/analysis3ddef/planepolardlg.h \
     $$PWD/analysis3ddef/polar3ddlg.h \
-    $$PWD/analysis3ddef/t123578polardlg.h \
     $$PWD/analysis3ddef/t6polardlg.h \
     $$PWD/analysis3ddef/wpolarautonamedlg.h \
     $$PWD/boatedit/boatdlg.h \
@@ -97,6 +97,7 @@ HEADERS += \
 
 
 SOURCES += \
+    $$PWD/analysis3ddef/t1234578polardlg.cpp \
     $$PWD/boatedit/sailnurbsdlg.cpp \
     $$PWD/boatedit/sailoccdlg.cpp \
     $$PWD/boatedit/sailsplinedlg.cpp \
@@ -112,7 +113,6 @@ SOURCES += \
     $$PWD/analysis3ddef/extradragwt.cpp \
     $$PWD/analysis3ddef/planepolardlg.cpp \
     $$PWD/analysis3ddef/polar3ddlg.cpp \
-    $$PWD/analysis3ddef/t123578polardlg.cpp \
     $$PWD/analysis3ddef/t6polardlg.cpp \
     $$PWD/analysis3ddef/wpolarautonamedlg.cpp \
     $$PWD/analysisseldlg.cpp \

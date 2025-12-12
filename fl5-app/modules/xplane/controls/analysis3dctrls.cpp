@@ -105,7 +105,7 @@ void Analysis3dCtrls::setupLayout()
             pOptionLayout->addWidget(m_pchStabDerivatives);
         }
 
-        m_ppbAnalyze = new QPushButton("Analyze");
+        m_ppbAnalyze = new QPushButton("Calculate");
         m_ppbAnalyze->setAutoDefault(true);
         m_ppbAnalyze->setDefault(true);
         m_ppbAnalyze->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_A));

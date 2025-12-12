@@ -34,6 +34,7 @@
 
 #include <api/gmshparams.h>
 #include <api/node.h>
+#include <api/wingxfl.h>
 
 class Fuse;
 class Sail;
@@ -54,14 +55,14 @@ class GMesherWt : public QFrame
         GMesherWt(QWidget *pParent);
         ~GMesherWt();
 
-        void initWt(Fuse *pFuse, bool bMakexzSymmetric);
+        void initWt(Fuse *pFuse, bool bMakexzSymmetric, bool bThickSurfaces);
         void initWt(Sail *pSail);
 
         std::vector<Triangle3d> const &triangles() const {return m_Triangles;}
 
         void setAlgo(int iAlgo) {s_idxAlgo=iAlgo;}
 
-        void setWings(QVector<WingXfl*> const &wings) {m_Wings=wings;}
+        void setWings(QVector<WingXfl> const &wings) {m_Wings=wings;}
         void clearWings() {m_Wings.clear();}
 
         QSize sizeHint() const override {return QSize(300,150);}
@@ -82,7 +83,8 @@ class GMesherWt : public QFrame
         void meshNURBSSail();
         void meshSplineSail();
         void meshOccSail();
-        void meshFuseShells();
+        void meshFuseShellsThinSurfaces();
+        void meshFuseShellsThickSurfaces();
 
         int  meshAlgo();
         bool readMeshSize();
@@ -107,6 +109,8 @@ class GMesherWt : public QFrame
         QWidget *m_pParent;
         bool m_bIsMeshing;
         bool m_bMakexzSymmetric;
+        bool m_bThickSurfaces;
+
         int m_iLoggerStack;
 
 
@@ -121,7 +125,7 @@ class GMesherWt : public QFrame
         Fuse *m_pFuse;
         Sail *m_pSail;
 
-        QVector<WingXfl*> m_Wings; /** if not emmpty, used to embed mid lines in the fuse mesh */
+        QVector<WingXfl> m_Wings; /** if not empty, used to embed mid lines in the fuse mesh */
 
         static int s_idxAlgo;
 };

@@ -62,9 +62,9 @@ void XSailAnalysisCtrls::setupLayout()
         m_pAnalysisRangeTable = new AnalysisRangeTable(this);
         m_pAnalysisRangeTable->setName("XSail_Analysis3d_ctrls"); // debug use only
 
-        m_pchStoreBtOpps    = new QCheckBox("Store operating points");
+        m_pchStoreBtOpps = new QCheckBox("Store operating points");
 
-        m_ppbAnalyze     = new QPushButton("Analyze");
+        m_ppbAnalyze     = new QPushButton("Calculate");
         m_ppbAnalyze->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_A));
         m_ppbAnalyze->setToolTip("Start the analysis\t(Ctrl+A)");
 
@@ -72,7 +72,6 @@ void XSailAnalysisCtrls::setupLayout()
 
         pAnalysisLayout->addWidget(m_pchStoreBtOpps);
         pAnalysisLayout->addWidget(m_ppbAnalyze);
-//        pAnalysisLayout->addStretch();
     }
 
     setLayout(pAnalysisLayout);

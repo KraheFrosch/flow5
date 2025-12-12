@@ -87,11 +87,11 @@ void T6PolarDlg::connectSignals()
 {
     PlanePolarDlg::connectSignals();
 
-    connect(m_pchAdjustedVelocity, SIGNAL(clicked(bool)), SLOT(onAdjustedVelocity()));
+    connect(m_pchAdjustedVelocity,    SIGNAL(clicked(bool)),         SLOT(onAdjustedVelocity()));
 
-    connect(m_pcptOppRange,  SIGNAL(dataPasted()),           SLOT(onRangeCellChanged()));
-    connect(m_pcptInertia,   SIGNAL(dataPasted()),           SLOT(onInertiaCellChanged()));
-    connect(m_pcptAngles,    SIGNAL(dataPasted()),           SLOT(onAngleCellChanged()));
+    connect(m_pcptOppRange,           SIGNAL(dataPasted()),          SLOT(onRangeCellChanged()));
+    connect(m_pcptInertia,            SIGNAL(dataPasted()),          SLOT(onInertiaCellChanged()));
+    connect(m_pcptAngles,             SIGNAL(dataPasted()),          SLOT(onAngleCellChanged()));
 
     connect(m_pOppRangeCtrlDelegate,  SIGNAL(closeEditor(QWidget*)), SLOT(onRangeCellChanged()));
     connect(m_pInertiaCtrlDelegate,   SIGNAL(closeEditor(QWidget*)), SLOT(onInertiaCellChanged()));
@@ -265,20 +265,23 @@ void T6PolarDlg::initPolar3dDlg(Plane const *pPlane, PlanePolar const *pWPolar)
 
     if(pWPolar)
     {
-        m_bAutoName = false;
-        m_plePolarName->setText(QString::fromStdString(pWPolar->name()));
+//        m_bAutoName = false;
+//        m_plePolarName->setText(QString::fromStdString(pWPolar->name()));
         s_WPolar.duplicateSpec(pWPolar);
         s_WPolar.setName(pWPolar->name());
         s_WPolar.setPlaneName(pWPolar->planeName());
     }
     else
     {
-        m_bAutoName = true;
+//        m_bAutoName = true;
         s_WPolar.clearAngleRangeList();
         if(s_WPolar.bAutoInertia()) s_WPolar.retrieveInertia(m_pPlane);
     }
 
-    if(s_WPolar.m_OperatingRange.size()<4) s_WPolar.m_OperatingRange.resize(4); // cleaning up old mistakes - second
+//    m_pchAutoName->setChecked(m_bAutoName);
+//    m_plePolarName->setEnabled(!m_bAutoName);
+
+    if(s_WPolar.m_OperatingRange.size()<4) s_WPolar.m_OperatingRange.resize(4); // cleaning up old mistakes
 
     if(pWPolar)
     {

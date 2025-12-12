@@ -43,7 +43,8 @@
 #include <api/plane.h>
 #include <interfaces/widgets/customdlg/doublevaluedlg.h>
 #include <interfaces/widgets/customdlg/intvaluedlg.h>
-#include <interfaces/widgets/customwts/plaintextoutput.h>
+
+#include <interfaces/widgets/customwts/formattextoutput.h>
 
 
 
@@ -79,7 +80,7 @@ void PlaneDlg::makeCommonControls()
     m_pleDescription = new QPlainTextEdit;
     m_pleDescription->setToolTip("Enter here a short description for the plane");
 
-    m_ppto = new PlainTextOutput;
+    m_ppto = new FormatTextOutput;
 
     m_pCheckMesh            = new QAction("Check mesh", this);
     m_pCheckFreeEdges       = new QAction("Check free edges", this);

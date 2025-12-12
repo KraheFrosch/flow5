@@ -131,14 +131,12 @@ class FL5LIB_EXPORT PlanePolar : public Polar3d
         void addAVLControl(AngleControl const &avlc) {m_AVLControls.push_back(avlc);}
         void insertAVLControl(int ic, AngleControl const &avlc) {m_AVLControls.insert(m_AVLControls.begin()+ic, avlc);}
         void removeAVLControl(int ic) {if(ic>=0 && ic<int(m_AVLControls.size())) m_AVLControls.erase(m_AVLControls.begin()+ic);}
-
+        bool hasActiveAVLControl() const; /** returns true if one control at least is active */
         AngleControl &AVLCtrl(int ic) {return m_AVLControls[ic];}
         AngleControl const &AVLCtrl(int ic) const {return m_AVLControls[ic];}
-        std::string AVLCtrlName(int ic) const {if(ic>=0 && ic<int(m_AVLControls.size())) return m_AVLControls.at(ic).name(); else return std::string();}
-        double AVLGain(int iAVLCtrl, int iCtrlSurf) const {if(iAVLCtrl>=0 && iAVLCtrl<int(m_AVLControls.size())) return m_AVLControls.at(iAVLCtrl).value(iCtrlSurf); else return 0.0;}
-        void setGain(int iAVLCtrl, int iCtrlSurf, double g) {if(iAVLCtrl>=0 && iAVLCtrl<int(m_AVLControls.size())) m_AVLControls[iAVLCtrl].setValue(iCtrlSurf, g); }
-
-        bool hasActiveAVLControl() const; /** returns true if one control at least is active */
+        std::string AVLCtrlName(int ic) const;
+        double AVLGain(int iAVLCtrl, int iCtrlSurf) const;
+        void setGain(int iAVLCtrl, int iCtrlSurf, double g);
 
         void retrieveInertia(Plane const *pPlane);
 
@@ -270,8 +268,8 @@ class FL5LIB_EXPORT PlanePolar : public Polar3d
 
     public:
 
-        std::vector<AngleControl> m_FlapControls;      /**< T123578 polar: list of flap angles for each wing */
-        std::vector<AngleControl> m_AVLControls;
+        std::vector<AngleControl> m_FlapControls;      /**< T1234578 polar: list of preset flap angles for each wing */
+        std::vector<AngleControl> m_AVLControls;       /**< T1234578 polar: list of flap gains for each wing */
 
         std::vector<CtrlRange> m_OperatingRange;        /**< the operating range for a control polar: Velocity, alpha, beta, phi*/
         std::vector<CtrlRange> m_InertiaRange;          /**< the range of inertia parameters for a control polar: mass, CoG.x, CoG.z */

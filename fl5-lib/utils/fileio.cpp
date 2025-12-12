@@ -176,7 +176,6 @@ bool FileIO::serializeProjectFl5(QDataStream &ar, bool bIsStoring)
             return false;
         }
 
-
         outputMessage("   Reading boat objects...\n");
         serializeBtObjectsFl5(ar, false);
 
@@ -188,17 +187,18 @@ bool FileIO::serializeProjectFl5(QDataStream &ar, bool bIsStoring)
 
         if(ArchiveFormat<500750)
         {
-/*            QString strange;
-            Objects3d::cleanObjects(strange);
-            if(strange.length())
-            {
-                strange = "Cleaning results:" + EOLCHAR + strange + EOLCHAR;
-                outputMessage(strange);
-            }*/
-
             Objects3d::updatePlPolarstoV750();
         }
 
+
+        if(ArchiveFormat<500754)
+        {
+            // 500754: removed wing tilts from AVL control sets
+            for(PlanePolar *pPlPolar : Objects3d::planePolars())
+            {
+                pPlPolar->clearAVLCtrls();
+            }
+        }
     }
     return true;
 }
@@ -228,10 +228,11 @@ int FileIO::serializeProjectMetaDataFl5(QDataStream &ar, bool bIsStoring)
         // 500005: Added External WPolar
         // 500006: Added splines of FoilSplineDlg
         // 500750: added wpolar flap angles
+        // 500754: removed wing tilts from AVL control sets
 
         outputMessage("   Saving project meta-data\n");
 
-        ArchiveFormat = 500750;
+        ArchiveFormat = 500754;
         ar << ArchiveFormat;
 
         Polar polar;

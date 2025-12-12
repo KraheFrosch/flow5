@@ -70,7 +70,7 @@
 #include <globals/mainframe.h>
 #include <modules/xdirect/analysis/polarnamemaker.h>
 #include <modules/xobjects.h>
-#include <modules/xplane/analysis/wpolarnamemaker.h>
+#include <modules/xplane/analysis/plpolarnamemaker.h>
 
 QThread::Priority XflScriptExec::s_ThreadPriority = QThread::NormalPriority;
 

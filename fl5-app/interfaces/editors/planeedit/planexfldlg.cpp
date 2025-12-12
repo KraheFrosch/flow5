@@ -102,7 +102,7 @@
 #include <interfaces/widgets/customwts/cptableview.h>
 #include <interfaces/widgets/customwts/floatedit.h>
 #include <interfaces/widgets/customwts/intedit.h>
-#include <interfaces/widgets/customwts/plaintextoutput.h>
+#include <interfaces/widgets/customwts/formattextoutput.h>
 #include <modules/xobjects.h>
 
 bool PlaneXflDlg::s_bThickSurfAssy(true);
@@ -165,16 +165,7 @@ void PlaneXflDlg::connectSignals()
     connect(m_pExportMeshSTL,         SIGNAL(triggered(bool)), SLOT(onExportMeshToSTLFile()));
     connect(m_pScalePlane,            SIGNAL(triggered(bool)), SLOT(onScalePlane()));
 
-    connect(m_plwThinWings,           SIGNAL(clicked(QModelIndex)), SLOT(onThinListClick()));
-
-    connect(m_plwThickWings,          SIGNAL(clicked(QModelIndex)), SLOT(onPartListClicked(QModelIndex)));
-    connect(m_plwFuseListWt,          SIGNAL(clicked(QModelIndex)), SLOT(onThickListClick()));
-    connect(m_plwFuseListWt,          SIGNAL(clicked(QModelIndex)), SLOT(onPartListClicked(QModelIndex)));
-
-    QItemSelectionModel *pSelModel = m_plwThickWings->selectionModel();
-    connect(pSelModel,                SIGNAL(selectionChanged(QItemSelection,QItemSelection)), SLOT(onThickListClick()));
-
-    connect(m_ppbCutFuse,             SIGNAL(clicked(bool)),                                     SLOT(onCutFuse()));
+    connect(m_plwWings,               SIGNAL(itemSelectionChanged()), SLOT(onThinListClick()));
 
     connect(m_pResetFuse,             SIGNAL(triggered()),                                       SLOT(onResetFuse()));
     connect(m_pTessellation,          SIGNAL(triggered()),                                       SLOT(onTessellation()));
@@ -201,11 +192,6 @@ void PlaneXflDlg::connectSignals()
     connect(m_pglPlaneView,           SIGNAL(partSelected(Part*)),            SLOT(onSelectPart(Part*)));
     connect(m_pglPlaneView,           SIGNAL(pickedNodePair(QPair<int,int>)), SLOT(onPickedNodePair(QPair<int,int>)));
 
-
-    connect(m_prbfl5Mesher,           SIGNAL(clicked(bool)),              SLOT(onSelMesher()));
-    connect(m_prbGMesher,             SIGNAL(clicked(bool)),              SLOT(onSelMesher()));
-    connect(m_pMesherWt,              SIGNAL(outputMsg(QString)), m_ppto, SLOT(onAppendQText(QString)));
-    connect(m_pMesherWt,              SIGNAL(updateFuseView()),           SLOT(onUpdateMesh()));
     connect(m_pGMesherWt,             SIGNAL(outputMsg(QString)), m_ppto, SLOT(onAppendQText(QString)));
     connect(m_pGMesherWt,             SIGNAL(updateFuseView()),           SLOT(onUpdateMesh()));
 
@@ -326,174 +312,66 @@ void PlaneXflDlg::setupLayout()
                         {
                             QVBoxLayout *pThinThickLayout = new QVBoxLayout;
                             {
+
                                 QHBoxLayout *pSelLayout = new QHBoxLayout;
                                 {
+                                    QLabel *plabAssyType = new QLabel("Target assembly:");
                                     QButtonGroup *pGroup = new QButtonGroup;
                                     {
                                         m_prbThin  = new QRadioButton("Thin  surfaces");
                                         m_prbThick = new QRadioButton("Thick surfaces");
+                                        m_prbThin->setToolTip("<p>Assemble the fuselage and wings for THIN surface calculations;<br>"
+                                                              "The fuselage mesh will conform to the mid-camber line of the selected wings."
+                                                              "</p>");
+                                        m_prbThick->setToolTip("<p>Assemble the fuselage and wings for THICK surface calculations;<br>"
+                                                              "The fuselage mesh will conform to the top and bottom surfaces of the selected wings."
+                                                              "</p>");
+
                                         pGroup->addButton(m_prbThin);
                                         pGroup->addButton(m_prbThick);
                                     }
-                                    pSelLayout->addStretch();
+                                    pSelLayout->addWidget(plabAssyType);
                                     pSelLayout->addWidget(m_prbThin);
-                                    pSelLayout->addStretch();
                                     pSelLayout->addWidget(m_prbThick);
                                     pSelLayout->addStretch();
                                 }
 
-                                m_pswThinThick = new QStackedWidget;
-                                {
-                                    QFrame *pfrThin = new QFrame;
-                                    {
-                                        QVBoxLayout *pThinLayout = new QVBoxLayout;
-                                        {
-                                            QLabel *plabThinNote = new QLabel("<p>Assemble the fuselage and wings for THIN surface analyses;<br>"
-                                                                              "The fuselage mesh will conform to the mid-camber line of the selected wings."
-                                                                              "</p>");
-                                            plabThinNote->setWordWrap(true);
-                                            m_plwThinWings = new QListWidget;
-                                            m_plwThinWings->setSelectionMode(QAbstractItemView::MultiSelection);
+                                QLabel *plabConnectedWings = new QLabel("Select the wings connected to the fuselage:");
+                                m_plwWings = new QListWidget;
+                                m_plwWings->setSelectionMode(QAbstractItemView::MultiSelection);
 
-                                            pThinLayout->addWidget(plabThinNote);
-                                            pThinLayout->addWidget(m_plwThinWings);
-                                        }
-                                        pfrThin->setLayout(pThinLayout);
-                                    }
-
-                                    QFrame *pfrThick = new QFrame;
-                                    {
-                                QVBoxLayout *pThickLayout = new QVBoxLayout;
-                                {
-                                    QLabel *plabThickNote = new QLabel("<p>Assemble the fuselage and wings for THICK surface analyses</p>");
-                                    plabThickNote->setWordWrap(true);
-                                    QHBoxLayout *pObjectsLayout = new QHBoxLayout;
-                                    {
-                                        QGroupBox * pCuttingWingsBox = new QGroupBox("Cutting wings");
-                                        {
-                                            QVBoxLayout *pCuttingWingsLayout = new QVBoxLayout;
-                                            {
-                                                m_plwThickWings = new QListWidget;
-                                                m_plwThickWings->setSelectionMode(QAbstractItemView::MultiSelection);
-
-                                                QGridLayout *pAssyParamLayout = new QGridLayout;
-                                                {
-                                                    QString sewtip = "<p>OpenCascade documentation: "
-                                                                     "Sewing allows creation of connected topology (shells and wires) "
-                                                                     "from a set of separate topological elements (faces and edges). ";
-                                                    sewtip += "Working tolerance defines the maximal distance between topological elements "
-                                                              "which can be sewn. It is not ultimate that such elements will be actually "
-                                                              "sewn as many other criteria are applied to make the final decision. "
-                                                              "Minimal tolerance defines the size of the smallest element (edge) in "
-                                                              "the resulting shape. It is declared that no edges with size less than this "
-                                                              "value are created after sewing. If encountered, such topology becomes degenerated.  ";
-
-                                                    sewtip +="The following recommendations can be proposed for tuning-up the sewing process: "
-                                                             "<ul>"
-                                                             "<li> Use as small working tolerance as possible. This will reduce the sewing time and, "
-                                                             "  consequently, the number of incorrectly sewn edges for shells with free boundaries.</li>"
-                                                             "<li> Use as large minimal tolerance as possible. This will reduce the number of small "
-                                                             "  geometry in the shape, both original and appearing after cutting.</li>"
-                                                             "<li> If it is expected to obtain a shell with holes (free boundaries) as a result "
-                                                             "  of sewing, the working tolerance should be set to a value not greater than the "
-                                                             "  size of the smallest element (edge) or smallest distance between elements of such "
-                                                             "  free boundary. Otherwise the free boundary may be sewn only partially.</li>"
-                                                             "<li> It should be mentioned that the Sewing algorithm is unable to understand which "
-                                                             "  small (less than working tolerance) free boundary should be kept and which should "
-                                                             "  be sewn.</li>"
-                                                             "</ul>"
-                                                             "</p>";
-
-                                                    QLabel *pLabSewPrecision = new QLabel("Sewing precision:");
-                                                    pLabSewPrecision->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-                                                    QLabel *pLabLength1 = new QLabel(Units::lengthUnitQLabel());
-                                                    pLabLength1->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
-                                                    m_pfeStitchPrecision = new FloatEdit(0.001f);
-                                                    m_pfeStitchPrecision->setToolTip(sewtip);
-
-                                                    pAssyParamLayout->addWidget(pLabSewPrecision,       1,1);
-                                                    pAssyParamLayout->addWidget(m_pfeStitchPrecision, 1,2);
-                                                    pAssyParamLayout->addWidget(pLabLength1,            1,3);
-                                                }
-
-                                                pCuttingWingsLayout->addWidget(m_plwThickWings);
-                                                pCuttingWingsLayout->addLayout(pAssyParamLayout);
-                                            }
-                                            pCuttingWingsBox->setLayout(pCuttingWingsLayout);
-                                        }
-
-                                        QGroupBox *pFuseToCutBox = new QGroupBox("Fuselage to cut");
-                                        {
-                                            QVBoxLayout *pFuseToCutLayout = new QVBoxLayout;
-                                            {
-                                                m_plwFuseListWt = new QListWidget;
-                                                pFuseToCutLayout->addWidget(m_plwFuseListWt);
-                                            }
-                                            pFuseToCutBox->setLayout(pFuseToCutLayout);
-                                        }
-
-                                        pObjectsLayout->addWidget(pCuttingWingsBox);
-                                        pObjectsLayout->addWidget(pFuseToCutBox);
-                                    }
-
-                                    m_ppbCutFuse = new QPushButton("Cut fuselage");
-
-                                    pThickLayout->addWidget(plabThickNote);
-                                    pThickLayout->addLayout(pObjectsLayout);
-                                    pThickLayout->addWidget(m_ppbCutFuse);
-                                }
-                                pfrThick->setLayout(pThickLayout);
-                            }
-
-                                    m_pswThinThick->addWidget(pfrThin);
-                                    m_pswThinThick->addWidget(pfrThick);
-                                }
                                 pThinThickLayout->addLayout(pSelLayout);
-                                pThinThickLayout->addWidget(m_pswThinThick);
+                                pThinThickLayout->addWidget(plabConnectedWings);
+                                pThinThickLayout->addWidget(m_plwWings);
                             }
                             pfrThinThick->setLayout(pThinThickLayout);
                         }
-                        QFrame *pfrFreeMesh = new QFrame;
+
+                        QFrame *pfrGmesher = new QFrame;
                         {
-                            QVBoxLayout *pMeshLayout = new QVBoxLayout;
+                            QVBoxLayout *pGMesherLayout = new QVBoxLayout;
                             {
-                                QHBoxLayout *pMeshSelLayout = new QHBoxLayout;
-                                {
-                                    QButtonGroup *pGroup = new QButtonGroup;
-                                    {
-                                        m_prbfl5Mesher = new QRadioButton("flow5 mesher (deprecated)");
-                                        m_prbGMesher   = new QRadioButton("Gmsh");
-                                        m_prbfl5Mesher->setChecked(FuseOccDlg::bfl5Mesher());
-                                        m_prbGMesher->setChecked(!FuseOccDlg::bfl5Mesher());
+                                QLabel *plabGmsh = new QLabel("<p><b>Gmsh</b></p>");
 
-                                        pGroup->addButton(m_prbfl5Mesher);
-                                        pGroup->addButton(m_prbGMesher);
-                                    }
-                                    pMeshSelLayout->addStretch();
-                                    pMeshSelLayout->addWidget(m_prbfl5Mesher);
-                                    pMeshSelLayout->addWidget(m_prbGMesher);
-                                    pMeshSelLayout->addStretch();
-                                }
+                                QLabel *plabGmshLink = new QLabel;
+                                plabGmshLink->setText("<a href=https://gmsh.info>https://gmsh.info</a>");
+                                plabGmshLink->setOpenExternalLinks(true);
+                                plabGmshLink->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
 
-                                m_pMesherWt = new MesherWt(this);
-                                m_pMesherWt->showPickEdge(false);
-                    #ifdef QT_DEBUG
-                                m_pMesherWt->showDebugBox(true);
-                    #endif
+
                                 m_pGMesherWt = new GMesherWt(this);
-                                m_pMesherWt->setVisible(FuseOccDlg::bfl5Mesher());
-                                m_pGMesherWt->setVisible(!FuseOccDlg::bfl5Mesher());
-                                pMeshLayout->addLayout(pMeshSelLayout);
-                                pMeshLayout->addWidget(m_pMesherWt);
-                                pMeshLayout->addWidget(m_pGMesherWt);
+
+                                pGMesherLayout->addWidget(plabGmsh);
+                                pGMesherLayout->addWidget(plabGmshLink);
+                                pGMesherLayout->addWidget(m_pGMesherWt);
                             }
-                            pfrFreeMesh->setLayout(pMeshLayout);
+                            pfrGmesher->setLayout(pGMesherLayout);
                         }
 
                         m_pMeshCorrectionsFrame = new QFrame;
                         {
-                            QLabel *plabInfo = new QLabel("Use the actions below to modify the fuselage's mesh<br>"
-                                                          "and to connect it to the wing's mesh.");
+                            QLabel *plabInfo = new QLabel("<p>Use the actions below to modify the fuselage's mesh<br>"
+                                                          "and to connect it to the wing's mesh.</p>");
                             QVBoxLayout *pCorrectLayout = new QVBoxLayout;
                             {
                                 QGridLayout *pModLayout = new QGridLayout;
@@ -585,7 +463,7 @@ void PlaneXflDlg::setupLayout()
                         m_pLeftTabWidget->addTab(pMetaFrame,               "Meta");
                         m_pLeftTabWidget->addTab(pfrParts,                 "Parts");
                         m_pLeftTabWidget->addTab(pfrThinThick,             "Assembly");
-                        m_pLeftTabWidget->addTab(pfrFreeMesh,              "Fuselage mesh");
+                        m_pLeftTabWidget->addTab(pfrGmesher,               "Fuselage mesh");
                         m_pLeftTabWidget->addTab(m_pMeshCorrectionsFrame , "Mesh connections");
 
                         m_pLeftTabWidget->setTabToolTip(0, "Ctrl+1");
@@ -762,11 +640,9 @@ void PlaneXflDlg::setControls()
 {
     gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
     m_pchHighlightSel->setChecked(pglPlaneXflView->isHighlightingPart());
-    m_pfeStitchPrecision->setValue(s_StitchPrecision*Units::mtoUnit());
 
     m_prbThick->setChecked(s_bThickSurfAssy);
     m_prbThin->setChecked(!s_bThickSurfAssy);
-    m_pswThinThick->setCurrentIndex(s_bThickSurfAssy ? 1 : 0);
 }
 
 
@@ -848,6 +724,46 @@ void PlaneXflDlg::keyPressEvent(QKeyEvent *pEvent)
             if(!cancelPicks())
                 reject();
             return;
+            break;
+        }
+        case Qt::Key_D:
+        {
+            if(bCtrl)
+            {
+                if(m_pPlaneXfl->nWings()>0)
+                {
+                    WingXfl MainWing(*m_pPlaneXfl->wingAt(0));
+                    MainWing.createSurfaces(MainWing.position(), MainWing.rx(), MainWing.ry());
+
+                    for (int j=0; j<MainWing.nSurfaces(); j++)
+                        MainWing.surface(j).makeSideNodes(nullptr);
+
+                    std::vector<std::vector<Node>> wires;
+                    MainWing.makeMidWires(wires);
+
+                    Q_ASSERT(wires.size()==3);
+
+                    m_pglPlaneView->clearDebugPoints();
+                    for(uint i=0; i<wires.front().size(); i++)
+                    {
+                        Node const &ndA = wires.front().at(i);
+                        Node const &ndB = wires.at(1).at(i);
+                        m_pglPlaneView->appendDebugPoint(ndA);
+                        m_pglPlaneView->appendDebugVec(ndB-ndA);
+
+                    }
+                    for(uint i=0; i<wires.at(1).size(); i++)
+                    {
+                        Node const &ndA = wires.at(1).at(i);
+                        Node const &ndB = wires.at(2).at(i);
+                        m_pglPlaneView->appendDebugPoint(ndA);
+                        m_pglPlaneView->appendDebugVec(ndB-ndA);
+
+                    }
+
+                    m_pglPlaneView->update();
+                }
+            }
             break;
         }
         case Qt::Key_1:
@@ -1017,8 +933,6 @@ void PlaneXflDlg::showEvent(QShowEvent *pEvent)
     if(s_HSplitterSizes.length()>0)  m_pHSplitter->restoreState(s_HSplitterSizes);
     if(s_PartSplitterSizes.length()>0)  m_pPartSplitter->restoreState(s_PartSplitterSizes);
 
-    m_pfeStitchPrecision->setValue(s_StitchPrecision*Units::mtoUnit());
-
     onResizeColumns();
 }
 
@@ -1050,7 +964,6 @@ void PlaneXflDlg::hideEvent(QHideEvent *pEvent)
 void PlaneXflDlg::readParams()
 {
     if(!m_pPlane) return;
-    s_StitchPrecision  = m_pfeStitchPrecision->value()/Units::mtoUnit();
 }
 
 
@@ -1990,7 +1903,6 @@ void PlaneXflDlg::onNamesChanged()
 void PlaneXflDlg::onThinThick()
 {
     s_bThickSurfAssy = m_prbThick->isChecked();
-    m_pswThinThick->setCurrentIndex(s_bThickSurfAssy ? 1 : 0);
     onUpdatePlane();
 }
 
@@ -2013,66 +1925,63 @@ void PlaneXflDlg::onTabChanged(int iNewTab)
         }
         case 2:
         {
-            QVector<WingXfl*> thinwings = thinWingList(); // current selection
+            QVector<WingXfl> const &thinwings = thinWingList(); // current selection
             QStringList wingnames;
-            for(WingXfl const*pWing : thinwings)  wingnames.push_back(QString::fromStdString(pWing->name()));
+            for(WingXfl const &wing : thinwings)  wingnames.push_back(QString::fromStdString(wing.name()));
 
-            //fill the wing list for thin assembly - parts may have changed
-            m_plwThinWings->clear();
+            //fill the wing list - parts may have changed
+            m_plwWings->clear();
             for(int iw=0; iw<m_pPlaneXfl->nWings(); iw++)
             {
-                m_plwThinWings->addItem(QString::fromStdString(m_pPlaneXfl->wing(iw)->name()));
+                m_plwWings->addItem(QString::fromStdString(m_pPlaneXfl->wing(iw)->name()));
             }
 
             //restore the existing selection
-            for(int row=0; row<m_plwThinWings->count();row++)
+            for(int row=0; row<m_plwWings->count();row++)
             {
-                QListWidgetItem *pItem = m_plwThinWings->item(row);
+                QListWidgetItem *pItem = m_plwWings->item(row);
                 if(pItem && wingnames.contains(pItem->text()))
                 {
                     pItem->setSelected(true);
                 }
             }
 
-            //fill the tables for thick assembly
-            m_plwThickWings->clear();
-            m_plwFuseListWt->clear();
-            for(int iw=0; iw<m_pPlaneXfl->nWings(); iw++)
-            {
-                m_plwThickWings->addItem(QString::fromStdString(m_pPlaneXfl->wing(iw)->name()));
-            }
-            for(int ifuse=0; ifuse<m_pPlaneXfl->nFuse(); ifuse++)
-            {
-                m_plwFuseListWt->addItem(QString::fromStdString(m_pPlaneXfl->fuse(ifuse)->name()));
-            }
-            onThickListClick();
             break;
         }
         case 3:
         {            
             // initialize the flow5 mesher
             Fuse *pFuse =nullptr;
-            QVector<WingXfl*> thinwings = thinWingList(); // current selection
 
             if(!s_bThickSurfAssy)
             {
+                QVector<WingXfl> const&thinwings = thinWingList(); // current selection
                 m_ppto->onAppendQText("Conforming fuselage mesh to mid-camber lines of:\n");
-                for(WingXfl const*pWing : thinwings)
+                for(WingXfl const &wing : thinwings)
                 {
-                    m_ppto->onAppendQText("   " + QString::fromStdString(pWing->name()) + EOLch);
+                    m_ppto->onAppendQText("   " + QString::fromStdString(wing.name()) + EOLch);
                 }
                 m_ppto->appendEOL(2);
                 m_pGMesherWt->setWings(thinwings);
             }
             else
             {
-                // get the fuse name currently selected in the assembly table, if any
+                QVector<WingXfl> const&thickwings = thinWingList(); // current selection
+                m_ppto->onAppendQText("Conforming fuselage mesh to top and bottom lines of:\n");
+                for(WingXfl const &wing : thickwings)
+                {
+                    m_ppto->onAppendQText("   " + QString::fromStdString(wing.name()) + EOLch);
+                }
+                m_ppto->appendEOL(2);
+                m_pGMesherWt->setWings(thickwings);
+
+/*                // get the fuse name currently selected in the assembly table, if any
                 QListWidgetItem *pItem = m_plwFuseListWt->currentItem();
                 if(pItem)
                 {
                     QString fusename = pItem->text();
                     pFuse = m_pPlaneXfl->fuse(fusename.toStdString());
-                }
+                }*/
             }
 
             if(!pFuse)
@@ -2083,18 +1992,12 @@ void PlaneXflDlg::onTabChanged(int iNewTab)
 
             if(!pFuse)
             {
-                m_pMesherWt->setEnabled(false);
+                m_pGMesherWt->setEnabled(false);
             }
             else
             {
-                m_pMesherWt->setEnabled(true);
-                FuseXfl *pFuseXfl = dynamic_cast<FuseXfl*>(pFuse);
-                if(pFuseXfl)
-                    m_pMesherWt->initWt(pFuseXfl->rightSideShells(), pFuse->maxElementSize(), true, false);
-                else
-                    m_pMesherWt->initWt(pFuse->shells(), pFuse->maxElementSize(), false, false);
-
-                m_pGMesherWt->initWt(pFuse, pFuse->isXflType());
+                m_pGMesherWt->setEnabled(true);
+                m_pGMesherWt->initWt(pFuse, pFuse->isXflType(), s_bThickSurfAssy);
 
                 AFMesher::setTraceFaceIndex(-1);
             }
@@ -2103,18 +2006,9 @@ void PlaneXflDlg::onTabChanged(int iNewTab)
         case 4:
         {
             Fuse *pFuse =nullptr;
-            // get the fuse name currently selected in the assembly table, if any
-            QListWidgetItem *pItem = m_plwFuseListWt->currentItem();
-            if(pItem)
-            {
-                QString fusename = pItem->text();
-                pFuse = m_pPlaneXfl->fuse(fusename.toStdString());
-            }
-            if(!pFuse)
-            {
-                // get the firtst fuse, if any
-                pFuse = m_pPlaneXfl->fuse(0);
-            }
+
+            // get the firtst fuse, if any
+            pFuse = m_pPlaneXfl->fuse(0);
 
             m_UndoStack.clear();
             m_pMeshCorrectionsFrame->setEnabled(pFuse);
@@ -2135,25 +2029,24 @@ void PlaneXflDlg::onTabChanged(int iNewTab)
 }
 
 
-void PlaneXflDlg::onSelMesher()
+QVector<WingXfl> PlaneXflDlg::thinWingList() const
 {
-    FuseOccDlg::setfl5Mesher(m_prbfl5Mesher->isChecked());
-    m_pMesherWt->setVisible(FuseOccDlg::bfl5Mesher());
-    m_pGMesherWt->setVisible(!FuseOccDlg::bfl5Mesher());
-}
+    QVector<WingXfl> winglist;
 
-
-QVector<WingXfl*> PlaneXflDlg::thinWingList() const
-{
-    QVector<WingXfl*> winglist;
-
-    for(int row=0; row<m_plwThinWings->count(); row++)
+    for(int row=0; row<m_plwWings->count(); row++)
     {
-        QListWidgetItem *pItem = m_plwThinWings->item(row);
+        QListWidgetItem *pItem = m_plwWings->item(row);
         if(pItem && pItem->isSelected())
         {
-            WingXfl *pWing = m_pPlaneXfl->wing(row);
-            if(pWing) winglist.push_back(pWing);
+            WingXfl const *pWing = m_pPlaneXfl->wing(row);
+
+            WingXfl ThinWing(*pWing);
+            ThinWing.createSurfaces(ThinWing.position(), ThinWing.rx(), ThinWing.ry());
+
+            for (int j=0; j<ThinWing.nSurfaces(); j++)
+                ThinWing.surface(j).makeSideNodes(nullptr);
+
+            winglist.push_back(ThinWing);
         }
     }
 
@@ -2163,52 +2056,25 @@ QVector<WingXfl*> PlaneXflDlg::thinWingList() const
 
 void PlaneXflDlg::onThinListClick()
 {
-    m_pGMesherWt->setWings(thinWingList());
-}
+    QVector<WingXfl> winglist = thinWingList();
+    m_pGMesherWt->setWings(winglist);
 
-
-void PlaneXflDlg::onThickListClick()
-{
-    QList<QListWidgetItem*> selectedtools = m_plwThickWings->selectedItems();
-//    QList<QListWidgetItem*> selectedfuse = m_plwFuseListWt->selectedItems();
-
-    Fuse *pFuse = nullptr;
-    for(int ifuse=0; ifuse<m_plwFuseListWt->count(); ifuse++)
+    if(s_bThickSurfAssy)
     {
-        QListWidgetItem *pItem = m_plwFuseListWt->item(ifuse);
-        if(pItem && pItem->isSelected())
+        for(WingXfl const &wing : winglist)
         {
-            pFuse = m_pPlaneXfl->fuse(ifuse);
-            break;
+            if(!wing.isTwoSided())
+            {
+                if(wing.isClosedInnerSide())
+                {
+                    QString strange = "<p><font color=red>Warning:</font> The wing <i>"+
+                             QString::fromStdString(wing.name()) +
+                            "</i> is one sided and closed at its inner section<br></p>";
+                    m_ppto->appendHtmlText(strange);
+                }
+            }
         }
     }
-
-    m_ppbCutFuse->setEnabled(pFuse && selectedtools.size()>0);
-}
-
-
-void PlaneXflDlg::onPartListClicked(QModelIndex)
-{
-    m_pglPlaneView->clearSelectedParts();
-    for(int iw=0; iw<m_plwThickWings->count(); iw++)
-    {
-        QListWidgetItem *pItem = m_plwThickWings->item(iw);
-        if(pItem && pItem->isSelected())
-        {
-            WingXfl *pWing = m_pPlaneXfl->wing(iw);
-            m_pglPlaneView->setSelectedPart(pWing->uniqueIndex());
-        }
-    }
-    for(int ifuse=0; ifuse<m_plwFuseListWt->count(); ifuse++)
-    {
-        QListWidgetItem *pItem = m_plwFuseListWt->item(ifuse);
-        if(pItem && pItem->isSelected())
-        {
-            Fuse const *pFuse = m_pPlaneXfl->fuse(ifuse);
-            m_pglPlaneView->setSelectedPart(pFuse->uniqueIndex());
-        }
-    }
-    m_pglPlaneView->update();
 }
 
 
@@ -2229,42 +2095,31 @@ void PlaneXflDlg::onCutFuse()
         return;
     }*/
 
-    QString strange;
+//    QString strange;
 
     readParams();
 
     // reset the shells
     Fuse *pFuse = nullptr;
     Vector3d fusepos;
-    for(int ifuse=0; ifuse<m_plwFuseListWt->count(); ifuse++)
-    {
-        QListWidgetItem *pItem = m_plwFuseListWt->item(ifuse);
-        if(pItem && pItem->isSelected())
-        {
-            pFuse = m_pPlaneXfl->fuse(ifuse);
-            fusepos = m_pPlaneXfl->fusePos(ifuse);
-            break;
-        }
-    }
+
     if(!pFuse)
     {
-        updateOutput("No fuse selected.\n\n");
-        return;
+        pFuse = m_pPlaneXfl->fuse(0);
+        if(!pFuse)
+        {
+            updateOutput("No fuse selected.\n\n");
+            return;
+        }
     }
-
-    s_StitchPrecision = m_pfeStitchPrecision->value()/Units::mtoUnit();
-    strange = QString::asprintf("Stitching faces with precision %g ", s_StitchPrecision*Units::mtoUnit());
-    strange += Units::lengthUnitQLabel() + "\n";
-    updateOutput(strange);
-    strange.clear();
 
     TopTools_ListOfShape WingShapeList;
     WingShapeList.Clear();
 
     TopoDS_Shape WingShape;
-    for(int iw=0; iw<m_plwThickWings->count(); iw++)
+    for(int iw=0; iw<m_plwWings->count(); iw++)
     {
-        QListWidgetItem *pItem = m_plwThickWings->item(iw);
+        QListWidgetItem *pItem = m_plwWings->item(iw);
         if(pItem && pItem->isSelected())
         {
             std::string logmsg;
@@ -3132,7 +2987,7 @@ void PlaneXflDlg::onSelectPart(Part *pPart)
             if(m_pPlaneXfl->wing(iw)==pPart)
             {
                 m_pcptParts->selectRow(iw);
-                m_plwThickWings->setCurrentRow(iw);
+                m_plwWings->setCurrentRow(iw);
             }
         }
     }
@@ -3143,7 +2998,6 @@ void PlaneXflDlg::onSelectPart(Part *pPart)
             if(m_pPlaneXfl->fuse(ifuse)==pPart)
             {
                 m_pcptParts->selectRow(m_pPlaneXfl->nWings()+ifuse);
-                m_plwFuseListWt->setCurrentRow(ifuse);
             }
         }
     }
@@ -3236,18 +3090,7 @@ Fuse *PlaneXflDlg::activeFuse()
         if(row<m_pPlaneXfl->nWings()) return nullptr;
         else pFuse = m_pPlaneXfl->fuse(row-m_pPlaneXfl->nWings());
     }
-    else if(m_pLeftTabWidget->currentIndex()>1)
-    {
-        for(int ifuse=0; ifuse<m_plwFuseListWt->count(); ifuse++)
-        {
-            QListWidgetItem *pItem = m_plwFuseListWt->item(ifuse);
-            if(pItem && pItem->isSelected())
-            {
-                pFuse = m_pPlaneXfl->fuse(ifuse);
-                break;
-            }
-        }
-    }
+
     return pFuse;
 }
 

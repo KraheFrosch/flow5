@@ -47,7 +47,7 @@
 #include <core/xflcore.h>
 #include <interfaces/editors/analysis3ddef/ctrltablemodel.h>
 #include <interfaces/editors/analysis3ddef/extradragwt.h>
-#include <interfaces/editors/analysis3ddef/t123578polardlg.h>
+#include <interfaces/editors/analysis3ddef/t1234578polardlg.h>
 #include <interfaces/widgets/customwts/actionitemmodel.h>
 #include <interfaces/widgets/customwts/cptableview.h>
 #include <interfaces/widgets/customwts/ctrltabledelegate.h>
@@ -55,7 +55,7 @@
 #include <interfaces/widgets/customwts/intedit.h>
 
 
-T123578PolarDlg::T123578PolarDlg(QWidget *pParent) : PlanePolarDlg(pParent)
+T1234578PolarDlg::T1234578PolarDlg(QWidget *pParent) : PlanePolarDlg(pParent)
 {
     setWindowTitle("Analysis definition");
 
@@ -65,7 +65,7 @@ T123578PolarDlg::T123578PolarDlg(QWidget *pParent) : PlanePolarDlg(pParent)
 }
 
 
-void T123578PolarDlg::connectSignals()
+void T1234578PolarDlg::connectSignals()
 {
     PlanePolarDlg::connectSignals();
 
@@ -82,17 +82,18 @@ void T123578PolarDlg::connectSignals()
 
     connect(m_pfePlaneMass,    SIGNAL(floatChanged(float)),  SLOT(onEditingFinished()));
     connect(m_pfeQInf,         SIGNAL(floatChanged(float)),  SLOT(onEditingFinished()));
-    connect(m_pdeAlphaSpec,    SIGNAL(floatChanged(float)),  SLOT(onEditingFinished()));
-    connect(m_pdePhiSpec,      SIGNAL(floatChanged(float)),  SLOT(onEditingFinished()));
+    connect(m_pfeAlphaSpec,    SIGNAL(floatChanged(float)),  SLOT(onEditingFinished()));
+    connect(m_pfePhiSpec,      SIGNAL(floatChanged(float)),  SLOT(onEditingFinished()));
 
     connect(m_pcptAVLCtrls->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), SLOT(onAVLRowChanged(QModelIndex)));
     connect(m_pcptAVLCtrls,                   SIGNAL(customContextMenuRequested(QPoint)),         SLOT(onAVLContextMenu(QPoint)));
+    connect(m_pAVLCtrlModel,                  SIGNAL(dataChanged(QModelIndex,QModelIndex)),       SLOT(onAVLCtrlChanged()));
     connect(m_pcptAVLGains,                   SIGNAL(dataPasted()),                               SLOT(onAVLGainChanged()));
     connect(m_pAVLGainDelegate,               SIGNAL(closeEditor(QWidget*)),                      SLOT(onAVLGainChanged()));
 }
 
 
-void T123578PolarDlg::enableControls()
+void T1234578PolarDlg::enableControls()
 {
     PlanePolarDlg::enableControls();
 
@@ -172,7 +173,7 @@ void T123578PolarDlg::enableControls()
 }
 
 
-void T123578PolarDlg::initPolar3dDlg(const Plane *pPlane, const PlanePolar *pWPolar)
+void T1234578PolarDlg::initPolar3dDlg(const Plane *pPlane, const PlanePolar *pWPolar)
 {
     PlanePolarDlg::initPolar3dDlg(pPlane, pWPolar);
 
@@ -215,8 +216,8 @@ void T123578PolarDlg::initPolar3dDlg(const Plane *pPlane, const PlanePolar *pWPo
     }
 
     m_pfeQInf->setValue(s_WPolar.velocity()*Units::mstoUnit());
-    m_pdeAlphaSpec->setValue(s_WPolar.alphaSpec());
-    m_pdePhiSpec->setValue(s_WPolar.phi());
+    m_pfeAlphaSpec->setValue(s_WPolar.alphaSpec());
+    m_pfePhiSpec->setValue(s_WPolar.phi());
 
 
     m_pfePlaneMass->setValue(s_WPolar.mass()*Units::kgtoUnit());
@@ -244,7 +245,7 @@ void T123578PolarDlg::initPolar3dDlg(const Plane *pPlane, const PlanePolar *pWPo
 }
 
 
-void T123578PolarDlg::setType7Polar()
+void T1234578PolarDlg::setType7Polar()
 {
     s_WPolar.setType(xfl::T7POLAR);
 
@@ -258,7 +259,7 @@ void T123578PolarDlg::setType7Polar()
 }
 
 
-void T123578PolarDlg::onEditingFinished()
+void T1234578PolarDlg::onEditingFinished()
 {
     readData();
     setReynolds();
@@ -267,7 +268,7 @@ void T123578PolarDlg::onEditingFinished()
 }
 
 
-void T123578PolarDlg::onOK()
+void T1234578PolarDlg::onOK()
 {
     readData();
 
@@ -287,7 +288,7 @@ void T123578PolarDlg::onOK()
 }
 
 
-void T123578PolarDlg::onPolarType()
+void T1234578PolarDlg::onPolarType()
 {
     if     (m_prbType1->isChecked())    s_WPolar.setType(xfl::T1POLAR);
     else if(m_prbType2->isChecked())    s_WPolar.setType(xfl::T2POLAR);
@@ -303,7 +304,7 @@ void T123578PolarDlg::onPolarType()
 }
 
 
-void T123578PolarDlg::readData()
+void T1234578PolarDlg::readData()
 {
     PlanePolarDlg::readData();
 
@@ -327,8 +328,8 @@ void T123578PolarDlg::readData()
     readInertiaData();
 
     s_WPolar.setVelocity(m_pfeQInf->value() / Units::mstoUnit());
-    s_WPolar.setAlphaSpec(m_pdeAlphaSpec->value());
-    s_WPolar.setPhi(m_pdePhiSpec->value());
+    s_WPolar.setAlphaSpec(m_pfeAlphaSpec->value());
+    s_WPolar.setPhi(m_pfePhiSpec->value());
 
     s_WPolar.setGroundHeight(m_pfeHeight->value() / Units::mtoUnit());
 
@@ -336,7 +337,7 @@ void T123578PolarDlg::readData()
 }
 
 
-void T123578PolarDlg::setupLayout()
+void T1234578PolarDlg::setupLayout()
 {
     QString strSpeedUnit, strLengthUnit, strWeightUnit;
     strSpeedUnit = Units::speedUnitQLabel();
@@ -346,6 +347,7 @@ void T123578PolarDlg::setupLayout()
     QFont fixedfnt(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
     QTabWidget *pTabWt = new QTabWidget(this);
+    connect(pTabWt, SIGNAL(currentChanged(int)), SLOT(onTabChanged(int)));
     pTabWt->setMovable(true);
 
     QFrame *pfrPolarType = new QFrame;
@@ -404,11 +406,11 @@ void T123578PolarDlg::setupLayout()
                     QHBoxLayout *pAlphaLayout = new QHBoxLayout;
                     {
                         QLabel *pLabAlpha = new QLabel("<p>&alpha; =</p>");
-                        m_pdeAlphaSpec = new FloatEdit;
+                        m_pfeAlphaSpec = new FloatEdit;
                         QLabel *pLabDeg = new QLabel("<p>&deg;</p>");
 
                         pAlphaLayout->addWidget(pLabAlpha, 0, Qt::AlignRight);
-                        pAlphaLayout->addWidget(m_pdeAlphaSpec);
+                        pAlphaLayout->addWidget(m_pfeAlphaSpec);
                         pAlphaLayout->addWidget(pLabDeg);
                     }
                     m_pfrAlpha->setLayout(pAlphaLayout);
@@ -419,12 +421,12 @@ void T123578PolarDlg::setupLayout()
                     QHBoxLayout *pPhiLayout = new QHBoxLayout;
                     {
                         QLabel *pLabPhi = new QLabel("<p>&phi; =</p>");
-                        m_pdePhiSpec = new FloatEdit;
-                        m_pdePhiSpec->setToolTip("<p>The bank angle</p>");
+                        m_pfePhiSpec = new FloatEdit;
+                        m_pfePhiSpec->setToolTip("<p>The bank angle</p>");
                         QLabel *pLabDeg = new QLabel("<p>&deg;</p>");
 
                         pPhiLayout->addWidget(pLabPhi, 0, Qt::AlignRight);
-                        pPhiLayout->addWidget(m_pdePhiSpec);
+                        pPhiLayout->addWidget(m_pfePhiSpec);
                         pPhiLayout->addWidget(pLabDeg);
                     }
                     m_pfrPhi->setLayout(pPhiLayout);
@@ -491,7 +493,7 @@ void T123578PolarDlg::setupLayout()
                 m_pcptAVLCtrls->setEditable(true);
                 m_pcptAVLCtrls->setWindowTitle("Controls");
                 m_pcptAVLCtrls->setContextMenuPolicy(Qt::CustomContextMenu);
-                m_pAVLCtrlModel = new ActionItemModel(this);
+                m_pAVLCtrlModel = new QStandardItemModel(this);
                 m_pAVLCtrlModel->setRowCount(0);//temporary
                 m_pAVLCtrlModel->setColumnCount(1);
                 m_pAVLCtrlModel->setHeaderData(0, Qt::Horizontal, "Control name");
@@ -507,10 +509,11 @@ void T123578PolarDlg::setupLayout()
                 m_pAVLGainModel->setRowCount(0);//temporary
                 m_pAVLGainModel->setColumnCount(2);
                 m_pAVLGainModel->setHeaderData(0, Qt::Horizontal, "Control surfaces");
-                m_pAVLGainModel->setHeaderData(1, Qt::Horizontal, QString("Gain (") + DEGch + ")");
+                m_pAVLGainModel->setHeaderData(1, Qt::Horizontal, QString("Gain (") + DEGch + ")/ ctrl unit");
 
                 m_pcptAVLGains->setModel(m_pAVLGainModel);
-                m_pcptAVLGains->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+//                m_pcptAVLGains->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+                m_pcptAVLGains->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 
                 m_pAVLGainDelegate = new CtrlTableDelegate(this);
                 m_pAVLGainDelegate->setPrecision({1,3});
@@ -521,9 +524,7 @@ void T123578PolarDlg::setupLayout()
                 pAVLCtrlsLayout->addWidget(m_pcptAVLGains);
             }
 
-            QLabel *plabNote = new QLabel("<p>Each set of controls is used to calculate a control derivative.<br>"
-                                          "The influence matrix is rebuilt and the linear system is solved for each set of controls "
-                                          "and for each operating point.<br>"
+            QLabel *plabNote = new QLabel("<p>Each set of controls is used to calculate a control derivative."
                                           "</p>");
             pAVLPageLayout->addLayout(pAVLCtrlsLayout);
             pAVLPageLayout->addWidget(plabNote);
@@ -557,7 +558,14 @@ void T123578PolarDlg::setupLayout()
 }
 
 
-void T123578PolarDlg::setWingLoad()
+void T1234578PolarDlg::resizeColumns()
+{
+    double w = double(m_pcptAVLGains->width())*.7;
+    m_pcptAVLGains->setColumnWidth(0, w);
+}
+
+
+void T1234578PolarDlg::setWingLoad()
 {
     QString str,str1, str2;
 
@@ -574,7 +582,7 @@ void T123578PolarDlg::setWingLoad()
 }
 
 
-void T123578PolarDlg::setReynolds()
+void T1234578PolarDlg::setReynolds()
 {
     QString strange, strUnit;
     QString lab;
@@ -619,7 +627,7 @@ void T123578PolarDlg::setReynolds()
 }
 
 
-void T123578PolarDlg::onAVLRowChanged(QModelIndex index)
+void T1234578PolarDlg::onAVLRowChanged(QModelIndex index)
 {
     PlaneXfl const *pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pPlane);
     if(!pPlaneXfl)
@@ -641,7 +649,7 @@ void T123578PolarDlg::onAVLRowChanged(QModelIndex index)
 }
 
 
-void T123578PolarDlg::fillAVLCtrlList()
+void T1234578PolarDlg::fillAVLCtrlList()
 {
     PlaneXfl const *pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pPlane);
     if(!pPlaneXfl)
@@ -662,7 +670,7 @@ void T123578PolarDlg::fillAVLCtrlList()
 }
 
 
-void T123578PolarDlg::fillAVLGains()
+void T1234578PolarDlg::fillAVLGains()
 {
     PlaneXfl const *pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pPlane);
     if(!pPlaneXfl)
@@ -696,7 +704,7 @@ void T123578PolarDlg::fillAVLGains()
 }
 
 
-void T123578PolarDlg::readAVLCtrls()
+void T1234578PolarDlg::readAVLCtrls()
 {
     s_WPolar.clearAVLCtrls();
 
@@ -718,7 +726,7 @@ void T123578PolarDlg::readAVLCtrls()
 }
 
 
-void T123578PolarDlg::onAVLContextMenu(QPoint)
+void T1234578PolarDlg::onAVLContextMenu(QPoint)
 {
     QModelIndex ind = m_pcptAVLCtrls->selectionModel()->currentIndex();
 
@@ -762,7 +770,7 @@ void T123578PolarDlg::onAVLContextMenu(QPoint)
 }
 
 
-void T123578PolarDlg::onAppendAVLCtrl()
+void T1234578PolarDlg::onAppendAVLCtrl()
 {
     PlaneXfl const *pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pPlane);
     if(!pPlaneXfl) return;
@@ -778,7 +786,7 @@ void T123578PolarDlg::onAppendAVLCtrl()
 }
 
 
-void T123578PolarDlg::onDuplicateAVLCtrl()
+void T1234578PolarDlg::onDuplicateAVLCtrl()
 {
     PlaneXfl const *pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pPlane);
     if(!pPlaneXfl) return;
@@ -794,7 +802,7 @@ void T123578PolarDlg::onDuplicateAVLCtrl()
 }
 
 
-void T123578PolarDlg::onDeleteAVLCtrl()
+void T1234578PolarDlg::onDeleteAVLCtrl()
 {
     PlaneXfl const *pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pPlane);
     if(!pPlaneXfl) return;
@@ -810,9 +818,7 @@ void T123578PolarDlg::onDeleteAVLCtrl()
 }
 
 
-
-
-void T123578PolarDlg::onAVLCtrlChanged()
+void T1234578PolarDlg::onAVLCtrlChanged()
 {
     QModelIndex ind = m_pcptAVLCtrls->selectionModel()->currentIndex();
     if(!ind.isValid()) return;
@@ -826,7 +832,7 @@ void T123578PolarDlg::onAVLCtrlChanged()
 }
 
 
-void T123578PolarDlg::onAVLGainChanged()
+void T1234578PolarDlg::onAVLGainChanged()
 {
     PlaneXfl const *pPlaneXfl = dynamic_cast<PlaneXfl const*>(m_pPlane);
     if(!pPlaneXfl) return;
@@ -848,7 +854,7 @@ void T123578PolarDlg::onAVLGainChanged()
 }
 
 
-void T123578PolarDlg::onMoveAVLCtrl()
+void T1234578PolarDlg::onMoveAVLCtrl()
 {
     QModelIndex ind = m_pcptAVLCtrls->selectionModel()->currentIndex();
     if(!ind.isValid()) return;
