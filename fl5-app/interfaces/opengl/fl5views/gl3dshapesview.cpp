@@ -422,8 +422,8 @@ void gl3dShapesView::mouseMoveEvent(QMouseEvent *pEvent)
             Vector3d U((BB-AA).normalized());
 
             double dcrit = 0.03;
-            double dmax = 1.0e10;
-            double dist = 1.0e10;
+            double dmax = LARGEVALUE;
+            double dist = LARGEVALUE;
 
             Handle(Geom_TrimmedCurve) ln = GC_MakeSegment(gp_Pnt(AA.x, AA.y, AA.z) , gp_Pnt(BB.x, BB.y, BB.z));
 //            Handle(Geom_Line) ln = new Geom_Line(gp_Pnt(AA.x, AA.y, AA.z), gp_Dir(U.x, U.y, U.z));

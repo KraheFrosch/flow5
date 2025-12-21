@@ -65,7 +65,7 @@ gl3dSailView::gl3dSailView(QWidget *pSailDlg) : gl3dXflView(pSailDlg)
 {
     m_pSail = nullptr;
 
-    m_bNormals      = false;
+    m_bNormals = false;
 
     m_bResetglSectionHighlight = true;
     m_bResetglSail             = true;
@@ -116,7 +116,10 @@ void gl3dSailView::setSail(Sail const* pSail)
     if(pSail->isExternalSail())
     {
         ExternalSail const *pExtSail = dynamic_cast<ExternalSail const*>(m_pSail);
-        setReferenceLength(pExtSail->size()*2.5);
+        int size = pExtSail->size();
+        if(size<1.e-3) size = pExtSail->refChord(); // case where the corner points have not been defined
+
+        setReferenceLength(size*2.5);
     }
     else
         setReferenceLength(m_pSail->luffLength()*2);
@@ -638,8 +641,8 @@ void gl3dSailView::mouseMoveEvent(QMouseEvent *pEvent)
             Vector3d U((BB-AA).normalized());
 
             double dcrit = 0.3;
-            double dmax = 1.0e10;
-            double dist = 1.0e10;
+            double dmax = LARGEVALUE;
+            double dist = LARGEVALUE;
 
 
             Handle(Geom_TrimmedCurve) ln = GC_MakeSegment(gp_Pnt(AA.x, AA.y, AA.z) , gp_Pnt(BB.x, BB.y, BB.z));

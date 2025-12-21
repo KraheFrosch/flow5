@@ -714,6 +714,10 @@ void XflExecutor::runPlaneAnalyses()
 //        connect(pTask, &Task3d::outputMessage, this, &XflExecutor::traceLog);
 //        connect(this, SIGNAL(cancelTask()), pTask, SLOT(onCancel()));
 
+        if(pTask)
+        {
+            pTask->setKeepOpps(m_bMakePlaneOpps);
+        }
 
         PlaneTask *pPlaneTask = dynamic_cast<PlaneTask*>(pTask);
         LLTTask *pLLTTask = dynamic_cast<LLTTask*>(pTask);
@@ -851,21 +855,6 @@ void XflExecutor::cleanUpLLTTask(LLTTask *pLLTTask)
 
 void XflExecutor::cleanUpPlaneTask(PlaneTask *pPlaneTask)
 {
-    //The WPolar has been populated with results by the PlaneTask
-    //Store the POpps if requested
-    for(int iPOpp=0; iPOpp<int(pPlaneTask->planeOppList().size()); iPOpp++)
-    {
-        //add the data to the polar object
-        PlaneOpp *pPOpp = pPlaneTask->planeOppList().at(iPOpp);
-        if(m_bMakePlaneOpps && !pPOpp->isOut())
-            Objects3d::insertPlaneOpp(pPOpp);
-        else
-        {
-            delete pPOpp;
-            pPOpp = nullptr;
-        }
-    }
-
     QString strong;
 
     if (!pPlaneTask->isCancelled() && !pPlaneTask->hasErrors())

@@ -165,17 +165,17 @@ void W3dPrefs::readData()
     Sail::setTessellation(m_pieSailXRes->value(), m_pieSailZRes->value());
 
     s_bShowGround = m_pchGround->isChecked();
-    s_BoxX        = m_pdeBoxX->value()/Units::mtoUnit();
-    s_BoxY        = m_pdeBoxY->value()/Units::mtoUnit();
+    s_BoxX        = m_pfeBoxX->value()/Units::mtoUnit();
+    s_BoxY        = m_pfeBoxY->value()/Units::mtoUnit();
 
-    ArcBall::setSphereRadius(std::min(m_pdeArcballRadius->value()/100.0, 1.0));
+    ArcBall::setSphereRadius(std::min(m_pfeArcballRadius->value()/100.0, 1.0));
 
     W3dPrefs::setSpinAnimation(m_pchSpinAnimation->isChecked());
-    W3dPrefs::setSpinDamping(m_pdeSpinDamping->value()/100.0);
+    W3dPrefs::setSpinDamping(m_pfeSpinDamping->value()/100.0);
     gl3dView::setAnimationTransitions(m_pchAnimateTransitions->isChecked());
     gl3dView::setTransitionTime(m_pieAnimationTime->value());
 
-    gl3dView::setZAnimAngle(m_pdeZAnimAngle->value());
+    gl3dView::setZAnimAngle(m_pfeZAnimAngle->value());
 
     s_HighStyle = m_plbHighlight->theLineStyle();
     s_SelectStyle = m_plbSelect->theLineStyle();
@@ -208,8 +208,8 @@ void W3dPrefs::initWidgets()
 
     m_pcbWaterColor->setColor(s_WaterColor);
     m_pchGround->setChecked(s_bShowGround);
-    m_pdeBoxX->setValue(s_BoxX*Units::mtoUnit());
-    m_pdeBoxY->setValue(s_BoxY*Units::mtoUnit());
+    m_pfeBoxX->setValue(s_BoxX*Units::mtoUnit());
+    m_pfeBoxY->setValue(s_BoxY*Units::mtoUnit());
 
     m_pcbMassColor->setColor(s_MassColor);
 
@@ -231,15 +231,15 @@ void W3dPrefs::initWidgets()
     m_pieSailXRes->setValue(Sail::iXRes());
     m_pieSailZRes->setValue(Sail::iZRes());
 
-    m_pdeArcballRadius->setValue(ArcBall::sphereRadius()*100.0);
+    m_pfeArcballRadius->setValue(ArcBall::sphereRadius()*100.0);
 
     m_pchSpinAnimation->setChecked(s_bSpinAnimation);
-    m_pdeSpinDamping->setValue(s_SpinDamping*100.0);
+    m_pfeSpinDamping->setValue(s_SpinDamping*100.0);
 
     m_pchAnimateTransitions->setChecked(gl3dView::bAnimateTransitions());
     m_pieAnimationTime->setValue(gl3dView::transitionTime());
 
-    m_pdeZAnimAngle->setValue(gl3dView::zAnimAngle());
+    m_pfeZAnimAngle->setValue(gl3dView::zAnimAngle());
 
     onOther3dChanged();
 
@@ -427,14 +427,14 @@ void W3dPrefs::setupLayout()
 
                             m_pLabXUnit = new QLabel(Units::lengthUnitQLabel());
                             m_pLabYUnit = new QLabel(Units::lengthUnitQLabel());
-                            m_pdeBoxX = new FloatEdit;
-                            m_pdeBoxY = new FloatEdit;
+                            m_pfeBoxX = new FloatEdit;
+                            m_pfeBoxY = new FloatEdit;
 
                             pBoxSizeLayout->addWidget(pLabX,       1, 1, Qt::AlignVCenter|Qt::AlignRight);
-                            pBoxSizeLayout->addWidget(m_pdeBoxX,   1, 2);
+                            pBoxSizeLayout->addWidget(m_pfeBoxX,   1, 2);
                             pBoxSizeLayout->addWidget(m_pLabXUnit, 1, 3, Qt::AlignVCenter|Qt::AlignLeft);
                             pBoxSizeLayout->addWidget(pLabY,       2, 1, Qt::AlignVCenter|Qt::AlignRight);
-                            pBoxSizeLayout->addWidget(m_pdeBoxY,   2, 2);
+                            pBoxSizeLayout->addWidget(m_pfeBoxY,   2, 2);
                             pBoxSizeLayout->addWidget(m_pLabYUnit, 2, 3, Qt::AlignVCenter|Qt::AlignLeft);
                             pBoxSizeLayout->setColumnStretch(3,1);
                         }
@@ -530,12 +530,12 @@ void W3dPrefs::setupLayout()
             QGridLayout *pGridLayout = new QGridLayout;
             {   
                 m_pchSpinAnimation = new QCheckBox("Enable mouse animations");
-                m_pdeSpinDamping = new FloatEdit;
-                m_pdeSpinDamping->setToolTip("Defines the damping of the animation at each frame update.<br>"
+                m_pfeSpinDamping = new FloatEdit;
+                m_pfeSpinDamping->setToolTip("Defines the damping of the animation at each frame update.<br>"
                                              "Set to 0 for perpetual movement.");
                 QLabel *plabpcDamping = new QLabel("% damping");
                 pGridLayout->addWidget(m_pchSpinAnimation, 1, 1);
-                pGridLayout->addWidget(m_pdeSpinDamping,   1, 2);
+                pGridLayout->addWidget(m_pfeSpinDamping,   1, 2);
                 pGridLayout->addWidget(plabpcDamping,      1, 3);
 
                 m_pchAnimateTransitions = new QCheckBox("Animate view transitions");
@@ -549,18 +549,18 @@ void W3dPrefs::setupLayout()
 
                 QLabel *labArcBall = new QLabel("Arcball radius:");
                 QLabel *labPercent = new QLabel("% view width");
-                m_pdeArcballRadius = new FloatEdit(100.0,0);
-                m_pdeArcballRadius->setToolTip("<p>The radius of the arcball as a percentage of the view's width</p>");
+                m_pfeArcballRadius = new FloatEdit(100.0,0);
+                m_pfeArcballRadius->setToolTip("<p>The radius of the arcball as a percentage of the view's width</p>");
 
                 pGridLayout->addWidget(labArcBall,         3, 1, Qt::AlignVCenter |Qt::AlignRight);
-                pGridLayout->addWidget(m_pdeArcballRadius, 3, 2);
+                pGridLayout->addWidget(m_pfeArcballRadius, 3, 2);
                 pGridLayout->addWidget(labPercent,         3, 3);
 
                 QLabel *pLabZAngle    = new QLabel("Auto z-rotation incremental angle:");
-                m_pdeZAnimAngle = new FloatEdit(1);
+                m_pfeZAnimAngle = new FloatEdit(1);
                 QLabel *plabDeg = new QLabel("<p>&deg;</p>");
                 pGridLayout->addWidget(pLabZAngle,      4, 1, Qt::AlignVCenter |Qt::AlignRight);
-                pGridLayout->addWidget(m_pdeZAnimAngle, 4, 2);
+                pGridLayout->addWidget(m_pfeZAnimAngle, 4, 2);
                 pGridLayout->addWidget(plabDeg,         4, 3);
                 pGridLayout->setColumnStretch(          5, 1);
             }
@@ -870,7 +870,7 @@ void W3dPrefs::onShowWake()
 
 void W3dPrefs::onOther3dChanged()
 {
-    m_pdeSpinDamping->setEnabled(m_pchSpinAnimation->isChecked());
+    m_pfeSpinDamping->setEnabled(m_pchSpinAnimation->isChecked());
     m_pieAnimationTime->setEnabled(m_pchAnimateTransitions->isChecked());
 }
 
@@ -1127,8 +1127,8 @@ void W3dPrefs::showBox(int iBox)
 
 void W3dPrefs::onUpdateUnits()
 {
-    m_pdeBoxX->setValue(s_BoxX*Units::mtoUnit());
-    m_pdeBoxY->setValue(s_BoxY*Units::mtoUnit());
+    m_pfeBoxX->setValue(s_BoxX*Units::mtoUnit());
+    m_pfeBoxY->setValue(s_BoxY*Units::mtoUnit());
     m_pLabXUnit->setText(Units::lengthUnitQLabel());
     m_pLabYUnit->setText(Units::lengthUnitQLabel());
 }

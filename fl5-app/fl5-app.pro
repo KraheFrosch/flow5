@@ -44,7 +44,7 @@ linux-g++ {
     BINDIR = $$PREFIX/bin
     DATADIR = $$PREFIX/share/flow5
 
-    desktop.path = $$DATADIR
+    desktop.path = $$(HOME)/.local/share/applications
     desktop.files += ../meta/linux/$${TARGET}.desktop
 
     icon128.path = $$DATADIR

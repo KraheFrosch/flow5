@@ -92,7 +92,7 @@ class MainFrame : public QMainWindow
         ~MainFrame();
 
         QString const &projectName() const {return m_ProjectName;}
-        xfl::enumApp loadXflFile(const QString &PathName);
+        xfl::enumApp loadProjectFile(const QString &PathName);
 
 
         void displayMessage(QString const & msg, bool bShowWindow, bool bStatusBar=true, int duration=5000);
@@ -198,7 +198,6 @@ class MainFrame : public QMainWindow
         void onLoadFoilFile();
         void onLoadPlrFile();
         void onLoadLastProject();
-        void onLoadXflProject();
         void onLogFile();
         void onNewProject();
         void onOpenGLInfo();
@@ -287,7 +286,7 @@ class MainFrame : public QMainWindow
         QAction *m_pOpenAct, *m_pInsertAct;
         QAction *m_pLoadFoil, *m_pLoadPlrFile;
         QAction *m_pSaveAct, *m_pSaveProjectAsAct, *m_pNewProjectAct, *m_pCloseProjectAct;
-        QAction *m_pLoadLastProjectAct, *m_pLoadXflProject;
+        QAction *m_pLoadLastProjectAct;
         QAction *m_pPreferencesAct;
         QAction *m_pExitAct;
         QAction *m_pOpenGLAct;

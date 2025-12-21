@@ -106,7 +106,6 @@ bool SailDlg::s_bRuledMesh = true;
 bool SailDlg::s_bGuessOpposite = false;
 double SailDlg::s_TEMaxAngle = 0;
 
-bool SailDlg::s_bfl5Mesher(true);
 
 Grid SailDlg::s_SectionGrid;
 
@@ -161,18 +160,9 @@ void SailDlg::connectBaseSignals()
     connect(m_pBackImageClear,      SIGNAL(triggered()), m_pglSailView, SLOT(onClearBackImage()));
     connect(m_pBackImageSettings,   SIGNAL(triggered()), m_pglSailView, SLOT(onBackImageSettings()));
 
-    connect(m_prbfl5Mesher,         SIGNAL(clicked(bool)),        SLOT(onSelMesher()));
-    connect(m_prbGMesher,           SIGNAL(clicked(bool)),        SLOT(onSelMesher()));
 
     connect(m_prbRuledMesh,         SIGNAL(clicked()),            SLOT(onRuledMesh()));
     connect(m_prbFreeMesh,          SIGNAL(clicked()),            SLOT(onRuledMesh()));
-    connect(m_pMesherWt->m_pchPickEdge,  SIGNAL(clicked(bool)),   SLOT(onPickEdge(bool)));
-
-    for(int iedge=0; iedge<4; iedge++)
-    {
-        connect(m_pieNSegs[iedge],    SIGNAL(intChanged(int)), SLOT(onReadEdgeSplits()));
-        connect(m_pcbDistType[iedge], SIGNAL(activated(int)),  SLOT(onReadEdgeSplits()));
-    }
 
     connect(m_ppbGuessTE,           SIGNAL(clicked(bool)),        SLOT(onGuessTE()));
     connect(m_ppbClearTE,           SIGNAL(clicked(bool)),        SLOT(onClearTEPanels()));
@@ -335,79 +325,11 @@ void SailDlg::makeCommonWts()
                 m_pfrRuledMesh->setLayout(pRuledMeshLayout);
             }
 
-            m_pfrFreeMesh = new QFrame;
-            {
-                QVBoxLayout *pMeshLayout = new QVBoxLayout;
-                {
-                    QHBoxLayout *pMeshSelLayout = new QHBoxLayout;
-                    {
-                        QButtonGroup *pGroup = new QButtonGroup;
-                        {
-                            m_prbfl5Mesher = new QRadioButton("flow5 mesher (deprecated)");
-                            m_prbGMesher   = new QRadioButton("Gmsh");
-                            m_prbfl5Mesher->setChecked(s_bfl5Mesher);
-                            m_prbGMesher->setChecked(!s_bfl5Mesher);
-
-                            pGroup->addButton(m_prbfl5Mesher);
-                            pGroup->addButton(m_prbGMesher);
-                        }
-                        pMeshSelLayout->addStretch();
-                        pMeshSelLayout->addWidget(m_prbfl5Mesher);
-                        pMeshSelLayout->addWidget(m_prbGMesher);
-                        pMeshSelLayout->addStretch();
-                    }
-
-                    m_pMesherWt = new MesherWt(this);
-                    m_pMesherWt->showPickEdge(false);
-        #ifdef QT_DEBUG
-                    m_pMesherWt->showDebugBox(true);
-        #endif
-                    m_pGMesherWt = new GMesherWt(this);
-                    m_pMesherWt->setVisible(s_bfl5Mesher);
-                    m_pGMesherWt->setVisible(!s_bfl5Mesher);
-                    pMeshLayout->addLayout(pMeshSelLayout);
-                    pMeshLayout->addWidget(m_pMesherWt);
-                    pMeshLayout->addWidget(m_pGMesherWt);
-                }
-                m_pfrFreeMesh->setLayout(pMeshLayout);
-            }
-
-            m_pgbEdgeSplit = new QGroupBox("Edge split", this);
-            {
-                QGridLayout *pEdgeLayout = new QGridLayout;
-                {
-                    pEdgeLayout->addWidget(new QLabel("Segments"),      1, 2, Qt::AlignCenter);
-                    pEdgeLayout->addWidget(new QLabel("Distribution"),  1, 3, Qt::AlignCenter);
-
-                    pEdgeLayout->addWidget(new QLabel("Luff:"),         2, 1, Qt::AlignRight|Qt::AlignVCenter);
-                    pEdgeLayout->addWidget(new QLabel("Gaff:"),         3, 1, Qt::AlignRight|Qt::AlignVCenter);
-                    pEdgeLayout->addWidget(new QLabel("Leech:"),        4, 1, Qt::AlignRight|Qt::AlignVCenter);
-                    pEdgeLayout->addWidget(new QLabel("Foot:"),         5, 1, Qt::AlignRight|Qt::AlignVCenter);
-
-                    for(int iEdge=0; iEdge<4; iEdge++)
-                    {
-                        m_pieNSegs[iEdge] = new IntEdit;
-                        m_pieNSegs[iEdge]->setToolTip("<p>Set the number of triangles on this EDGE. "
-                                                      "Set the value to -1 to let the mesher define the number "
-                                                      "using the global max. edge length setting.</p>");
-
-                        m_pcbDistType[iEdge] = new QComboBox;
-                        for(std::string distrib : xfl::distributionTypes())
-                            m_pcbDistType[iEdge]->addItem(QString::fromStdString(distrib));
-
-                        pEdgeLayout->addWidget(m_pieNSegs[iEdge],    iEdge+2, 2);
-                        pEdgeLayout->addWidget(m_pcbDistType[iEdge], iEdge+2, 3);
-                    }
-                    pEdgeLayout->setColumnStretch(4,1);
-                }
-                m_pgbEdgeSplit->setLayout(pEdgeLayout);
-            }
-
+            m_pGMesherWt = new GMesherWt(this);
 
             pMeshLayout->addWidget(m_pgbMeshType);
             pMeshLayout->addWidget(m_pfrRuledMesh);
-            pMeshLayout->addWidget(m_pfrFreeMesh);
-            pMeshLayout->addWidget(m_pgbEdgeSplit);
+            pMeshLayout->addWidget(m_pGMesherWt);
         }
 
         m_pfrMesh->setLayout(pMeshLayout);
@@ -641,7 +563,6 @@ void SailDlg::initDialog(Sail *pSail)
     m_pfeRefArea->setValue(pSail->refArea()*Units::m2toUnit());
     m_pfeRefChord->setValue(pSail->refChord()*Units::mtoUnit());
 
-    m_pMesherWt->initWt(pSail);
     m_pGMesherWt->initWt(pSail);
 }
 
@@ -735,8 +656,6 @@ void SailDlg::setSailData()
         case xfl::INV_EXP:       m_pcbZDistType->setCurrentIndex(6);  break;
     }
 
-
-    m_pMesherWt->m_pfeMaxEdgeSize->setValue(m_pSail->maxElementSize()*Units::mtoUnit());
     AFMesher::setMaxEdgeLength(m_pSail->maxElementSize()*Units::mtoUnit());
 
     m_iActiveSection = 0;
@@ -769,7 +688,7 @@ void SailDlg::setControls()
     if(m_pSail)
     {
         m_pfrRuledMesh->setVisible(m_pSail->bRuledMesh());
-        m_pfrFreeMesh->setVisible(!m_pSail->bRuledMesh());
+        m_pGMesherWt->setVisible(!m_pSail->bRuledMesh());
     }
 }
 
@@ -1533,14 +1452,6 @@ void SailDlg::onDefinitions()
 }
 
 
-void SailDlg::onSelMesher()
-{
-    s_bfl5Mesher = m_prbfl5Mesher->isChecked();
-    m_pMesherWt->setVisible(s_bfl5Mesher);
-    m_pGMesherWt->setVisible(!s_bfl5Mesher);
-}
-
-
 void SailDlg::onClearHighlighted()
 {
     m_pglSailView->clearHighlightList();
@@ -1768,14 +1679,13 @@ void SailDlg::onCheckFreeEdges()
 
     m_pSail->triMesh().getFreeEdges(freeedges);
 
-    QVector<Segment3d> m_FreeEdges;
-    QVector<Segment3d> qVec = QVector<Segment3d>(m_FreeEdges.begin(), m_FreeEdges.end());
+    QVector<Segment3d> qVec = QVector<Segment3d>(freeedges.begin(), freeedges.end());
     m_pglSailView->setSegments(qVec);
 
     m_pglSailView->resetgl3dMesh();
     m_pglSailView->update();
     QString strange;
-    strange = QString::asprintf("Found %d free edges\n\n", int(m_FreeEdges.size()));
+    strange = QString::asprintf("Found %d free edges\n\n", int(freeedges.size()));
     m_ppto->onAppendQText(strange);
 }
 
@@ -1815,7 +1725,7 @@ void SailDlg::onCheckTEPanels()
 /** Finds the shortest of the two paths from clew to peak through the free dges
  * and returns it as the TE */
 bool SailDlg::makeFreeTELine(Vector3d const& clew, Vector3d const& peak,
-                                     QVector<Segment3d> const &freeedges, QVector<Segment3d> &TELine)
+                             QVector<Segment3d> const &freeedges, QVector<Segment3d> &TELine)
 {
     double dcrit = 1.e-4;
     TELine.clear();

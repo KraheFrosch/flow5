@@ -125,7 +125,6 @@ class SailDlg : public XflDialog
         void onNodeDistance();
         void onPickedNodePair(QPair<int, int> nodepair);
         void onDefinitions();
-        void onSelMesher();
         void onSetChanged();
 
         virtual void accept() override;
@@ -178,6 +177,7 @@ class SailDlg : public XflDialog
         virtual void onPickEdge(bool bPick);
         virtual void onPickedEdge(int iFace, int iEdge);
         virtual void onMakeEdgeSplits();
+        virtual void onReadEdgeSplits() {}
 
         virtual void onRuledMesh() {}
 
@@ -197,12 +197,6 @@ class SailDlg : public XflDialog
         QFrame *m_pfrMesh;
         QGroupBox *m_pgbMeshType;
         QFrame *m_pfrRuledMesh;
-        QFrame *m_pfrFreeMesh;
-        QGroupBox *m_pgbEdgeSplit;
-        IntEdit *m_pieNSegs[4];
-        QComboBox *m_pcbDistType[4];
-
-
 
         QFrame *m_pfrTE;
         QPushButton *m_ppbConnectPanels;
@@ -223,7 +217,6 @@ class SailDlg : public XflDialog
         IntEdit *m_pieNZPanels;
 
         GMesherWt *m_pGMesherWt;
-        MesherWt *m_pMesherWt;
 
         CPTableView *m_pcptSections;
 
@@ -273,7 +266,6 @@ class SailDlg : public XflDialog
         QSplitter *m_pSectionTableSplitter;
 
 
-        QRadioButton *m_prbfl5Mesher, *m_prbGMesher;
 
         static bool s_bAxes, s_bOutline, s_bSurfaces, s_bPanels, s_bCtrlPoints, s_bCornerPts;
 
@@ -294,7 +286,5 @@ class SailDlg : public XflDialog
         static QByteArray s_ExtSplitterSizes;
         static QByteArray s_TableSplitterSizes;
 
-
-        static bool s_bfl5Mesher;
 };
 

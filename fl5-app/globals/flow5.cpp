@@ -206,7 +206,7 @@ Flow5App::Flow5App(int &argc, char** argv) : QApplication(argc, argv)
         {
             m_pMainFrame->displayMessage("Launching flow5 with project file "+fi.canonicalFilePath()+"\n", false);
             bProjectFile = true;
-            int iApp = m_pMainFrame->loadXflFile(fi.canonicalFilePath());
+            int iApp = m_pMainFrame->loadProjectFile(fi.canonicalFilePath());
             switch (iApp)
             {
                 case xfl::XSAIL:    m_pMainFrame->onXSail();           break;
@@ -278,7 +278,7 @@ bool Flow5App::event(QEvent *pEvent)
             licencesettings.endGroup(); */
 #endif
 
-            iApp = m_pMainFrame->loadXflFile(pFOEvent->file());
+            iApp = m_pMainFrame->loadProjectFile(pFOEvent->file());
             switch (iApp)
             {
                 case xfl::XSAIL:    m_pMainFrame->onXSail();           break;

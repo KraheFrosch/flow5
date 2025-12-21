@@ -24,6 +24,7 @@
 
 #include <QElapsedTimer>
 #include <QString>
+#include <QDebug>
 
 #include <planexfl.h>
 #include <fusenurbs.h>
@@ -47,6 +48,7 @@
 
 PlaneXfl::PlaneXfl(bool bDefaultPlane) : Plane()
 {
+    m_bThickBuild = true; // to be consistent with legacy builds <7.54
     if(bDefaultPlane) makeDefaultPlane();
 }
 
@@ -237,6 +239,8 @@ void PlaneXfl::duplicate(Plane const*pPlane)
     if(!pPlaneXfl) return;
 
     Plane::duplicate(pPlane);
+
+    m_bThickBuild = pPlaneXfl->m_bThickBuild;
 
     m_PartIndexes.clear();
 
@@ -772,11 +776,13 @@ bool PlaneXfl::serializePlaneFl5(QDataStream &ar, bool bIsStoring)
         //        serializeTriMesh(ar, bIsStoring);
 
         // space allocation for the future storage of more data, without need to change the format
-        int nSpares=0;
+        int nSpares=1;
         ar << nSpares;
-        for (int i=0; i<nSpares; i++) ar << 0;
-        ar << nSpares;
-        for (int i=0; i<nSpares; i++) ar << 0.0;
+        ar << int(m_bThickBuild);
+//        for (int i=0; i<nSpares; i++) ar << 0;
+        int nDbleSpares = 0;
+        ar << nDbleSpares;
+//        for (int i=0; i<nSpares; i++) ar << 0.0;
 
         return true;
     }
@@ -912,9 +918,15 @@ bool PlaneXfl::serializePlaneFl5(QDataStream &ar, bool bIsStoring)
         // space allocation
         int nSpares=0;
         ar >> nSpares;
-        for (int i=0; i<nSpares; i++) ar >> k;
-        ar >> nSpares;
-        for (int i=0; i<nSpares; i++) ar >> dble;
+        if(nSpares>0)
+        {
+            ar >> k;  m_bThickBuild = bool(k); // v7.54
+        }
+
+        for (int i=1; i<nSpares; i++) ar >> k;
+        int nDbleSpares = 0;
+        ar >> nDbleSpares;
+        for (int i=0; i<nDbleSpares; i++) ar >> dble;
 
         return true;
     }

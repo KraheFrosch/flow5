@@ -77,7 +77,7 @@ PlaneOpp::PlaneOpp(Plane const *pPlane, PlanePolar const *pWPolar, int panel4Arr
 
     if(pWPolar)
     {
-        m_WPlrName        = pWPolar->name();
+        m_PlrName        = pWPolar->name();
         m_bThinSurface    = pWPolar->bThinSurfaces();
 //        m_bTiltedGeom     = pWPolar->isTilted();
         m_PolarType      = pWPolar->type();
@@ -110,7 +110,7 @@ void PlaneOpp::setVariableNames()
 void PlaneOpp::initialize()
 {
     m_PlaneName   = "";
-    m_WPlrName    = "";
+    m_PlrName    = "";
 
     m_nPanel4 = m_nPanel3 = 0;
 
@@ -681,7 +681,7 @@ bool PlaneOpp::serializePOppXFL(QDataStream &ar, bool bIsStoring)
         m_WingOpp.resize(n);
 
         ar >> strange;   m_PlaneName = strange.toStdString();
-        ar >> strange;   m_WPlrName  = strange.toStdString();
+        ar >> strange;   m_PlrName  = strange.toStdString();
         if(ArchiveFormat<200002)
         {
             ar >> k; m_theStyle.m_Stipple=LineStyle::convertLineStyle(k);
@@ -884,7 +884,7 @@ bool PlaneOpp::serializeFl5(QDataStream &ar, bool bIsStoring)
         ar << int(m_WingOpp.size());
 
         ar << QString::fromStdString(m_PlaneName);
-        ar << QString::fromStdString(m_WPlrName);
+        ar << QString::fromStdString(m_PlrName);
 
         ar << LineStyle::convertLineStyle(m_theStyle.m_Stipple);
         ar << m_theStyle.m_Width;
@@ -1023,7 +1023,7 @@ bool PlaneOpp::serializeFl5(QDataStream &ar, bool bIsStoring)
         m_WingOpp.resize(n);
 
         ar >> strange;   m_PlaneName = strange.toStdString();
-        ar >> strange;   m_WPlrName  = strange.toStdString();
+        ar >> strange;   m_PlrName  = strange.toStdString();
 
         ar >> k; m_theStyle.m_Stipple=LineStyle::convertLineStyle(k);
         ar >> m_theStyle.m_Width;

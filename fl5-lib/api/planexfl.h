@@ -240,7 +240,14 @@ class FL5LIB_EXPORT PlaneXfl : public Plane
         void rotateWingNodes(const std::vector<Panel3> &panel3, std::vector<Node> &node, WingXfl const *pWing, Vector3d const &hingePoint, Vector3d const & hingeVector, double alpha) const;
         void rotateFlapNodes(std::vector<Panel3> const &panel3, std::vector<Node> &node, Surface const &surf, Vector3d const &hingePoint, Vector3d const &hingeVector, double theta) const;
 
+
+        void setThickBuild(bool b) {m_bThickBuild=b;}
+        bool isThickBuild() const {return m_bThickBuild;}
+
+
     private:
+
+        bool m_bThickBuild;
 
         std::vector<WingXfl> m_Wing;                       /**< the array of Wing objects used to define this Plane */
 

@@ -105,7 +105,6 @@
 #include <interfaces/widgets/customwts/formattextoutput.h>
 #include <modules/xobjects.h>
 
-bool PlaneXflDlg::s_bThickSurfAssy(true);
 
 int PlaneXflDlg::s_iActivePage = 1;
 
@@ -641,8 +640,8 @@ void PlaneXflDlg::setControls()
     gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
     m_pchHighlightSel->setChecked(pglPlaneXflView->isHighlightingPart());
 
-    m_prbThick->setChecked(s_bThickSurfAssy);
-    m_prbThin->setChecked(!s_bThickSurfAssy);
+    m_prbThick->setChecked(m_pPlaneXfl->isThickBuild());
+    m_prbThin->setChecked(!m_pPlaneXfl->isThickBuild());
 }
 
 
@@ -981,7 +980,7 @@ void PlaneXflDlg::onOK(int iExitCode)
 
     m_pPlaneXfl->setDescription(m_pleDescription->toPlainText().toStdString());
 
-    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
+    m_pPlaneXfl->makeTriMesh(m_pPlaneXfl->isThickBuild());
 
     done(iExitCode);
 }
@@ -1700,7 +1699,7 @@ void PlaneXflDlg::onUpdatePlane()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-    m_pPlaneXfl->makePlane(s_bThickSurfAssy, false, true);
+    m_pPlaneXfl->makePlane(m_pPlaneXfl->isThickBuild(), false, true);
 
     onUpdatePlaneProps();
 
@@ -1721,7 +1720,7 @@ void PlaneXflDlg::onUpdateMesh()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     onClearHighlighted();
 
-    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
+    m_pPlaneXfl->makeTriMesh(m_pPlaneXfl->isThickBuild());
     m_bChanged = true;
 
     m_pglPlaneView->resetgl3dMesh();
@@ -1936,8 +1935,9 @@ void PlaneXflDlg::onNamesChanged()
 
 void PlaneXflDlg::onThinThick()
 {
-    s_bThickSurfAssy = m_prbThick->isChecked();
+    m_pPlaneXfl->setThickBuild(m_prbThick->isChecked());
     onUpdatePlane();
+    m_bChanged = true;
 }
 
 
@@ -1987,7 +1987,7 @@ void PlaneXflDlg::onTabChanged(int iNewTab)
             // initialize the flow5 mesher
             Fuse *pFuse =nullptr;
 
-            if(!s_bThickSurfAssy)
+            if(!m_pPlaneXfl->isThickBuild())
             {
                 QVector<WingXfl> const&thinwings = thinWingList(); // current selection
                 m_ppto->onAppendQText("Conforming fuselage mesh to mid-camber lines of:\n");
@@ -2031,7 +2031,7 @@ void PlaneXflDlg::onTabChanged(int iNewTab)
             else
             {
                 m_pGMesherWt->setEnabled(true);
-                m_pGMesherWt->initWt(pFuse, pFuse->isXflType(), s_bThickSurfAssy);
+                m_pGMesherWt->initWt(pFuse, pFuse->isXflType(), m_pPlaneXfl->isThickBuild());
 
                 AFMesher::setTraceFaceIndex(-1);
             }
@@ -2093,7 +2093,7 @@ void PlaneXflDlg::onThinListClick()
     QVector<WingXfl> winglist = thinWingList();
     m_pGMesherWt->setWings(winglist);
 
-    if(s_bThickSurfAssy)
+    if(m_pPlaneXfl->isThickBuild())
     {
         for(WingXfl const &wing : winglist)
         {
@@ -2113,23 +2113,10 @@ void PlaneXflDlg::onThinListClick()
 
 
 /**
- * Cuts the left and right shells with each of the wings and updates the two half shells.
+ * Unused in v7.54 - replaced by calls to gmsh API
  */
 void PlaneXflDlg::onCutFuse()
 {
-/*    s_bThickSurfAssy = m_pchThickSurfAssy->isChecked();
-    if(!s_bThickSurfAssy)
-    {
-//        makeFragments();
-//        m_pGMesherWt->setWings({m_pPlaneXfl->mainWing()});
-//        m_pGMesherWt->setWings({m_pPlaneXfl->stab()});
-//        m_pGMesherWt->setWings({m_pPlaneXfl->mainWing(), m_pPlaneXfl->stab()});
-        m_pGMesherWt->setWings({m_pPlaneXfl->mainWing(), m_pPlaneXfl->stab(), m_pPlaneXfl->fin()});
-
-        return;
-    }*/
-
-//    QString strange;
 
     readParams();
 
@@ -2251,7 +2238,7 @@ void PlaneXflDlg::onCutFuse()
     std::string str;
     pFuse->makeDefaultTriMesh(str, ""); // just for xfl and stl
 
-    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
+    m_pPlaneXfl->makeTriMesh(m_pPlaneXfl->isThickBuild());
 
     gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
     pglPlaneXflView->resetgl3dFuse();
@@ -2637,7 +2624,6 @@ void PlaneXflDlg::loadSettings(QSettings &settings)
         s_HSplitterSizes    = settings.value("HSplitterSizes").toByteArray();
         s_PartSplitterSizes = settings.value("VSplitterSizes").toByteArray();
 
-        s_bThickSurfAssy    = settings.value("ThickSurfAssy",     s_bThickSurfAssy).toBool();
         s_StitchPrecision   = settings.value("StitchPrecision",   s_StitchPrecision  ).toDouble();
         s_NodeMergeDistance = settings.value("NodeMergeDistance", s_NodeMergeDistance).toDouble();
 
@@ -2655,7 +2641,6 @@ void PlaneXflDlg::saveSettings(QSettings &settings)
         settings.setValue("HSplitterSizes",    s_HSplitterSizes);
         settings.setValue("VSplitterSizes",    s_PartSplitterSizes);
 
-        settings.setValue("ThickSurfAssy",     s_bThickSurfAssy);
         settings.setValue("StitchPrecision",   s_StitchPrecision);
         settings.setValue("NodeMergeDistance", s_NodeMergeDistance);
 
@@ -2810,7 +2795,7 @@ void PlaneXflDlg::onResetFuse()
     pFuse->makeFuseGeometry();
 
     pFuse->makeDefaultTriMesh(strange, "");
-    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
+    m_pPlaneXfl->makeTriMesh(m_pPlaneXfl->isThickBuild());
     gl3dPlaneXflView*pglPlaneXflView = dynamic_cast<gl3dPlaneXflView*>(m_pglPlaneView);
     pglPlaneXflView->resetgl3dFuse();
     QString str;
@@ -3135,7 +3120,7 @@ void PlaneXflDlg::onResetFuseMesh()
     m_pPlaneXfl->fuse(0)->makeDefaultTriMesh(logmsg, "   ");
     updateStdOutput(logmsg);
 
-    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
+    m_pPlaneXfl->makeTriMesh(m_pPlaneXfl->isThickBuild());
 
     QString strange;
     strange = QString::asprintf("\nTriangle count=%d\n", m_pPlaneXfl->nPanel3());
@@ -3166,7 +3151,7 @@ void PlaneXflDlg::onFuseMeshDlg()
         return;
     }
 
-    m_pPlaneXfl->makeTriMesh(s_bThickSurfAssy);
+    m_pPlaneXfl->makeTriMesh(m_pPlaneXfl->isThickBuild());
 
     QString strange;
     strange = QString::asprintf("\nTriangle count=%d\n", m_pPlaneXfl->nPanel3());

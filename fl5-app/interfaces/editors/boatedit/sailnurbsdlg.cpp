@@ -80,8 +80,8 @@ void SailNurbsDlg::connectSignals()
     connect(m_pieNXDegree,      SIGNAL(editingFinished()),      SLOT(onNurbsMetaChanged()));
     connect(m_pieNZDegree,      SIGNAL(editingFinished()),      SLOT(onNurbsMetaChanged()));
 
-    connect(m_pdeEdgeWeightu,   SIGNAL(editingFinished()),      SLOT(onNurbsMetaChanged()));
-    connect(m_pdeEdgeWeightv,   SIGNAL(editingFinished()),      SLOT(onNurbsMetaChanged()));
+    connect(m_pfeEdgeWeightu,   SIGNAL(editingFinished()),      SLOT(onNurbsMetaChanged()));
+    connect(m_pfeEdgeWeightv,   SIGNAL(editingFinished()),      SLOT(onNurbsMetaChanged()));
 
 
     connect(m_pTabWidget,       SIGNAL(currentChanged(int)),    SLOT(onResizeTableColumns()));
@@ -119,8 +119,8 @@ void SailNurbsDlg::setupLayout()
                                     m_pieNXDegree = new IntEdit(2);
                                     m_pieNZDegree = new IntEdit(2);
 
-                                    m_pdeEdgeWeightu = new FloatEdit(1.0, 1);
-                                    m_pdeEdgeWeightv = new FloatEdit(1.0, 1);
+                                    m_pfeEdgeWeightu = new FloatEdit(1.0, 1);
+                                    m_pfeEdgeWeightv = new FloatEdit(1.0, 1);
 
                                     m_pieNXDegree->setToolTip("<p>The x-degree must be strictly less than the number of control points</p>");
                                     m_pieNZDegree->setToolTip("<p>The z-degree must be strictly less than the number of sections</p>");
@@ -132,8 +132,8 @@ void SailNurbsDlg::setupLayout()
                                     pNURBSDataLayout->addWidget(m_pieNXDegree,      2, 2);
                                     pNURBSDataLayout->addWidget(m_pieNZDegree,      2, 3);
                                     pNURBSDataLayout->addWidget(pLabEdgeWeight,     3, 1, Qt::AlignRight | Qt::AlignVCenter);
-                                    pNURBSDataLayout->addWidget(m_pdeEdgeWeightu,   3, 2);
-                                    pNURBSDataLayout->addWidget(m_pdeEdgeWeightv,   3, 3);
+                                    pNURBSDataLayout->addWidget(m_pfeEdgeWeightu,   3, 2);
+                                    pNURBSDataLayout->addWidget(m_pfeEdgeWeightv,   3, 3);
                                     pNURBSDataLayout->addWidget(pLimitLab,          4, 1, 1, 3);
 
                                     pNURBSDataLayout->setColumnStretch(1,1);
@@ -361,8 +361,8 @@ void SailNurbsDlg::onNurbsMetaChanged()
 
     pNS->nurbs().setuDegree(udegree);
     pNS->nurbs().setvDegree(vdegree);
-    pNS->nurbs().setuEdgeWeight(m_pdeEdgeWeightu->value());
-    pNS->nurbs().setvEdgeWeight(m_pdeEdgeWeightv->value());
+    pNS->nurbs().setuEdgeWeight(m_pfeEdgeWeightu->value());
+    pNS->nurbs().setvEdgeWeight(m_pfeEdgeWeightv->value());
 
     m_bChanged = true;
 
@@ -379,7 +379,6 @@ void SailNurbsDlg::setSailData()
 {
     ThinSailDlg::setSailData();
 
-    m_pgbEdgeSplit->setVisible(!m_pSail->bRuledMesh());
     fillSectionModel();
     fillPointModel();
 }
@@ -443,8 +442,8 @@ void SailNurbsDlg::setControls()
     m_pieNXDegree->setValue(pNS->nurbs().vDegree());
     m_pieNZDegree->setValue(pNS->nurbs().uDegree());
 
-    m_pdeEdgeWeightu->setValue(pNS->nurbs().uEdgeWeight());
-    m_pdeEdgeWeightv->setValue(pNS->nurbs().vEdgeWeight());
+    m_pfeEdgeWeightu->setValue(pNS->nurbs().uEdgeWeight());
+    m_pfeEdgeWeightv->setValue(pNS->nurbs().vEdgeWeight());
 }
 
 
@@ -593,8 +592,8 @@ void SailNurbsDlg::readData()
     //the degree may have been adjusted, so set the returned value
     m_pieNZDegree->setValue(pNS->pNurbs()->uDegree());
 
-    pNS->pNurbs()->setuEdgeWeight(m_pdeEdgeWeightu->value());
-    pNS->pNurbs()->setvEdgeWeight(m_pdeEdgeWeightv->value());
+    pNS->pNurbs()->setuEdgeWeight(m_pfeEdgeWeightu->value());
+    pNS->pNurbs()->setvEdgeWeight(m_pfeEdgeWeightv->value());
 
     readPointData();
     readSectionData();// read section data after to set z position

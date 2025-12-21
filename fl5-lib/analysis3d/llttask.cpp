@@ -132,7 +132,7 @@ void LLTTask::initializeVelocity(double alpha, double &QInf)
             {
                 double yob   = cos(k*PI/s_NLLTStations);
                 m_pWing->getFoils(&pFoil0, &pFoil1, yob*m_pWing->planformSpan()/2.0, tau);
-                double alpha0 = Objects2d::getZeroLiftAngle(pFoil0, pFoil1, 1.0e10, tau);
+                double alpha0 = Objects2d::getZeroLiftAngle(pFoil0, pFoil1, LARGEVALUE, tau);
                 double Cl = 2.0*PI*(alpha-alpha0+m_Twist.at(k))*PI/180.0;
                 Lift += Eta(k) * Cl * m_Chord.at(k) /m_pWing->planformSpan();
             }

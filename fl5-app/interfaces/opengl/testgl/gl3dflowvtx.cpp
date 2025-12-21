@@ -57,6 +57,8 @@ gl3dFlowVtx::gl3dFlowVtx(QWidget *pParent) : gl3dTestGLView(pParent)
 
     m_bAxes = false;
 
+    m_stackInterval.resize(50, 0);
+
     QPalette palette;
     palette.setColor(QPalette::WindowText, DisplayOptions::textColor());
     palette.setColor(QPalette::Text, DisplayOptions::textColor());
@@ -107,6 +109,10 @@ gl3dFlowVtx::gl3dFlowVtx(QWidget *pParent) : gl3dTestGLView(pParent)
             m_pfeDt->setToolTip("<p>The time step of the Runge-Kutta scheme.<br>"
                                 "The boids (particles) are moved every 1/60 seconds by an increment of V.dt</p>");
 
+
+            m_plabFrameRate = new QLabel;
+            m_plabFrameRate->setFont(DisplayOptions::tableFont());
+
             QPushButton *ppbPause = new QPushButton("Pause/Resume");
             connect(ppbPause, SIGNAL(clicked()), SLOT(onPause()));
 
@@ -114,15 +120,16 @@ gl3dFlowVtx::gl3dFlowVtx(QWidget *pParent) : gl3dTestGLView(pParent)
             pMainLayout->addWidget(plabGroupSize,       2, 1);
             pMainLayout->addWidget(plabNGroups,         3, 1);
             pMainLayout->addWidget(m_pieNGroups,        3, 2);
-            pMainLayout->addWidget(m_plabNParticles,    4,1,1,2);
+            pMainLayout->addWidget(m_plabNParticles,    4, 1, 1, 2);
             pMainLayout->addWidget(plabGamma,           5, 1);
             pMainLayout->addWidget(m_pfeGamma,          5, 2);
             pMainLayout->addWidget(plabVInf,            8, 1);
             pMainLayout->addWidget(m_pfeVInf,           8, 2);
             pMainLayout->addWidget(plabDt,              9, 1);
             pMainLayout->addWidget(m_pfeDt,             9, 2);
+            pMainLayout->addWidget(m_plabFrameRate,    10, 1, 1, 2);
 
-            pMainLayout->addWidget(ppbPause,            12,1,1,2);
+            pMainLayout->addWidget(ppbPause,           12, 1, 1, 2);
 
             pMainLayout->setColumnStretch(3,1);
             pMainLayout->setRowStretch(11,1);
@@ -142,7 +149,7 @@ gl3dFlowVtx::gl3dFlowVtx(QWidget *pParent) : gl3dTestGLView(pParent)
     m_locRandSeed = -1;
 
 
-    m_Period = 17;
+    m_Period = 1;
 //    m_Period = int(1000.0/QGuiApplication::primaryScreen()->refreshRate());
 //    qDebug()<<"refreshrate="<<QGuiApplication::primaryScreen()->refreshRate()<<period;
     connect(&m_Timer, SIGNAL(timeout()), SLOT(moveThem()));
@@ -514,6 +521,13 @@ void gl3dFlowVtx::glRenderView()
 
     paintSegments(m_vboVortices, Qt::darkYellow, 3.0f, Line::SOLID);
 
+    m_stackInterval.push_back(QTime::currentTime().msecsSinceStartOfDay());
+    double average = 0.0;
+    for(int i=0; i<m_stackInterval.size()-1; i++)
+        average += m_stackInterval.at(i+1)-m_stackInterval.at(i);
+    average /= double(m_stackInterval.size()-1);
+    m_plabFrameRate->setText(QString::asprintf("FPS = %4.1f Hz", 1000.0/average));
+    m_stackInterval.pop_front();
 
     if (!m_bInitialized)
     {

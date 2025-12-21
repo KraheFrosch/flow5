@@ -27,6 +27,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QCheckBox>
+#include <QStack>
 
 #include <interfaces/opengl/testgl/gl3dtestglview.h>
 #include <api/boid.h>
@@ -70,6 +71,9 @@ class gl3dFlowVtx : public gl3dTestGLView
         FloatEdit *m_pfeVInf;
         FloatEdit *m_pfeDt;
 
+        QLabel *m_plabFrameRate;
+
+
         QTimer m_Timer;
         int m_Period;
 
@@ -89,6 +93,8 @@ class gl3dFlowVtx : public gl3dTestGLView
 
         bool m_bResetBoids;
         bool m_bResetVortices;
+
+        QStack<int> m_stackInterval;
 
         static float s_dt, s_VInf, s_Gamma;
         static int s_NGroups;

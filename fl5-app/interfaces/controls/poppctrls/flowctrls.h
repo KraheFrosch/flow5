@@ -32,6 +32,8 @@
 #include <QRadioButton>
 #include <api/vector3d.h>
 
+#define FLOWPERIOD 1
+
 class XPlane;
 class XSail;
 class ExponentialSlider;

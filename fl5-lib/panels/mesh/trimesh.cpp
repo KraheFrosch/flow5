@@ -352,7 +352,7 @@ void TriMesh::checkPanels(std::string &logmsg,
         for(int i3=0; i3<nPanels(); i3++)
         {
             Panel3 const &p3 = m_Panel3.at(i3);
-            double length(1.0e10);
+            double length(LARGEVALUE);
             for(int iedge=0; iedge<3; iedge++)
             {
                 if(p3.edge(iedge).length()<length)

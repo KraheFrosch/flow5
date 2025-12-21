@@ -337,6 +337,7 @@ MainFrame::MainFrame(QWidget *parent) : QMainWindow(parent)
     GraphOptions::resetGraphSettings(*m_pFastGraphWt->graph());
 
     connectSignals();
+
     gmsh::initialize();
     gmsh::option::setNumber("General.Terminal", 0);  
     gmsh::option::setNumber("Geometry.OCCParallel", 1.0);
@@ -655,10 +656,6 @@ void MainFrame::createMainFrameActions()
     m_pLoadLastProjectAct->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
     m_pLoadLastProjectAct->setStatusTip("Loads the last saved project");
     connect(m_pLoadLastProjectAct, SIGNAL(triggered()), SLOT(onLoadLastProject()));
-
-    m_pLoadXflProject = new QAction("Load xflr5 project", this);
-//    m_pLoadXflProject->setShortcut(QKeySequence(Qt::ALT | Qt::Key_X));
-    connect(m_pLoadXflProject, SIGNAL(triggered()), SLOT(onLoadXflProject()));
 
     m_pSaveProjectAsAct = new QAction("Save project as", this);
     m_pSaveProjectAsAct->setShortcut(QKeySequence::SaveAs);
@@ -995,7 +992,6 @@ void MainFrame::createMenus()
         m_pFileMenu->addAction(m_pNewProjectAct);
         m_pFileMenu->addAction(m_pOpenAct);
         m_pFileMenu->addAction(m_pLoadLastProjectAct);
-        m_pFileMenu->addAction(m_pLoadXflProject);
         m_pFileMenu->addAction(m_pInsertAct);
         m_pFileMenu->addAction(m_pCloseProjectAct);
         m_pFileMenu->addSeparator();
@@ -1019,6 +1015,7 @@ void MainFrame::createMenus()
         m_pFileMenu->addSeparator();
         updateRecentFileActions();
     }
+
     m_pModuleMenu = menuBar()->addMenu("&Module");
     {
         m_pModuleMenu->addAction(m_pNoAppAct);
@@ -1261,6 +1258,7 @@ void MainFrame::keyPressEvent(QKeyEvent *pEvent)
             }
             case Qt::Key_R:
             {
+#ifdef QT_DEBUG
                 if(bCtrl)
                 {
                     resize(2560, 1440);
@@ -1271,6 +1269,7 @@ void MainFrame::keyPressEvent(QKeyEvent *pEvent)
                     qDebug()<<"framegeom"<<frameGeometry();
                     pEvent->accept();
                 }
+#endif
                 break;
             }
             case Qt::Key_K:
@@ -1482,7 +1481,7 @@ void MainFrame::keyReleaseEvent(QKeyEvent *pEvent)
 }
 
 
-xfl::enumApp MainFrame::loadXflFile(QString const &PathName)
+xfl::enumApp MainFrame::loadProjectFile(QString const &PathName)
 {
     QString pathname = PathName;
 
@@ -1732,7 +1731,7 @@ void MainFrame::onLoadProjectFile()
 
     onShowLogWindow(true);
 
-    loadXflFile(PathName);
+    loadProjectFile(PathName);
 }
 
 
@@ -1772,7 +1771,7 @@ void MainFrame::loadRecentProject(QString recentfilename)
 
     if(recentfilename.endsWith(".xfl", Qt::CaseInsensitive) || recentfilename.endsWith(".fl5", Qt::CaseInsensitive))
     {
-        xfl::enumApp iApp = loadXflFile(recentfilename);
+        xfl::enumApp iApp = loadProjectFile(recentfilename);
 
         switch (iApp)
         {
@@ -3564,33 +3563,6 @@ void MainFrame::onCurGraphSettings()
         default:
             break;
     }
-}
-
-
-void MainFrame::onLoadXflProject()
-{
-    m_pLogMessageDlg->show();
-
-    if(!onCloseProject()) return;
-
-    QString PathName;
-
-    if(xfl::dontUseNativeMacDlg())
-    {
-        QFileDialog fd;
-        fd.setOption(QFileDialog::DontUseNativeDialog);
-        PathName = fd.getOpenFileName(this, "Open xflr5 project file",
-                                      s_XflProjectPath,
-                                      "xflr5 file (*.xfl)");
-    }
-    else
-    {
-        PathName = QFileDialog::getOpenFileName(this, "Open xflr5 project file",
-                                                SaveOptions::lastDirName(),
-                                                "xflr5 file (*.xfl)");
-    }
-
-    loadXflFile(PathName);
 }
 
 

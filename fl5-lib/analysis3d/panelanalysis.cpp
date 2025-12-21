@@ -1205,7 +1205,6 @@ void PanelAnalysis::vortonDrag(double alpha, double beta, double QInf, int n0, i
     double vtncorelength = m_pPolar3d->vortonCoreSize()*m_pPolar3d->referenceChordLength();
 
     vtncorelength = Vortex::coreRadius();
-    vtncorelength = 1.0e-4;
 
     std::vector<Vorton> const &vorton = m_Vorton.at(iRow);
     int m=0;

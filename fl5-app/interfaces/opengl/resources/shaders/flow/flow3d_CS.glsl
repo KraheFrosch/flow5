@@ -29,7 +29,6 @@ uniform float GroundHeight;
 uniform int HasUniColor;
 uniform vec4 UniformColor;
 
-
 // Watch out for padding constraints of layouts 430/140 specifically for vec3:
 // https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL)
 // using vec4 everywhere instead
@@ -388,11 +387,9 @@ void main()
     bool bResetTrace = false;
     if(newpos.x>botright.x)
     {
-        float flt = 147.51861127f;
         // raising the digits to get pseudo rand
-        float randy = oldpos.y*flt-floor(oldpos.y*flt);
-        float randz = oldpos.z*flt-floor(oldpos.z*flt);
-
+        float randy = oldpos.y*1000.0f-floor(oldpos.y*1000.0f);
+        float randz = oldpos.z*1000.0f-floor(oldpos.z*1000.0f);
 
         newpos.x = topleft.x;
         newpos.y = topleft.y + randy * (botright.y-topleft.y);

@@ -240,15 +240,15 @@ int xfl::readValues(std::string const &theline, float val[], int nValues)
     }
     catch (const std::invalid_argument& ia)
     {
-          std::cerr << "Invalid argument: " << ia.what() << '\n';
+//          std::cerr << "Invalid argument: " << ia.what() << '\n';
     }
     catch (const std::out_of_range& oor)
     {
-        std::cerr << "Out of Range error: " << oor.what() << '\n';
+//        std::cerr << "Out of Range error: " << oor.what() << '\n';
     }
     catch(...)
     {
-        std::cerr << "Unknown error reading floats"<< '\n';
+//        std::cerr << "Unknown error reading floats"<< '\n';
     }
 
     return nread;

@@ -52,6 +52,7 @@ FuseOcc::FuseOcc() : Fuse()
 {
     m_FuseType = Fuse::Occ;
     m_Name = "CAD type fuse";
+    m_theStyle.m_Color.setRgb(142,161,183);
 }
 
 

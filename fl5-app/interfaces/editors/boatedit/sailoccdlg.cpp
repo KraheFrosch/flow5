@@ -54,7 +54,7 @@
 #include <api/flow5events.h>
 #include <api/units.h>
 
-
+QByteArray SailOccDlg::s_VSplitterSizes;
 
 
 SailOccDlg::SailOccDlg(QWidget *pParent) : ExternalSailDlg(pParent)
@@ -69,11 +69,20 @@ SailOccDlg::SailOccDlg(QWidget *pParent) : ExternalSailDlg(pParent)
 }
 
 
+void SailOccDlg::showEvent(QShowEvent *pEvent)
+{
+    ExternalSailDlg::showEvent(pEvent);
+    if(s_VSplitterSizes.length()>0) m_pLeftSplitter->restoreState(s_VSplitterSizes);
+}
+
+
 void SailOccDlg::hideEvent(QHideEvent *pEvent)
 {
     ExternalSailDlg::hideEvent(pEvent);
     SailOcc *pOccSail = dynamic_cast<SailOcc*>(m_pSail);
     pOccSail->setMaxElementSize(AFMesher::maxEdgeLength());
+
+    s_VSplitterSizes  = m_pLeftSplitter->saveState();
 }
 
 
@@ -117,24 +126,32 @@ void SailOccDlg::setupLayout()
     {
         QVBoxLayout *pLeftLayout = new QVBoxLayout;
         {
-            m_pTabWidget = new QTabWidget(this);
+            m_pLeftSplitter = new QSplitter;
             {
-                QFrame *pMetaFrame = new QFrame;
+                m_pLeftSplitter->setOrientation(Qt::Vertical);
+                m_pLeftSplitter->setChildrenCollapsible(false);
+
+                m_pTabWidget = new QTabWidget(this);
                 {
-                    QVBoxLayout *pMetaLayout = new QVBoxLayout;
+                    QFrame *pMetaFrame = new QFrame;
                     {
-                        pMetaLayout->addWidget(m_pfrMeta);
-                        pMetaLayout->addWidget(m_pCornersBox);
+                        QVBoxLayout *pMetaLayout = new QVBoxLayout;
+                        {
+                            pMetaLayout->addWidget(m_pfrMeta);
+                            pMetaLayout->addWidget(m_pCornersBox);
+                        }
+                        pMetaFrame->setLayout(pMetaLayout);
                     }
-                    pMetaFrame->setLayout(pMetaLayout);
+
+                    m_pTabWidget->addTab(pMetaFrame, "Meta");
+                    m_pTabWidget->addTab(m_pfrMesh,  "Mesh");
+                    m_pTabWidget->addTab(m_pfrTE,    "Trailing edge");
+                    m_pTabWidget->setCurrentIndex(0);
                 }
 
-                m_pTabWidget->addTab(pMetaFrame, "Meta");
-                m_pTabWidget->addTab(m_pfrMesh,  "Mesh");
-                m_pTabWidget->addTab(m_pfrTE,    "Trailing edge");
-                m_pTabWidget->setCurrentIndex(0);
+                m_pLeftSplitter->addWidget(m_pTabWidget);
+                m_pLeftSplitter->addWidget(m_ppto);
             }
-
             QPushButton *ppbSailActions = new QPushButton("Sail actions");
             {
                 QMenu *ppbSailMenu = new QMenu("Sail actions");
@@ -168,8 +185,8 @@ void SailOccDlg::setupLayout()
                 ppbSailActions->setMenu(ppbSailMenu);
                 m_pButtonBox->addButton(ppbSailActions, QDialogButtonBox::ActionRole);
             }
-            pLeftLayout->addWidget(m_pTabWidget);
-            pLeftLayout->addWidget(m_ppto);
+            pLeftLayout->addWidget(m_pLeftSplitter);
+
             pLeftLayout->addWidget(m_pFlow5Link);
             pLeftLayout->addWidget(m_pButtonBox);
             pLeftLayout->setStretchFactor(m_pTabWidget,1);
@@ -200,12 +217,6 @@ void SailOccDlg::setupLayout()
 void SailOccDlg::connectSignals()
 {
     ExternalSailDlg::connectSignals();
-
-
-    connect(m_pMesherWt,        SIGNAL(updateFuseView()),     SLOT(onUpdateSailView()));
-    connect(m_pMesherWt,        SIGNAL(outputMsg(QString)), m_ppto, SLOT(onAppendQText(QString)));
-    connect(m_pMesherWt->m_pfeMaxEdgeSize,  SIGNAL(floatChanged(float)),  SLOT(onMakeEdgeSplits()));
-    connect(m_pMesherWt->m_pchPickEdge,     SIGNAL(clicked(bool)),   SLOT(onPickEdge(bool)));
 
     connect(m_pGMesherWt,       SIGNAL(updateFuseView()),     SLOT(onUpdateSailView()));
     connect(m_pGMesherWt,       SIGNAL(outputMsg(QString)), m_ppto, SLOT(onAppendQText(QString)));
@@ -351,7 +362,6 @@ void SailOccDlg::onTabChanged(int iTab)
     if(iTab==1) initMesher();
     else
     {
-        m_pMesherWt->m_pchPickEdge->setChecked(false);
         onPickEdge(false);
     }
 }
@@ -387,7 +397,6 @@ void SailOccDlg::initMesher()
     }
     (void)iShell;
 
-    m_pMesherWt->initWt(shells, pOccSail->maxElementSize(), false, false);
     m_pGMesherWt->initWt(pOccSail);
 }
 
@@ -492,7 +501,6 @@ void SailOccDlg::onMakeEdgeSplits()
     }
     updateEdgeNodes();
 
-    m_pMesherWt->setEdgeSplit(pOccSail->m_EdgeSplit);
 }
 
 

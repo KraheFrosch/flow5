@@ -115,8 +115,8 @@ void gl3dSurface::glMakeSurface()
 
     QVector<float>surfvertexarray(bufferSize);
 
-    float zmin= 1.0e10f;
-    float zmax=-1.0e10f;
+    float zmin= float(LARGEVALUE);
+    float zmax=-float(LARGEVALUE);
     for(int i=0; i<m_Size_x*m_Size_y; i++)
     {
         zmin = std::min(zmin, m_PointArray[i].zf());

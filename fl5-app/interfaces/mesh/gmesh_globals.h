@@ -52,7 +52,7 @@ namespace gmesh
     std::string getNumberOption(std::string name);
     std::string getStringOption(std::string name);
 
-    void listModelEntities(QString &list);
+//    void listModelEntities(QString &list);
     void listModel(QString &list);
 
     void convertFromGmsh(std::vector<Triangle3d> &triangles, QString &log);

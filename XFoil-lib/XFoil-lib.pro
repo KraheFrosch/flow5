@@ -30,7 +30,7 @@ HEADERS +=\
 
 OBJECTS_DIR = ./objects
 
-
+VERSION = 1.1.0
 
 linux-g++{
 

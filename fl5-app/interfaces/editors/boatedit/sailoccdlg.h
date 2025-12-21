@@ -37,6 +37,7 @@ class SailOccDlg: public ExternalSailDlg
         SailOccDlg(QWidget *pParent);
         void initDialog(Sail *pSail) override;
         void customEvent(QEvent *pEvent) override;
+        void showEvent(QShowEvent *pEvent) override;
         void hideEvent(QHideEvent *pEvent) override;
         void keyPressEvent(QKeyEvent *pEvent) override;
 
@@ -62,6 +63,10 @@ class SailOccDlg: public ExternalSailDlg
     private:
 
         QAction *m_pTessSettings, *m_pFlipTessNormals;
+
+        QSplitter *m_pLeftSplitter;
+
+        static QByteArray s_VSplitterSizes;
 
 
 };

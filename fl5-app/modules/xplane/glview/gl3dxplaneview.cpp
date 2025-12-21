@@ -804,6 +804,7 @@ void gl3dXPlaneView::glRenderView()
     for(uint i=0; i<TriMesh::s_DebugPts.size(); i++)
         paintIcosahedron(TriMesh::s_DebugPts.at(i), 0.0075/m_glScalef, Qt::darkYellow, W3dPrefs::s_OutlineStyle, true, true);
 #endif
+
 }
 
 
@@ -1031,7 +1032,7 @@ bool gl3dXPlaneView::glMakeStreamLines(const std::vector<Panel3> &panel3list, st
     else
         m_NStreamLines = points.size();
 
-    int streamArraySize =     m_NStreamLines * (StreamLineCtrls::nX()+1) * 3;
+    int streamArraySize = m_NStreamLines * (StreamLineCtrls::nX()+1) * 3;
     QVector<float> StreamVertexArray(streamArraySize);
 
     int iv = 0;
@@ -1049,6 +1050,7 @@ bool gl3dXPlaneView::glMakeStreamLines(const std::vector<Panel3> &panel3list, st
         m_pP3LinAnalysis->setTriMesh(s_pXPlane->curPlane()->triMesh());
         m_pP3LinAnalysis->setVortons(pPOpp->m_Vorton);
     }
+    m_pP3UniAnalysis->makeWakePanels(Vector3d(1.0, 0.0, 0.0), s_pXPlane->curPlPolar()->bVortonWake());
 
 
     // multithreaded mode only
@@ -3308,7 +3310,6 @@ void gl3dXPlaneView::paintOverlay()
         QPoint pos4(width()*devicePixelRatio()-5-wc, 50);
         painter.drawPixmap(pos4, m_ColourLegend.m_pix);
     }
-
 }
 
 
@@ -3332,6 +3333,7 @@ void gl3dXPlaneView::glMakeFlowBuffers()
         m_pP3UniAnalysis->initializeAnalysis(s_pXPlane->curPlPolar(),0);
         m_pP3UniAnalysis->setTriMesh(s_pXPlane->curPlane()->triMesh());
         m_pP3UniAnalysis->setVortons(pPOpp->m_Vorton);
+        m_pP3UniAnalysis->makeWakePanels(Vector3d(1.0,0,0), pWPolar->bVortonWake());
 
         // Create a VBO and an SSBO for the vortices
         // VBO is used for display and SSBO is used in the compute shader
@@ -3533,6 +3535,7 @@ void gl3dXPlaneView::glMakeFlowBuffers()
         //need to use v4 vertices for velocity due to std140/430 padding constraints for vec3:
         int buffersize = NBoids*(4+4+4); //4 vertices + 4 velocity + 4 color components for each boid
 
+
         QColor clr(xfl::fromfl5Clr(W3dPrefs::s_FlowStyle.m_Color));
         QVector<float>BufferArray(buffersize);
         int iv=0;
@@ -3650,7 +3653,7 @@ void gl3dXPlaneView::moveBoids()
 
         glDispatchCompute(FlowCtrls::s_FlowNGroups, 1, 1);
 
-        glFlush();
+//        glFlush();
     }
     m_shadFlow.release();
 

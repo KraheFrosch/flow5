@@ -37,12 +37,9 @@ class ThinSailDlg : public SailDlg
     public:
         ThinSailDlg(QWidget *pParent);
 
-        void initDialog(Sail*pSail) override;
-
     protected:
 
     protected slots:
-        void onReadEdgeSplits();
         void onRuledMesh() override;
         void onUpdateMesh() override;
 

@@ -57,7 +57,6 @@ void gmesh::listMainOptions(std::string &list)
     list += EOLstr;
     list += "   General:\n";
     list += "      " + getStringOption("General.Version")                      + EOLstr;
-//    list += "      " + getStringOption("General.BuildInfo")                    + EOLstr;
     list += "      " + getNumberOption("General.Terminal")                     + EOLstr;
     list += "      " + getNumberOption("General.Verbosity")                    + EOLstr;
     list += "      " + getNumberOption("General.NumThreads")                   + EOLstr;
@@ -103,7 +102,8 @@ std::string gmesh::getStringOption(std::string name)
 }
 
 
-void gmesh::listModelEntities(QString &list)
+/*
+ void gmesh::listModelEntities(QString &list)
 {
     list = "Model entities:\n";
 
@@ -117,7 +117,7 @@ void gmesh::listModelEntities(QString &list)
         gmsh::model::getEntityType(entity.first, entity.second, entityType);
         list += QString::asprintf("   entity dim=%d, tag=%d, name=",entity.first, entity.second)+QString::fromStdString(entityType)+EOLch;
     }
-}
+}*/
 
 
 void gmesh::listModel(QString &list)

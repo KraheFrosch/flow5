@@ -1759,13 +1759,7 @@ void XSail::onEditSail()
 
     if(!pSail) return;
 
-    editSail(pSail);
-    updateView();
-}
 
-
-void XSail::editSail(Sail *pSail)
-{
     if(pSail->isNURBSSail())
     {
         SailNurbs MemSail;

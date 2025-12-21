@@ -70,7 +70,7 @@ class Section2dOptions : public QWidget
 
     private:
         QCheckBox *m_pchSpinAnimation;
-        FloatEdit *m_pdeSpinDamping;
+        FloatEdit *m_pfeSpinDamping;
 
         QCheckBox *m_pchAntiAliasing;
         IntEdit *m_pieSelectionPixels;

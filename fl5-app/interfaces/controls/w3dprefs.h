@@ -150,23 +150,23 @@ class W3dPrefs : public QWidget
         ColorBtn *m_pcbFusePanelClr, *m_pcbWingPanelClr, *m_pcbFlapPanelClr, *m_pcbWakePanelClr;
 
         QCheckBox *m_pchSpinAnimation;
-        FloatEdit *m_pdeSpinDamping;
+        FloatEdit *m_pfeSpinDamping;
 
         QCheckBox*m_pchAnimateTransitions, *m_pchAutoAdjustScale, *m_pcbEnableClipPlane, *m_pchShowRefLength;
         QCheckBox*m_pchSaveViewPoints;
 
         IntEdit *m_pieAnimationTime;
 
-        FloatEdit *m_pdeZAnimAngle;
+        FloatEdit *m_pfeZAnimAngle;
 
         IntEdit *m_pieChordwiseRes, *m_pieBodyAxialRes, *m_pieBodyHoopRes;
         IntEdit *m_pieSailXRes, *m_pieSailZRes;
 
-        FloatEdit *m_pdeArcballRadius;
+        FloatEdit *m_pfeArcballRadius;
 
         QCheckBox *m_pchGround;
         ColorBtn *m_pcbWaterColor;
-        FloatEdit *m_pdeBoxX, *m_pdeBoxY;
+        FloatEdit *m_pfeBoxX, *m_pfeBoxY;
         QLabel *m_pLabXUnit, *m_pLabYUnit;
 
         QPushButton *m_ppbGradientBtn;

@@ -548,8 +548,12 @@ void GMesherWt::meshNURBSSail()
         Frame const &frame = pNurbsSail->nurbs().frameAt(i);
         for(int j=0; j<frame.nCtrlPoints(); j++)
         {
-            const Vector3d &pt = frame.ctrlPointAt(j);
+            Vector3d pt = frame.ctrlPointAt(j);
+            if(fabs(frame.angle())>ANGLEPRECISION) //degrees
+                pt.rotateY(frame.position(), frame.angle());
+
             PointsU.push_back(gmsh::model::occ::addPoint(pt.x, pt.y, pt.z));
+
         }
     }
 

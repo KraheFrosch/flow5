@@ -279,7 +279,7 @@ void BatchPlaneDlg::setupLayout()
 void BatchPlaneDlg::onButton(QAbstractButton *pButton)
 {
     if (m_pButtonBox->button(QDialogButtonBox::Close) == pButton) reject();
-    else if(pButton == m_ppbAnalyze) onAnalyze();
+    else if(pButton == m_ppbAnalyze) calculate();
 }
 
 
@@ -320,7 +320,8 @@ void BatchPlaneDlg::onOption()
 {
     s_bStorePOpps = m_pchStorePOpps->isChecked();
     Analysis3dSettings::setStabDerivatives(m_pchStabDerivatives->isChecked());
-    if(m_pExecutor) m_pExecutor->setMakePOpps(s_bStorePOpps);
+    if(m_pExecutor)
+        m_pExecutor->setMakePOpps(s_bStorePOpps);
 }
 
 
@@ -489,7 +490,7 @@ void BatchPlaneDlg::onMessage(QString const &msg)
 }
 
 
-void BatchPlaneDlg::onAnalyze()
+void BatchPlaneDlg::calculate()
 {
     if(m_pExecutor)
     {

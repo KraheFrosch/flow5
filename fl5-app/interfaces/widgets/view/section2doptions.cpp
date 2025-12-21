@@ -77,12 +77,12 @@ void Section2dOptions::setupLayout()
             QHBoxLayout *pDynamicLayout = new QHBoxLayout;
             {
                 m_pchSpinAnimation = new QCheckBox("Enable mouse animations");
-                m_pdeSpinDamping = new FloatEdit;
-                m_pdeSpinDamping->setToolTip("Defines the damping of the animation at each frame update.<br>"
+                m_pfeSpinDamping = new FloatEdit;
+                m_pfeSpinDamping->setToolTip("Defines the damping of the animation at each frame update.<br>"
                                              "Set to 0 for perpetual movement.");
                 QLabel *plabpcDamping = new QLabel("% damping");
                 pDynamicLayout->addWidget(m_pchSpinAnimation);
-                pDynamicLayout->addWidget(m_pdeSpinDamping);
+                pDynamicLayout->addWidget(m_pfeSpinDamping);
                 pDynamicLayout->addWidget(plabpcDamping);
                 pDynamicLayout->addStretch();
             }
@@ -173,8 +173,8 @@ void Section2dOptions::connectSignals()
 void Section2dOptions::initWidgets()
 {
     m_pchSpinAnimation->setChecked(Section2dWt::bAnimateTransitions());
-    m_pdeSpinDamping->setValue(Section2dWt::spinDamping()*100.0);
-    m_pdeSpinDamping->setEnabled(Section2dWt::bAnimateTransitions());
+    m_pfeSpinDamping->setValue(Section2dWt::spinDamping()*100.0);
+    m_pfeSpinDamping->setEnabled(Section2dWt::bAnimateTransitions());
 
     m_pieSelectionPixels->setValue(Section2dWt::nPixelSelection());
     m_pieSymbolSize->setValue(xfl::symbolSize());
@@ -191,14 +191,14 @@ void Section2dOptions::readData()
     xfl::setSymbolSize(m_pieSymbolSize->value());
     Section2dWt::setNPixelSelection(m_pieSelectionPixels->value());
     Section2dWt::setAnimateTransitions(m_pchSpinAnimation->isChecked());
-    Section2dWt::setSpinDamping(m_pdeSpinDamping->value()/100.0);
+    Section2dWt::setSpinDamping(m_pfeSpinDamping->value()/100.0);
     Section2dWt::setAntiAliasing(m_pchAntiAliasing->isChecked());
 }
 
 
 void Section2dOptions::onSpinAnimation(bool bSpin)
 {
-    m_pdeSpinDamping->setEnabled(bSpin);
+    m_pfeSpinDamping->setEnabled(bSpin);
 }
 
 

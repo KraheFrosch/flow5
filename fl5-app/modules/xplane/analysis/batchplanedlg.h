@@ -78,10 +78,10 @@ class BatchPlaneDlg : public QDialog
         void setupLayout();
         void connectSignals();
         void setObjectProperties(QModelIndex index);
+        void calculate();
 
     private slots:
         void onAnalysisFinished();
-        void onAnalyze();
         void onButton(QAbstractButton *pButton);
         void onCurrentRowChanged(QModelIndex currentidx, QModelIndex );
         void onEditAnalysis();

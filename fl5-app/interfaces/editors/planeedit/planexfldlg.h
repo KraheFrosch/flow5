@@ -259,8 +259,6 @@ class PlaneXflDlg : public PlaneDlg
         static QByteArray s_PartSplitterSizes;
         static QByteArray s_XflGeometry;
 
-        static bool s_bThickSurfAssy;
-
         static int s_iActivePage;
 
 };

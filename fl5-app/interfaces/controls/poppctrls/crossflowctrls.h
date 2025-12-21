@@ -34,7 +34,6 @@
 #include <api/linestyle.h>
 
 
-#define FLOWPERIOD 1
 
 class XPlane;
 class XSail;

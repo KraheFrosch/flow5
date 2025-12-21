@@ -257,10 +257,8 @@ void NURBSSurface::getPoint(double u, double v, Vector3d &Pt) const
             rpt.x = uframe.ctrlPointAt(jv).x;
             rpt.y = uframe.ctrlPointAt(jv).y;
             rpt.z = uframe.ctrlPointAt(jv).z;
-            if(fabs(uframe.angle())>0.01) //degrees
-            {
-                 rpt.rotateY(uframe.position(), uframe.angle());
-            }
+            if(fabs(uframe.angle())>ANGLEPRECISION) //degrees
+                rpt.rotateY(uframe.position(), uframe.angle());
 
             Vv.x += rpt.x * cs;
             Vv.y += rpt.y * cs;

@@ -305,7 +305,7 @@ void Polar3dDlg::makeBaseCommonControls()
             QVBoxLayout *pWakeTypeLayout = new QVBoxLayout;
             {
                 m_prbPanelWake  = new QRadioButton("Flat panel wake");
-                m_prbVortonWake = new QRadioButton("Vortex Particle Wake (VPW) - T6 polars and panel methods only");
+                m_prbVortonWake = new QRadioButton("Vortex Particle Wake (Not recommended)");
                 pWakeTypeLayout->addWidget(m_prbPanelWake);
                 pWakeTypeLayout->addWidget(m_prbVortonWake);
                 pWakeTypeLayout->addStretch();
@@ -318,11 +318,11 @@ void Polar3dDlg::makeBaseCommonControls()
                     QLabel *pLabWake = new QLabel("The wake should extend to a distance where the influence of the plane's panels "
                                                   "is no longer felt, e.g. > 30 x chord");
                     m_pieNXWakePanels = new IntEdit(1);
-                    m_pieNXWakePanels->setToolTip("The number of panels in each streamwise wake column.");
+                    m_pieNXWakePanels->setToolTip("<p>The number of panels in each streamwise wake column.</p>");
                     m_pfeWakeLength = new FloatEdit(1.0f);
-                    m_pfeWakeLength->setToolTip("The wake's total length.<br>Defines the position of the Trefftz plane.");
+                    m_pfeWakeLength->setToolTip("<p>The wake's total length.<br>Defines the position of the Trefftz plane.</p>");
                     m_pfeWakePanelFactor = new FloatEdit(1.1f);
-                    m_pfeWakePanelFactor->setToolTip("The ratio between the length of two wake panels in the x direction");
+                    m_pfeWakePanelFactor->setToolTip("<p>The ratio between the length of two wake panels in the x direction</p>");
 
                     QLabel *pLab1 = new QLabel("Nb. of wake panels:");
                     QLabel *pLab2 = new QLabel("Total length:");

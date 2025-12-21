@@ -89,7 +89,7 @@ class SailNurbsDlg : public ThinSailDlg
 
     private:
         IntEdit *m_pieNXDegree, *m_pieNZDegree;
-        FloatEdit *m_pdeEdgeWeightu, *m_pdeEdgeWeightv;
+        FloatEdit *m_pfeEdgeWeightu, *m_pfeEdgeWeightv;
 
         ActionItemModel *m_pSectionModel;
         XflDelegate *m_pSectionDelegate;

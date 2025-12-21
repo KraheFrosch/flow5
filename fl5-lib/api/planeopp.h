@@ -76,8 +76,8 @@ class FL5LIB_EXPORT PlaneOpp : public Opp3d
         std::string const &planeName() const {return m_PlaneName;}
         void setPlaneName(std::string const & name) {m_PlaneName=name;}
 
-        std::string const &polarName() const override {return m_WPlrName;}
-        void setPolarName(std::string const &name) override {m_WPlrName=name;}
+        std::string const &polarName() const override {return m_PlrName;}
+        void setPolarName(std::string const &name) override {m_PlrName=name;}
 
         xfl::enumPolarType polarType() const {return m_PolarType;}
 
@@ -132,7 +132,7 @@ class FL5LIB_EXPORT PlaneOpp : public Opp3d
     private:
 
         std::string m_PlaneName;        /**< the pPane's name to which the PlaneOpp is attached */
-        std::string m_WPlrName;         /**< the WPolar's name to which the PlaneOpp is attached */
+        std::string m_PlrName;         /**< the WPolar's name to which the PlaneOpp is attached */
 
         double m_Span;             /**< the parent's Wing span */
         double m_MAChord;          /**< the parent's Wing mean aerodynamic chord*/

@@ -129,7 +129,6 @@ class XSail : public QObject
         void connectSignals();
         void createBtPolarCurves();
         void createCpCurves();
-        void editSail(Sail *pSail);
         void fillBtPlrCurve(Curve *pCurve, const BoatPolar *pBtPolar, int XVar, int YVar);
         BoatPolar *importBtPolarFromXML(QFile &xmlFile);
         Boat *importBoatFromXML(QFile &xmlFile);

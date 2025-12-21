@@ -43,7 +43,7 @@ bool xfl::g_bMultiThread=true;
 int xfl::g_MaxThreadCount = QThread::idealThreadCount();
 QThread::Priority xfl::g_ThreadPriority=QThread::NormalPriority;
 
-bool xfl::g_bDontUseNativeDlg(true);
+bool xfl::g_bDontUseNativeDlg(false);
 bool xfl::g_bConfirmDiscard(true);
 
 bool xfl::g_bLocalize = false;

@@ -245,7 +245,7 @@ int main()
         pPlPolar->resizeFlapCtrls(pPlaneXfl);
         {
             // sanity check: the number of ctrls is the same as the number of wings
-            assert(pPlPolar->nFlapCtrls()==pPlaneXfl->nWings()); // since all the wings are flapped
+            assert(pPlPolar->nFlapCtrls()==pPlaneXfl->nWings()); // because all the wings are flapped
 
             // get a reference to the main wing's flap controls
             AngleControl &mainwingctrls = pPlPolar->flapCtrls(0);
@@ -268,7 +268,7 @@ int main()
             // get a reference to the elevator's flap controls
             AngleControl &elevctrls = pPlPolar->flapCtrls(1);
             {
-                // the elevator's has been defined with two flaps
+                // the elevator has been defined with two flaps
                 elevctrls.setValue(0, +3);
                 elevctrls.setValue(1, +3);
             }

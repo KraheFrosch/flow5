@@ -295,8 +295,6 @@ void SailSplineDlg::setSailData()
 {
     ThinSailDlg::setSailData();
     fillSectionModel();
-
-    m_pgbEdgeSplit->setVisible(!m_pSail->bRuledMesh());
 }
 
 
