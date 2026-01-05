@@ -86,6 +86,7 @@ linux-g++ {
     #----------- OPENCASCADE -------------
     #   The include paths to the development headers must be set explicitely
     INCLUDEPATH += /usr/local/include/opencascade/
+    INCLUDEPATH += /usr/include/opencascade/
     #   Ensure that the paths to the binary libraries
     #   are known either by defining them at system level
     #   or by setting them explicitely in this section

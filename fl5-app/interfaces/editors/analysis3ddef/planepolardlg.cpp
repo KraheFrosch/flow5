@@ -183,12 +183,20 @@ void PlanePolarDlg::makeCommonControls()
                                 "</p>");
                     m_prbViscOnTheFly = new QRadioButton("XFoil on the fly");
                     m_prbViscOnTheFly->setToolTip(tip);
+                    
+                    QString tipNF("<p>Use NeuralFoil neural network for 2D viscous characteristics calculation. "
+                                  "NeuralFoil is faster than XFoil and always converges, but may be less accurate for some conditions.</p>");
+                    m_prbNeuralFoilOTF = new QRadioButton("NeuralFoil on the fly");
+                    m_prbNeuralFoilOTF->setToolTip(tipNF);
+                    
                     m_prbViscInterpolated = new QRadioButton("Interpolated (xflr5 method) (LLT method)");
                     m_prbViscInterpolated->setToolTip(tip);
                     pbgMethod->addButton(m_prbViscOnTheFly);
+                    pbgMethod->addButton(m_prbNeuralFoilOTF);
                     pbgMethod->addButton(m_prbViscInterpolated);
                 }
                 pMethodLayout->addWidget(m_prbViscOnTheFly);
+                pMethodLayout->addWidget(m_prbNeuralFoilOTF);
                 pMethodLayout->addWidget(m_prbViscInterpolated);
                 pMethodLayout->addStretch();
             }
@@ -484,6 +492,7 @@ void PlanePolarDlg::connectSignals()
     connect(m_pchViscAnalysis,     SIGNAL(clicked()),               SLOT(onViscous()));
     connect(m_prbViscInterpolated, SIGNAL(clicked()),               SLOT(onViscous()));
     connect(m_prbViscOnTheFly,     SIGNAL(clicked()),               SLOT(onViscous()));
+    connect(m_prbNeuralFoilOTF,    SIGNAL(clicked()),               SLOT(onViscous()));
     connect(m_prbViscFromAlpha,    SIGNAL(clicked()),               SLOT(onViscous()));
     connect(m_prbViscFromCl,       SIGNAL(clicked()),               SLOT(onViscous()));
 
@@ -546,7 +555,8 @@ void PlanePolarDlg::initPolar3dDlg(const Plane *pPlane, PlanePolar const *pWPola
     m_pchViscAnalysis->setEnabled(true);
     m_pchViscAnalysis->setChecked(s_WPolar.isViscous());
     m_prbViscInterpolated->setChecked(s_WPolar.isViscInterpolated());
-    m_prbViscOnTheFly->setChecked(!s_WPolar.isViscInterpolated());
+    m_prbViscOnTheFly->setChecked(s_WPolar.isViscOnTheFly());
+    m_prbNeuralFoilOTF->setChecked(s_WPolar.isNeuralFoilOTF());
     m_prbViscFromCl->setChecked(s_WPolar.isViscFromCl());
     m_prbViscFromAlpha->setChecked(!s_WPolar.isViscFromCl());
     m_pfeNCrit ->setValuef(s_WPolar.NCrit());
@@ -764,7 +774,21 @@ void PlanePolarDlg::readMethodData()
 void PlanePolarDlg::readViscousData()
 {
     s_WPolar.setViscous(m_pchViscAnalysis->isChecked());
-    s_WPolar.setViscInterpolated(m_prbViscInterpolated->isChecked());
+    
+    // Set the viscosity method - mutually exclusive radio buttons
+    if(m_prbViscInterpolated->isChecked())
+    {
+        s_WPolar.setViscInterpolated(true);
+    }
+    else if(m_prbViscOnTheFly->isChecked())
+    {
+        s_WPolar.setViscOnTheFly(true);
+    }
+    else if(m_prbNeuralFoilOTF->isChecked())
+    {
+        s_WPolar.setNeuralFoilOTF(true);
+    }
+    
     s_WPolar.setViscFromCl(m_prbViscFromCl->isChecked());
 
     s_WPolar.setNCrit(m_pfeNCrit->value());
@@ -916,15 +940,17 @@ void PlanePolarDlg::enableControls()
     bool bVisc = m_pchViscAnalysis->isChecked();
     m_prbViscInterpolated->setEnabled(bVisc);
     m_prbViscOnTheFly->setEnabled(bVisc);
+    m_prbNeuralFoilOTF->setEnabled(bVisc);
 
+    bool bOnTheFly = m_prbViscOnTheFly->isChecked() || m_prbNeuralFoilOTF->isChecked();
     m_pfrInterpolated->setEnabled(bVisc && m_prbViscInterpolated->isChecked());
-    m_pfrOntheFly->setEnabled(bVisc && m_prbViscOnTheFly->isChecked());
+    m_pfrOntheFly->setEnabled(bVisc && bOnTheFly);
 
 
     m_pchViscousLoop->setEnabled(s_WPolar.isType6() && m_pchViscAnalysis->isChecked() && m_prbViscInterpolated->isChecked());
 
     m_pfrInterpolated->setVisible(m_prbViscInterpolated->isChecked());
-    m_pfrOntheFly->setVisible(m_prbViscOnTheFly->isChecked());
+    m_pfrOntheFly->setVisible(bOnTheFly);
 
     m_prbViscFromCl->setEnabled(m_pchViscAnalysis->isChecked() && m_prbViscInterpolated->isChecked());
     m_prbViscFromAlpha->setEnabled(m_pchViscAnalysis->isChecked() && m_prbViscInterpolated->isChecked());

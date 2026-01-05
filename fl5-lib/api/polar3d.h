@@ -128,11 +128,14 @@ class FL5LIB_EXPORT Polar3d : public XflObject
         bool isViscous() const {return m_bViscous;}
         void setViscous(bool bViscous) {m_bViscous = bViscous;}
 
-        bool isViscInterpolated() const {return !m_bViscOnTheFly;}
-        void setViscInterpolated(bool b) {m_bViscOnTheFly=!b;}
+        bool isViscInterpolated() const {return !m_bViscOnTheFly && !m_bNeuralFoilOTF;}
+        void setViscInterpolated(bool b) {if(b) {m_bViscOnTheFly=false; m_bNeuralFoilOTF=false;}}
 
-        bool isViscOnTheFly() const {return m_bViscOnTheFly;}
-        void setViscOnTheFly(bool b) {m_bViscOnTheFly=b;}
+        bool isViscOnTheFly() const {return m_bViscOnTheFly && !m_bNeuralFoilOTF;}
+        void setViscOnTheFly(bool b) {m_bViscOnTheFly=b; if(b) m_bNeuralFoilOTF=false;}
+
+        bool isNeuralFoilOTF() const {return m_bNeuralFoilOTF;}
+        void setNeuralFoilOTF(bool b) {m_bNeuralFoilOTF=b; if(b) m_bViscOnTheFly=false;}
 
         bool isViscFromCl() const {return m_bViscFromCl;}
         void setViscFromCl(bool bFromCl) {m_bViscFromCl=bFromCl;}
@@ -265,7 +268,8 @@ class FL5LIB_EXPORT Polar3d : public XflObject
         bool     m_bTrefftz;           /**< true if the lift and drag are evaluated in the Trefftz plane, false if evaluation is made by summation of panel forces */
 
         bool     m_bViscous;           /**< true if the analysis is viscous */
-        bool     m_bViscOnTheFly;      /**< true if the viscous properties are interpolated on the 2d polar mesh, false if on the fly */
+        bool     m_bViscOnTheFly;      /**< true if XFoil on the fly viscous, false if interpolated */
+        bool     m_bNeuralFoilOTF;     /**< true if NeuralFoil on the fly viscous calculations */
         bool     m_bViscFromCl;        /**< true if the viscous properties are interpolated from the lift coefficient, i.e. xflr5 method */
         double   m_NCrit;              /**< the 2d free transition parameter for on the fly viscous calculations */
         double   m_XTrTop;             /**< the 2d forced top transition location for on the fly viscous calculations; unit is (x/c) */

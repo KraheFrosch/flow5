@@ -108,6 +108,11 @@ class FL5LIB_EXPORT PlaneTask : public Task3d
         bool computeSurfaceDragOTF(Surface const &surf, int iStartStation, double theta, SpanDistribs &spandist);
         bool computeSectionDragOTF(XFoilTask *pTask) const;
 
+#ifdef NEURALFOIL_ENABLED
+        bool computeViscousDragNF(WingXfl *pWing, double alpha, double beta, double QInf, const PlanePolar *pWPolar, Vector3d const &cog, const AngleControl &TEFlapAngles, SpanDistribs &SpanResFF, std::string &logmsg);
+        bool computeSurfaceDragNF(Surface const &surf, int iStartStation, double theta, SpanDistribs &spandist);
+#endif
+
         PlaneOpp *createPlaneOpp(double ctrl, double alpha, double beta, double phi, double QInf, double mass, const Vector3d &CoG, const double *Cp, const double *Gamma, const double *Sigma, bool bCpOnly=false) const;
         void addTwistedVelField(double Qinf, double alpha, std::vector<Vector3d> &VField) const;
 

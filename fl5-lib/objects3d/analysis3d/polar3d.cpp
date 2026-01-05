@@ -51,6 +51,7 @@ void Polar3d::setDefaults()
 
     m_bViscous           = true;
     m_bViscOnTheFly      = false;
+    m_bNeuralFoilOTF     = false;
     m_bViscFromCl        = true;
 
     m_NCrit = 9.0;
@@ -124,6 +125,7 @@ void Polar3d::duplicateSpec(const Polar3d *pPolar3d)
 
     m_bViscous              = pPolar3d->m_bViscous;
     m_bViscOnTheFly         = pPolar3d->m_bViscOnTheFly;
+    m_bNeuralFoilOTF        = pPolar3d->m_bNeuralFoilOTF;
     m_bViscFromCl           = pPolar3d->m_bViscFromCl;
 
     m_NCrit                 = pPolar3d->m_NCrit;
@@ -431,7 +433,9 @@ bool Polar3d::serializeFl5v750(QDataStream &ar, bool bIsStoring)
         ar << m_bTransAtHinge;
 
         // provisions for future variable saves
-        for(int i=1; i<10; i++) ar <<boolean;
+        // First spare bool used for m_bNeuralFoilOTF
+        ar << m_bNeuralFoilOTF;
+        for(int i=2; i<10; i++) ar <<boolean;
         for(int i=0; i<20; i++) ar <<integer;
         for(int i=0; i<20; i++) ar <<dble;
 
@@ -519,11 +523,14 @@ bool Polar3d::serializeFl5v750(QDataStream &ar, bool bIsStoring)
         ar >> m_VPWIterations;
 
 
+
         // converted v7.54
         ar >> m_bTransAtHinge;
 
         // provisions for future variable saves
-        for(int i=1; i<10; i++) ar >> boolean;
+        // First spare bool used for m_bNeuralFoilOTF
+        ar >> m_bNeuralFoilOTF;
+        for(int i=2; i<10; i++) ar >> boolean;
         for(int i=0; i<20; i++) ar >> integer;
         for(int i=0; i<20; i++) ar >> dble;
 

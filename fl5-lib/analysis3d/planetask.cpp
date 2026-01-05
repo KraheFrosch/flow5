@@ -66,6 +66,10 @@
 #include <wingxfl.h>
 #include <xfoiltask.h>
 
+#ifdef NEURALFOIL_ENABLED
+#include <neuralfoiltask.h>
+#endif
+
 
 bool PlaneTask::s_bViscInitTwist = false;
 double PlaneTask::s_ViscRelax = 0.5;
@@ -1358,6 +1362,8 @@ PlaneOpp* PlaneTask::computePlane(double ctrl, double alpha, double beta, double
 
         if(m_pPlPolar->isViscInterpolated())
             traceStdLog("          Adding interpolated viscous drag...\n");
+        else if(m_pPlPolar->isNeuralFoilOTF())
+            traceStdLog("          Calculating NeuralFoil viscous drag on the fly...\n");
         else
             traceStdLog("          Calculating XFoil viscous drag on the fly...\n");
 
@@ -1379,6 +1385,24 @@ PlaneOpp* PlaneTask::computePlane(double ctrl, double alpha, double beta, double
                     if(logmsg.length()!=0)
                     {
                         traceStdLog("                ...Viscous interpolation failures:\n");
+                        traceStdLog(logmsg);
+                    }
+                }
+                else if(m_pPlPolar->isNeuralFoilOTF())
+                {
+                    traceLog("             Processing "+
+                             QString::fromStdString(pWing->name()) +": " +
+                             QString::asprintf("%d surfaces", pWing->nSurfaces()) +
+                             " (NeuralFoil)" + EOLch);
+#ifdef NEURALFOIL_ENABLED
+                    bViscOK = computeViscousDragNF(pWing, alpha, beta, QInf, m_pPlPolar, CoG, m_pPlPolar->flapCtrls(iw), m_SpanDistFF[iw], logmsg);
+#else
+                    // Fallback if NeuralFoil not compiled in
+                    bViscOK = computeViscousDragOTF(pWing, alpha, beta, QInf, m_pPlPolar, CoG, m_pPlPolar->flapCtrls(iw), m_SpanDistFF[iw], logmsg);
+#endif
+                    if(logmsg.length()!=0)
+                    {
+                        traceStdLog("                ...NeuralFoil OTF failures:\n");
                         traceStdLog(logmsg);
                     }
                 }
@@ -3151,4 +3175,178 @@ bool PlaneTask::setLinearSolution()
 }
 
 
+#ifdef NEURALFOIL_ENABLED
+
+bool PlaneTask::computeViscousDragNF(WingXfl *pWing, double alpha, double beta, double QInf,
+                                      PlanePolar const *pWPolar, Vector3d const &cog, const AngleControl &TEFlapAngles, SpanDistribs &SpanResFF,
+                                      std::string &logmsg)
+{
+    // This function mirrors computeViscousDragOTF but uses NeuralFoil instead of XFoil
+    bool bViscOK = true;
+    QString logg;
+
+    // Calculate Re for all stations
+    SpanResFF.m_Re.clear();
+    for (int m=0; m<pWing->nStations(); m++)
+        SpanResFF.m_Re.push_back(SpanResFF.m_Chord.at(m) * QInf / pWPolar->viscosity());
+
+    int iStation = 0;
+    int iCtrl = 0;
+
+    for(int j=0; j<pWing->nSurfaces(); j++)
+    {
+        Surface const &surf = pWing->surfaceAt(j);
+
+        double theta = 0.0;
+        if(surf.hasTEFlap() && TEFlapAngles.nValues()>0)
+        {
+            theta = TEFlapAngles.value(iCtrl);
+            iCtrl++;
+        }
+
+        bool bSurfOK = computeSurfaceDragNF(surf, iStation, theta, SpanResFF);
+        if(!bSurfOK)
+        {
+            logg += QString("      Surface %1 had NeuralFoil processing issues\n").arg(j);
+            bViscOK = false;
+        }
+
+        iStation += surf.NYPanels();
+        if(s_bCancel) break;
+    }
+
+    // Calculate viscous moments at each station
+    Vector3d winddirection = objects::windDirection(alpha, beta);
+    Vector3d windside      = objects::windSide(alpha, beta);
+
+    for(int m=0; m<pWing->nStations(); m++)
+    {
+        Vector3d dragvector = winddirection * (SpanResFF.m_PCd.at(m) * SpanResFF.m_StripArea.at(m));
+        Vector3d leverarmcog = SpanResFF.m_PtC4.at(m) - cog;
+        SpanResFF.m_CmViscous[m] = (leverarmcog * dragvector).dot(windside);
+        SpanResFF.m_CmViscous[m] *= 1.0 / SpanResFF.m_Chord.at(m) / SpanResFF.m_StripArea.at(m);
+    }
+
+    logmsg = logg.toStdString();
+    return bViscOK;
+}
+
+
+bool PlaneTask::computeSurfaceDragNF(Surface const &surf, int iStartStation, double theta, SpanDistribs &spandist)
+{
+    // Get foils for this surface
+    Foil foilA, foilB;
+    foilA.copy(surf.foilA(), true);
+    foilB.copy(surf.foilB(), true);
+
+    if(isCancelled()) return false;
+
+    const int m = iStartStation;
+
+    // Apply flap deflection if needed
+    if(surf.hasTEFlap() && fabs(theta) > FLAPANGLEPRECISION)
+    {
+        foilA.setTEFlapAngle(theta);
+        foilA.setFlaps();
+        foilB.setTEFlapAngle(theta);
+        foilB.setFlaps();
+    }
+    else
+    {
+        foilA.applyBase();
+        foilB.applyBase();
+    }
+
+    // Create polar for left (A) side
+    Polar LeftSidePolar;
+    LeftSidePolar.setType(xfl::T1POLAR);
+    LeftSidePolar.setReType(1);
+    LeftSidePolar.setMaType(1);
+    LeftSidePolar.setMach(0.0);
+    LeftSidePolar.setNCrit(m_pPolar3d->NCrit());
+    LeftSidePolar.resizeData(surf.NYPanels());
+    for(int k=0; k<surf.NYPanels(); k++)
+    {
+        LeftSidePolar.m_Cl[k] = spandist.m_Cl.at(m+k);
+        LeftSidePolar.m_Re[k] = spandist.m_Re.at(m+k);
+    }
+
+    double XTrTop = m_pPolar3d->XTrTop();
+    double XTrBot = m_pPolar3d->XTrBot();
+    if(surf.hasTEFlap() && m_pPlPolar->bTransAtHinge())
+    {
+        XTrTop = std::min(XTrTop, foilA.TEXHinge());
+        XTrBot = std::min(XTrBot, foilA.TEXHinge());
+    }
+    LeftSidePolar.setXTripTop(XTrTop);
+    LeftSidePolar.setXTripBot(XTrBot);
+
+    // Create polar for right (B) side
+    Polar RightSidePolar;
+    RightSidePolar.setType(xfl::T1POLAR);
+    RightSidePolar.setReType(1);
+    RightSidePolar.setMaType(1);
+    RightSidePolar.setMach(0.0);
+    RightSidePolar.setNCrit(m_pPolar3d->NCrit());
+    RightSidePolar.resizeData(surf.NYPanels());
+    for(int k=0; k<surf.NYPanels(); k++)
+    {
+        RightSidePolar.m_Cl[k] = spandist.m_Cl.at(m+k);
+        RightSidePolar.m_Re[k] = spandist.m_Re.at(m+k);
+    }
+
+    XTrTop = m_pPolar3d->XTrTop();
+    XTrBot = m_pPolar3d->XTrBot();
+    if(surf.hasTEFlap() && m_pPlPolar->bTransAtHinge())
+    {
+        XTrTop = std::min(XTrTop, foilB.TEXHinge());
+        XTrBot = std::min(XTrBot, foilB.TEXHinge());
+    }
+    RightSidePolar.setXTripTop(XTrTop);
+    RightSidePolar.setXTripBot(XTrBot);
+
+    // Process with NeuralFoil (faster than XFoil, no threading needed)
+    NeuralFoilTask leftTask;
+    leftTask.initialize(foilA, &LeftSidePolar);
+    bool bLeftOK = leftTask.processClList();
+
+    NeuralFoilTask rightTask;
+    rightTask.initialize(foilB, &RightSidePolar);
+    bool bRightOK = rightTask.processClList();
+
+    // Interpolate results for each station
+    bool bCv = bLeftOK && bRightOK;
+    int iStation = iStartStation;
+    for(int k=0; k<surf.NYPanels(); k++)
+    {
+        double tau = 0.0;
+        Vector3d PtC4;
+        surf.getC4(k, PtC4, tau);
+        if (tau < 0.0) tau = 0.0;
+        if (tau > 1.0) tau = 1.0;
+
+        spandist.m_Alpha_0[iStation] = Objects2d::getZeroLiftAngle(surf.foilA(), surf.foilB(), spandist.m_Re.at(iStation), tau);
+
+        // Interpolate between left and right foils
+        spandist.m_bConverged[iStation] = LeftSidePolar.m_Control.at(k) > 0.0 && RightSidePolar.m_Control.at(k) > 0.0;
+        spandist.m_PCd[iStation]    = LeftSidePolar.m_Cd.at(k)     * (1.0-tau) + RightSidePolar.m_Cd.at(k)     * tau;
+        spandist.m_XTrTop[iStation] = LeftSidePolar.m_XTrTop.at(k) * (1.0-tau) + RightSidePolar.m_XTrTop.at(k) * tau;
+        spandist.m_XTrBot[iStation] = LeftSidePolar.m_XTrBot.at(k) * (1.0-tau) + RightSidePolar.m_XTrBot.at(k) * tau;
+
+        iStation++;
+        if(s_bCancel) break;
+    }
+
+    QString report = QString::asprintf("                 ...done surface %d (NeuralFoil)", surf.index());
+    if(bCv)
+        report += EOLch;
+    else
+        report += " - some points may not have converged" + EOLch;
+
+    traceLog(report);
+
+    return bCv;
+}
+
+#endif // NEURALFOIL_ENABLED
 

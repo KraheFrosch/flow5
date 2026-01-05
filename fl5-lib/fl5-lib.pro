@@ -82,7 +82,17 @@ linux-g++ {
     #   or by setting them explicitely in this section
     #   The include paths to the development headers must be set explicitely
         INCLUDEPATH += /usr/local/include/opencascade/
+        INCLUDEPATH += /usr/include/opencascade/
         LIBS += -L/usr/local/lib/
+
+
+    #----------- PYTHON / PYBIND11 (for NeuralFoil) -------------
+    #   Python embedding for NeuralFoil on-the-fly calculations
+    #   Requires Python 3.12 development headers and pybind11
+        DEFINES += NEURALFOIL_ENABLED
+        INCLUDEPATH += /usr/include/python3.12
+        INCLUDEPATH += $$PWD/../../venv/lib/python3.12/site-packages/pybind11/include
+        LIBS += -lpython3.12
 
 }
 

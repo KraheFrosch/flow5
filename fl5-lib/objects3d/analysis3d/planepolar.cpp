@@ -1971,7 +1971,16 @@ void PlanePolar::getProperties(std::string &props, Plane const *pPlane) const
 
     if(isViscous())
     {
-        if(m_bViscOnTheFly)
+        if(m_bNeuralFoilOTF)
+        {
+            PolarProps += "Viscous drag: NeuralFoil on the fly\n";
+            PolarProps += QString::asprintf("   NCrit  = %g\n", m_NCrit);
+            PolarProps += QString::asprintf("   XTrTop = %g%% chord\n", m_XTrTop*100.0);
+            PolarProps += QString::asprintf("   XTrBot = %g%% chord\n", m_XTrBot*100.0);
+            if(m_bTransAtHinge)
+                PolarProps += "   Forcing transitions at hinge position\n";
+        }
+        else if(m_bViscOnTheFly)
         {
             PolarProps += "Viscous drag: XFoil on the fly\n";
             PolarProps += QString::asprintf("   NCrit  = %g\n", m_NCrit);
