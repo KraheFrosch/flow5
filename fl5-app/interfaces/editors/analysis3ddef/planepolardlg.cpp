@@ -213,6 +213,15 @@ void PlanePolarDlg::makeCommonControls()
                 m_pcbNFModelSize->setToolTip("<p>Select NeuralFoil model size. Larger models are more accurate but slower.</p>");
                 pMethodLayout->addWidget(m_pcbNFModelSize);
                 
+                // NeuralFoil mode selector (OTF vs Interpolated)
+                m_pcbNFMode = new QComboBox;
+                m_pcbNFMode->addItem("On the fly");
+                m_pcbNFMode->addItem("Interpolated (faster)");
+                m_pcbNFMode->setCurrentIndex(1);  // default to interpolated
+                m_pcbNFMode->setToolTip("<p><b>On the fly:</b> Compute each point individually (slower, always accurate)<br>"
+                                        "<b>Interpolated:</b> Pre-compute polars at multiple Re values, then interpolate (faster, slightly less accurate)</p>");
+                pMethodLayout->addWidget(m_pcbNFMode);
+                
                 pMethodLayout->addWidget(m_prbViscInterpolated);
                 pMethodLayout->addStretch();
             }
@@ -573,8 +582,9 @@ void PlanePolarDlg::initPolar3dDlg(const Plane *pPlane, PlanePolar const *pWPola
     m_pchViscAnalysis->setChecked(s_WPolar.isViscous());
     m_prbViscInterpolated->setChecked(s_WPolar.isViscInterpolated());
     m_prbViscOnTheFly->setChecked(s_WPolar.isViscOnTheFly());
-    m_prbNeuralFoilOTF->setChecked(s_WPolar.isNeuralFoilOTF());
+    m_prbNeuralFoilOTF->setChecked(s_WPolar.isNeuralFoilOTF() || s_WPolar.isNeuralFoilInterpolated());
     m_pcbNFModelSize->setCurrentIndex(s_WPolar.neuralFoilModelSize());
+    m_pcbNFMode->setCurrentIndex(s_WPolar.isNeuralFoilInterpolated() ? 1 : 0);
     m_prbViscFromCl->setChecked(s_WPolar.isViscFromCl());
     m_prbViscFromAlpha->setChecked(!s_WPolar.isViscFromCl());
     m_pfeNCrit ->setValuef(s_WPolar.NCrit());
@@ -804,8 +814,17 @@ void PlanePolarDlg::readViscousData()
     }
     else if(m_prbNeuralFoilOTF->isChecked())
     {
-        s_WPolar.setNeuralFoilOTF(true);
         s_WPolar.setNeuralFoilModelSize(m_pcbNFModelSize->currentIndex());
+        if(m_pcbNFMode->currentIndex() == 1)
+        {
+            // Interpolated mode
+            s_WPolar.setNeuralFoilInterpolated(true);
+        }
+        else
+        {
+            // OTF mode
+            s_WPolar.setNeuralFoilOTF(true);
+        }
     }
     
     s_WPolar.setViscFromCl(m_prbViscFromCl->isChecked());

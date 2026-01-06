@@ -1388,12 +1388,30 @@ PlaneOpp* PlaneTask::computePlane(double ctrl, double alpha, double beta, double
                         traceStdLog(logmsg);
                     }
                 }
+                else if(m_pPlPolar->isNeuralFoilInterpolated())
+                {
+                    traceLog("             Processing "+
+                             QString::fromStdString(pWing->name()) +": " +
+                             QString::asprintf("%d surfaces", pWing->nSurfaces()) +
+                             " (NeuralFoil interpolated)" + EOLch);
+#ifdef NEURALFOIL_ENABLED
+                    bViscOK = computeViscousDragNFInterpolated(pWing, alpha, beta, QInf, m_pPlPolar, CoG, m_pPlPolar->flapCtrls(iw), m_SpanDistFF[iw], logmsg);
+#else
+                    // Fallback if NeuralFoil not compiled in
+                    bViscOK = computeViscousDragOTF(pWing, alpha, beta, QInf, m_pPlPolar, CoG, m_pPlPolar->flapCtrls(iw), m_SpanDistFF[iw], logmsg);
+#endif
+                    if(logmsg.length()!=0)
+                    {
+                        traceStdLog("                ...NeuralFoil interpolated fallbacks:\n");
+                        traceStdLog(logmsg);
+                    }
+                }
                 else if(m_pPlPolar->isNeuralFoilOTF())
                 {
                     traceLog("             Processing "+
                              QString::fromStdString(pWing->name()) +": " +
                              QString::asprintf("%d surfaces", pWing->nSurfaces()) +
-                             " (NeuralFoil)" + EOLch);
+                             " (NeuralFoil OTF)" + EOLch);
 #ifdef NEURALFOIL_ENABLED
                     bViscOK = computeViscousDragNF(pWing, alpha, beta, QInf, m_pPlPolar, CoG, m_pPlPolar->flapCtrls(iw), m_SpanDistFF[iw], logmsg);
 #else
@@ -3348,6 +3366,197 @@ bool PlaneTask::computeSurfaceDragNF(Surface const &surf, int iStartStation, dou
     traceLog(report);
 
     return bCv;
+}
+
+#endif // NEURALFOIL_ENABLED
+
+
+#ifdef NEURALFOIL_ENABLED
+// ========================================================================
+// Vectorized NeuralFoil with interpolation (faster than per-point OTF)
+// ========================================================================
+
+bool PlaneTask::computeViscousDragNFInterpolated(WingXfl *pWing, double alpha, double beta, double QInf,
+                                                   PlanePolar const *pWPolar, Vector3d const &cog, 
+                                                   const AngleControl &TEFlapAngles, SpanDistribs &SpanResFF,
+                                                   std::string &logmsg)
+{
+    bool bViscOK = true;
+    QString logg;
+    
+    // Calculate Re range for this wing with safety factors
+    double minChord = 1e10, maxChord = 0.0;
+    for (int m = 0; m < pWing->nStations(); m++) {
+        double chord = SpanResFF.m_Chord.at(m);
+        minChord = std::min(minChord, chord);
+        maxChord = std::max(maxChord, chord);
+    }
+    
+    // For Type 2 polars, QInf can vary - use current QInf with safety factors
+    double reMin = (minChord * QInf / pWPolar->viscosity()) * 0.5;   // 0.5x safety
+    double reMax = (maxChord * QInf / pWPolar->viscosity()) * 2.0;   // 2.0x safety
+    
+    // Alpha range for the polars (generous to cover all conditions)
+    double alphaMin = -10.0;
+    double alphaMax = 25.0;
+    
+    // Calculate Re for all stations
+    SpanResFF.m_Re.clear();
+    for (int m = 0; m < pWing->nStations(); m++)
+        SpanResFF.m_Re.push_back(SpanResFF.m_Chord.at(m) * QInf / pWPolar->viscosity());
+
+    int iStation = 0;
+    int iCtrl = 0;
+    
+    for (int j = 0; j < pWing->nSurfaces(); j++)
+    {
+        Surface const &surf = pWing->surfaceAt(j);
+        
+        double theta = 0.0;
+        if (surf.hasTEFlap() && TEFlapAngles.nValues() > 0)
+        {
+            theta = TEFlapAngles.value(iCtrl);
+            iCtrl++;
+        }
+        
+        // Get foils for this surface
+        Foil foilA, foilB;
+        foilA.copy(surf.foilA(), true);
+        foilB.copy(surf.foilB(), true);
+        
+        // Apply flap deflection if needed
+        if (surf.hasTEFlap() && fabs(theta) > FLAPANGLEPRECISION)
+        {
+            foilA.setTEFlapAngle(theta);
+            foilA.setFlaps();
+            foilB.setTEFlapAngle(theta);
+            foilB.setFlaps();
+        }
+        else
+        {
+            foilA.applyBase();
+            foilB.applyBase();
+        }
+        
+        // Get or create polar caches for each foil
+        std::string hashA = foilA.name() + "_A_" + std::to_string(int(theta * 100));
+        std::string hashB = foilB.name() + "_B_" + std::to_string(int(theta * 100));
+        
+        // Ensure caches exist
+        if (m_NFPolarCaches.find(hashA) == m_NFPolarCaches.end())
+            m_NFPolarCaches[hashA] = new NeuralFoilPolarCache();
+        if (m_NFPolarCaches.find(hashB) == m_NFPolarCaches.end())
+            m_NFPolarCaches[hashB] = new NeuralFoilPolarCache();
+        
+        NeuralFoilPolarCache* cacheA = m_NFPolarCaches[hashA];
+        NeuralFoilPolarCache* cacheB = m_NFPolarCaches[hashB];
+        
+        // Generate polar meshes if needed
+        double XTrTop = m_pPolar3d->XTrTop();
+        double XTrBot = m_pPolar3d->XTrBot();
+        if (surf.hasTEFlap() && pWPolar->bTransAtHinge())
+        {
+            XTrTop = std::min(XTrTop, foilA.TEXHinge());
+            XTrBot = std::min(XTrBot, foilA.TEXHinge());
+        }
+        
+        NeuralFoilModelSize modelSize = static_cast<NeuralFoilModelSize>(m_pPolar3d->neuralFoilModelSize());
+        
+        if (!cacheA->hasData()) {
+            cacheA->generatePolarMesh(foilA, reMin, reMax, alphaMin, alphaMax,
+                                       m_pPolar3d->NCrit(), XTrTop, XTrBot, modelSize);
+        }
+        if (!cacheB->hasData()) {
+            cacheB->generatePolarMesh(foilB, reMin, reMax, alphaMin, alphaMax,
+                                       m_pPolar3d->NCrit(), XTrTop, XTrBot, modelSize);
+        }
+        
+        // Process each station in this surface
+        int iStartStation = iStation;
+        for (int k = 0; k < surf.NYPanels(); k++)
+        {
+            double tau = 0.0;
+            Vector3d PtC4;
+            surf.getC4(k, PtC4, tau);
+            if (tau < 0.0) tau = 0.0;
+            if (tau > 1.0) tau = 1.0;
+            
+            double re = SpanResFF.m_Re.at(iStation);
+            double cl = SpanResFF.m_Cl.at(iStation);
+            
+            SpanResFF.m_Alpha_0[iStation] = Objects2d::getZeroLiftAngle(surf.foilA(), surf.foilB(), re, tau);
+            
+            double cdA, cdB, xtrTopA, xtrTopB, xtrBotA, xtrBotB;
+            bool bOkA = cacheA->getPlrPointFromCl(re, cl, cdA, xtrTopA, xtrBotA);
+            bool bOkB = cacheB->getPlrPointFromCl(re, cl, cdB, xtrTopB, xtrBotB);
+            
+            if (bOkA && bOkB)
+            {
+                // Interpolation succeeded - use results
+                SpanResFF.m_PCd[iStation]    = cdA * (1.0 - tau) + cdB * tau;
+                SpanResFF.m_XTrTop[iStation] = xtrTopA * (1.0 - tau) + xtrTopB * tau;
+                SpanResFF.m_XTrBot[iStation] = xtrBotA * (1.0 - tau) + xtrBotB * tau;
+                SpanResFF.m_bConverged[iStation] = true;
+            }
+            else
+            {
+                // Fallback to NeuralFoil OTF for this single point
+                logg += QString("      Station %1: interpolation failed, using OTF fallback\n").arg(iStation);
+                
+                // Create temp polars for OTF processing
+                Polar tempPolarA, tempPolarB;
+                tempPolarA.setType(xfl::T1POLAR);
+                tempPolarA.setNCrit(m_pPolar3d->NCrit());
+                tempPolarA.resizeData(1);
+                tempPolarA.m_Cl[0] = cl;
+                tempPolarA.m_Re[0] = re;
+                
+                tempPolarB.setType(xfl::T1POLAR);
+                tempPolarB.setNCrit(m_pPolar3d->NCrit());
+                tempPolarB.resizeData(1);
+                tempPolarB.m_Cl[0] = cl;
+                tempPolarB.m_Re[0] = re;
+                
+                NeuralFoilTask taskA, taskB;
+                taskA.setModelSize(modelSize);
+                taskA.initialize(foilA, &tempPolarA);
+                taskA.processClList();
+                
+                taskB.setModelSize(modelSize);
+                taskB.initialize(foilB, &tempPolarB);
+                taskB.processClList();
+                
+                SpanResFF.m_PCd[iStation]    = tempPolarA.m_Cd[0] * (1.0 - tau) + tempPolarB.m_Cd[0] * tau;
+                SpanResFF.m_XTrTop[iStation] = tempPolarA.m_XTrTop[0] * (1.0 - tau) + tempPolarB.m_XTrTop[0] * tau;
+                SpanResFF.m_XTrBot[iStation] = tempPolarA.m_XTrBot[0] * (1.0 - tau) + tempPolarB.m_XTrBot[0] * tau;
+                SpanResFF.m_bConverged[iStation] = true;
+            }
+            
+            iStation++;
+            if (s_bCancel) break;
+        }
+        
+        if (s_bCancel) break;
+    }
+    
+    // Calculate viscous moments at each station
+    Vector3d winddirection = objects::windDirection(alpha, beta);
+    Vector3d windside      = objects::windSide(alpha, beta);
+    
+    for (int m = 0; m < pWing->nStations(); m++)
+    {
+        Vector3d dragvector = winddirection * (SpanResFF.m_PCd.at(m) * SpanResFF.m_StripArea.at(m));
+        Vector3d leverarmcog = SpanResFF.m_PtC4.at(m) - cog;
+        SpanResFF.m_CmViscous[m] = (leverarmcog * dragvector).dot(windside);
+        SpanResFF.m_CmViscous[m] *= 1.0 / SpanResFF.m_Chord.at(m) / SpanResFF.m_StripArea.at(m);
+    }
+    
+    QString report = QString("                 ...done wing %1 (NeuralFoil interpolated)").arg(QString::fromStdString(pWing->name()));
+    report += EOLch;
+    traceLog(report);
+    
+    logmsg = logg.toStdString();
+    return bViscOK;
 }
 
 #endif // NEURALFOIL_ENABLED

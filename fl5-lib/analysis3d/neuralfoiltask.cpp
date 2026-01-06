@@ -41,6 +41,8 @@
 
 #include <iostream>
 #include <mutex>
+#include <algorithm>
+#include <cmath>
 
 namespace py = pybind11;
 
@@ -244,3 +246,260 @@ bool NeuralFoilTask::processClList()
     
     return success;
 }
+
+
+// ========================================================================
+// NeuralFoilPolarCache implementation
+// ========================================================================
+
+NeuralFoilPolarCache::NeuralFoilPolarCache()
+    : m_reMin(0.0)
+    , m_reMax(0.0)
+    , m_alphaMin(0.0)
+    , m_alphaMax(0.0)
+{
+}
+
+
+NeuralFoilPolarCache::~NeuralFoilPolarCache()
+{
+    clear();
+}
+
+
+void NeuralFoilPolarCache::clear()
+{
+    for (Polar* p : m_polars) {
+        delete p;
+    }
+    m_polars.clear();
+    m_reValues.clear();
+    m_foilHash.clear();
+    m_reMin = m_reMax = 0.0;
+}
+
+
+std::string NeuralFoilPolarCache::computeFoilHash(Foil const &foil)
+{
+    // Simple hash based on number of points and a few key coordinates
+    std::string hash = std::to_string(foil.nNodes());
+    if (foil.nNodes() > 0) {
+        hash += "_" + std::to_string(int(foil.x(0) * 10000));
+        hash += "_" + std::to_string(int(foil.y(0) * 10000));
+        int mid = foil.nNodes() / 2;
+        hash += "_" + std::to_string(int(foil.x(mid) * 10000));
+        hash += "_" + std::to_string(int(foil.y(mid) * 10000));
+    }
+    return hash;
+}
+
+
+std::vector<double> NeuralFoilPolarCache::generateReValues(double reMin, double reMax, int nValues)
+{
+    std::vector<double> reValues;
+    reValues.reserve(nValues);
+    
+    // Logarithmically spaced: denser at lower Re
+    double logMin = std::log10(reMin);
+    double logMax = std::log10(reMax);
+    double step = (logMax - logMin) / (nValues - 1);
+    
+    for (int i = 0; i < nValues; i++) {
+        double logRe = logMin + i * step;
+        reValues.push_back(std::pow(10.0, logRe));
+    }
+    
+    return reValues;
+}
+
+
+bool NeuralFoilPolarCache::generatePolarMesh(Foil const &foil,
+                                              double reMin, double reMax,
+                                              double alphaMin, double alphaMax,
+                                              double nCrit, double xtrTop, double xtrBot,
+                                              NeuralFoilModelSize modelSize)
+{
+    // Check if we already have valid data for this foil
+    std::string newHash = computeFoilHash(foil);
+    if (hasData() && m_foilHash == newHash && 
+        m_reMin <= reMin && m_reMax >= reMax &&
+        m_alphaMin <= alphaMin && m_alphaMax >= alphaMax) {
+        // Cache is still valid
+        return true;
+    }
+    
+    // Clear old data
+    clear();
+    
+    // Ensure Python is ready
+    if (!NeuralFoilTask::ensurePythonReady()) {
+        std::cerr << "[NeuralFoilPolarCache] Failed to initialize Python" << std::endl;
+        return false;
+    }
+    
+    // Generate Re values
+    m_reValues = generateReValues(reMin, reMax, N_RE_VALUES);
+    m_reMin = reMin;
+    m_reMax = reMax;
+    m_alphaMin = alphaMin;
+    m_alphaMax = alphaMax;
+    m_foilHash = newHash;
+    
+    // Copy foil coordinates
+    std::vector<double> x, y;
+    int n = foil.nNodes();
+    x.reserve(n);
+    y.reserve(n);
+    for (int i = 0; i < n; i++) {
+        x.push_back(foil.x(i));
+        y.push_back(foil.y(i));
+    }
+    
+    std::string modelStr = NeuralFoilTask::modelSizeToString(modelSize);
+    
+    // Acquire GIL for Python call
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    
+    bool success = false;
+    
+    try {
+        py::module_ bridge = py::module_::import("neuralfoil_bridge");
+        
+        // Call vectorized polar generation
+        py::dict result = bridge.attr("generate_polar_vectorized")(
+            x, y, m_reValues,
+            alphaMin, alphaMax, 0.25,  // alpha step
+            nCrit, xtrTop, xtrBot, 0.0,  // mach
+            modelStr
+        );
+        
+        success = result["success"].cast<bool>();
+        
+        if (success) {
+            py::dict polars = result["polars"].cast<py::dict>();
+            
+            // Create Polar objects from Python data
+            for (auto item : polars) {
+                double re = item.first.cast<double>();
+                py::dict data = item.second.cast<py::dict>();
+                
+                std::vector<double> alphas = data["alpha"].cast<std::vector<double>>();
+                std::vector<double> cls = data["cl"].cast<std::vector<double>>();
+                std::vector<double> cds = data["cd"].cast<std::vector<double>>();
+                std::vector<double> xtrTops = data["xtr_top"].cast<std::vector<double>>();
+                std::vector<double> xtrBots = data["xtr_bot"].cast<std::vector<double>>();
+                
+                Polar* pPolar = new Polar();
+                pPolar->setType(xfl::T1POLAR);
+                pPolar->setReynolds(re);
+                pPolar->setNCrit(nCrit);
+                pPolar->setXTripTop(xtrTop);
+                pPolar->setXTripBot(xtrBot);
+                
+                int nPts = static_cast<int>(alphas.size());
+                pPolar->resizeData(nPts);
+                
+                for (int i = 0; i < nPts; i++) {
+                    pPolar->m_Alpha[i] = alphas[i];
+                    pPolar->m_Cl[i] = cls[i];
+                    pPolar->m_Cd[i] = cds[i];
+                    pPolar->m_XTrTop[i] = xtrTops[i];
+                    pPolar->m_XTrBot[i] = xtrBots[i];
+                    pPolar->m_Re[i] = re;
+                }
+                
+                m_polars.push_back(pPolar);
+            }
+            
+            // Sort polars by Re
+            std::sort(m_polars.begin(), m_polars.end(), 
+                      [](Polar const* a, Polar const* b) {
+                          return a->Reynolds() < b->Reynolds();
+                      });
+            
+            std::cerr << "[NeuralFoilPolarCache] Generated " << m_polars.size() 
+                      << " polars, Re range [" << reMin << ", " << reMax << "]" << std::endl;
+        }
+        else {
+            std::string error = result["error"].cast<std::string>();
+            std::cerr << "[NeuralFoilPolarCache] Generation failed: " << error << std::endl;
+        }
+    }
+    catch (const py::error_already_set &e) {
+        std::cerr << "[NeuralFoilPolarCache] Python error: " << e.what() << std::endl;
+        success = false;
+    }
+    catch (const std::exception &e) {
+        std::cerr << "[NeuralFoilPolarCache] C++ error: " << e.what() << std::endl;
+        success = false;
+    }
+    
+    PyGILState_Release(gstate);
+    
+    return success;
+}
+
+
+bool NeuralFoilPolarCache::getPlrPointFromCl(double re, double cl,
+                                              double &cd, double &xtrTop, double &xtrBot) const
+{
+    if (m_polars.empty()) return false;
+    
+    // Find the two polars bracketing the Re value
+    Polar const* pPolar1 = nullptr;
+    Polar const* pPolar2 = nullptr;
+    
+    for (size_t i = 0; i < m_polars.size(); i++) {
+        if (m_polars[i]->Reynolds() >= re) {
+            pPolar2 = m_polars[i];
+            if (i > 0) pPolar1 = m_polars[i-1];
+            break;
+        }
+        pPolar1 = m_polars[i];
+    }
+    
+    // Handle edge cases
+    if (!pPolar1 && !pPolar2) return false;
+    
+    if (!pPolar1) {
+        // Re below minimum - use lowest polar
+        bool bOutCl = false;
+        cd = pPolar2->interpolateFromCl(cl, Polar::CD, bOutCl);
+        xtrTop = pPolar2->interpolateFromCl(cl, Polar::XTRTOP, bOutCl);
+        xtrBot = pPolar2->interpolateFromCl(cl, Polar::XTRBOT, bOutCl);
+        return !bOutCl;
+    }
+    
+    if (!pPolar2) {
+        // Re above maximum - use highest polar
+        bool bOutCl = false;
+        cd = pPolar1->interpolateFromCl(cl, Polar::CD, bOutCl);
+        xtrTop = pPolar1->interpolateFromCl(cl, Polar::XTRTOP, bOutCl);
+        xtrBot = pPolar1->interpolateFromCl(cl, Polar::XTRBOT, bOutCl);
+        return !bOutCl;
+    }
+    
+    // Interpolate between the two polars
+    bool bOutCl1 = false, bOutCl2 = false;
+    
+    double cd1 = pPolar1->interpolateFromCl(cl, Polar::CD, bOutCl1);
+    double cd2 = pPolar2->interpolateFromCl(cl, Polar::CD, bOutCl2);
+    
+    double xtrTop1 = pPolar1->interpolateFromCl(cl, Polar::XTRTOP, bOutCl1);
+    double xtrTop2 = pPolar2->interpolateFromCl(cl, Polar::XTRTOP, bOutCl2);
+    
+    double xtrBot1 = pPolar1->interpolateFromCl(cl, Polar::XTRBOT, bOutCl1);
+    double xtrBot2 = pPolar2->interpolateFromCl(cl, Polar::XTRBOT, bOutCl2);
+    
+    if (bOutCl1 || bOutCl2) return false;
+    
+    // Linear interpolation in Re
+    double t = (re - pPolar1->Reynolds()) / (pPolar2->Reynolds() - pPolar1->Reynolds());
+    
+    cd = cd1 + t * (cd2 - cd1);
+    xtrTop = xtrTop1 + t * (xtrTop2 - xtrTop1);
+    xtrBot = xtrBot1 + t * (xtrBot2 - xtrBot1);
+    
+    return true;
+}
+

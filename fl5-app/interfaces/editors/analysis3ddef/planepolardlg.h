@@ -116,6 +116,7 @@ class PlanePolarDlg : public Polar3dDlg
         QFrame *m_pfrInterpolated, *m_pfrOntheFly;
         QCheckBox *m_pchViscousLoop;
         QComboBox *m_pcbNFModelSize;
+        QComboBox *m_pcbNFMode;
 
         static PlanePolar s_WPolar;
 };

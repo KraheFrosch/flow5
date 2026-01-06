@@ -131,6 +131,94 @@ def analyze_foil_at_cls(
         }
 
 
+def generate_polar_vectorized(
+    x_coords: list,
+    y_coords: list,
+    re_values: list,
+    alpha_min: float,
+    alpha_max: float,
+    alpha_step: float = 0.25,
+    n_crit: float = 9.0,
+    xtr_top: float = 1.0,
+    xtr_bot: float = 1.0,
+    mach: float = 0.0,
+    model_size: str = "xlarge"
+) -> dict:
+    """
+    Generate polar data at multiple Reynolds numbers using vectorized NeuralFoil.
+    
+    This function pre-computes polars for a range of alphas at each Re value,
+    enabling fast interpolation during 3D analysis.
+    
+    Args:
+        x_coords: X coordinates of airfoil
+        y_coords: Y coordinates of airfoil
+        re_values: List of Reynolds numbers (e.g., 16 logarithmically-spaced values)
+        alpha_min: Minimum angle of attack (degrees)
+        alpha_max: Maximum angle of attack (degrees)
+        alpha_step: Alpha step size (degrees), default 0.25 for fine resolution
+        n_crit: Critical amplification factor
+        xtr_top: Forced transition on top surface
+        xtr_bot: Forced transition on bottom surface
+        mach: Mach number
+        model_size: NeuralFoil model size
+        
+    Returns:
+        Dictionary with:
+            'success': bool
+            'polars': {re_value: {'alpha': [], 'cl': [], 'cd': [], 'cm': [], 
+                                  'xtr_top': [], 'xtr_bot': []}}
+            'error': str (if failed)
+    """
+    try:
+        # Create airfoil from coordinates
+        coords = np.column_stack([x_coords, y_coords])
+        airfoil = Airfoil(name="polar_foil", coordinates=coords)
+        
+        # Create alpha array
+        alphas = np.arange(alpha_min, alpha_max + alpha_step/2, alpha_step)
+        n_alphas = len(alphas)
+        
+        polars = {}
+        
+        for re in re_values:
+            # Single vectorized call per Re with all alphas at once!
+            # This is the key speedup - NeuralFoil processes entire alpha array
+            aero = airfoil.get_aero_from_neuralfoil(
+                alpha=alphas,
+                Re=float(re),
+                mach=mach,
+                n_crit=n_crit,
+                xtr_upper=xtr_top,
+                xtr_lower=xtr_bot,
+                model_size=model_size
+            )
+            
+            # Store results for this Re
+            polars[float(re)] = {
+                'alpha': alphas.tolist(),
+                'cl': aero['CL'].tolist() if isinstance(aero['CL'], np.ndarray) else [float(aero['CL'])],
+                'cd': aero['CD'].tolist() if isinstance(aero['CD'], np.ndarray) else [float(aero['CD'])],
+                'cm': aero['CM'].tolist() if isinstance(aero['CM'], np.ndarray) else [float(aero['CM'])],
+                'xtr_top': aero['Top_Xtr'].tolist() if isinstance(aero['Top_Xtr'], np.ndarray) else [float(aero['Top_Xtr'])],
+                'xtr_bot': aero['Bot_Xtr'].tolist() if isinstance(aero['Bot_Xtr'], np.ndarray) else [float(aero['Bot_Xtr'])]
+            }
+        
+        return {
+            'success': True,
+            'polars': polars,
+            'n_re': len(re_values),
+            'n_alpha': n_alphas
+        }
+        
+    except Exception as e:
+        return {
+            'success': False,
+            'error': str(e),
+            'polars': {}
+        }
+
+
 def analyze_foil_at_alphas(
     x_coords: list,
     y_coords: list,

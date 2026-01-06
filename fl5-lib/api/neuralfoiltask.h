@@ -142,3 +142,95 @@ private:
 
     static bool s_bPythonInitialized;
 };
+
+
+/**
+ * @brief Cache for pre-computed NeuralFoil polars
+ * 
+ * Stores polars at multiple Reynolds numbers for a single foil,
+ * enabling fast interpolation during 3D analysis. Polars are
+ * generated once per unique foil geometry.
+ */
+class FL5LIB_EXPORT NeuralFoilPolarCache
+{
+public:
+    NeuralFoilPolarCache();
+    ~NeuralFoilPolarCache();
+
+    /**
+     * @brief Generate polar mesh for a foil across Re range
+     * @param foil The airfoil geometry
+     * @param reMin Minimum Reynolds number (with 0.5x safety factor already applied)
+     * @param reMax Maximum Reynolds number (with 2.0x safety factor already applied)
+     * @param alphaMin Minimum angle of attack (degrees)
+     * @param alphaMax Maximum angle of attack (degrees)
+     * @param nCrit Critical amplification factor
+     * @param xtrTop Forced transition on top surface
+     * @param xtrBot Forced transition on bottom surface
+     * @param modelSize NeuralFoil model size
+     * @return true if generation succeeded
+     */
+    bool generatePolarMesh(Foil const &foil,
+                           double reMin, double reMax,
+                           double alphaMin, double alphaMax,
+                           double nCrit, double xtrTop, double xtrBot,
+                           NeuralFoilModelSize modelSize);
+
+    /**
+     * @brief Get Cd by interpolating from cached polars
+     * @param re Reynolds number
+     * @param cl Lift coefficient
+     * @param cd Output: drag coefficient
+     * @param xtrTop Output: top transition location
+     * @param xtrBot Output: bottom transition location
+     * @return true if interpolation succeeded, false if out of range
+     */
+    bool getPlrPointFromCl(double re, double cl,
+                           double &cd, double &xtrTop, double &xtrBot) const;
+
+    /**
+     * @brief Clear cached polars
+     */
+    void clear();
+
+    /**
+     * @brief Check if cache has data
+     */
+    bool hasData() const { return !m_polars.empty(); }
+
+    /**
+     * @brief Get number of cached polars
+     */
+    int nPolars() const { return static_cast<int>(m_polars.size()); }
+
+    /**
+     * @brief Get Re range covered
+     */
+    double reMin() const { return m_reMin; }
+    double reMax() const { return m_reMax; }
+
+    /**
+     * @brief Number of Reynolds numbers in polar mesh
+     */
+    static constexpr int N_RE_VALUES = 16;
+
+private:
+    std::vector<Polar*> m_polars;  ///< Polars sorted by ascending Re
+    std::vector<double> m_reValues; ///< Corresponding Re values
+    double m_reMin;
+    double m_reMax;
+    double m_alphaMin;
+    double m_alphaMax;
+    std::string m_foilHash;  ///< Hash to detect foil geometry changes
+
+    /**
+     * @brief Compute a simple hash of foil coordinates
+     */
+    static std::string computeFoilHash(Foil const &foil);
+
+    /**
+     * @brief Generate logarithmically-spaced Re values
+     */
+    static std::vector<double> generateReValues(double reMin, double reMax, int nValues);
+};
+
