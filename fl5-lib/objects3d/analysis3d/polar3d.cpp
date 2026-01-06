@@ -58,6 +58,7 @@ void Polar3d::setDefaults()
     m_XTrTop = 1.0;
     m_XTrBot = 1.0;
     m_bTransAtHinge = false;
+    m_NFModelSize = 5;  // xlarge default
 
     m_BC = xfl::DIRICHLET;
 
@@ -132,6 +133,7 @@ void Polar3d::duplicateSpec(const Polar3d *pPolar3d)
     m_XTrTop                = pPolar3d->m_XTrTop;
     m_XTrBot                = pPolar3d->m_XTrBot;
     m_bTransAtHinge         = pPolar3d->m_bTransAtHinge;
+    m_NFModelSize           = pPolar3d->m_NFModelSize;
 
     m_Mass = pPolar3d->m_Mass;
     m_CoG  = pPolar3d->m_CoG;

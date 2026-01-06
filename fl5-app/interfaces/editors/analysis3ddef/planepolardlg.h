@@ -33,6 +33,7 @@
 
 
 class CtrlTableDelegate;
+class QComboBox;
 
 class PlanePolarDlg : public Polar3dDlg
 {
@@ -114,6 +115,7 @@ class PlanePolarDlg : public Polar3dDlg
         QCheckBox *m_pchTransAtHinge;
         QFrame *m_pfrInterpolated, *m_pfrOntheFly;
         QCheckBox *m_pchViscousLoop;
+        QComboBox *m_pcbNFModelSize;
 
         static PlanePolar s_WPolar;
 };

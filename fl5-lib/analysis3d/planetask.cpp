@@ -3307,10 +3307,12 @@ bool PlaneTask::computeSurfaceDragNF(Surface const &surf, int iStartStation, dou
 
     // Process with NeuralFoil (faster than XFoil, no threading needed)
     NeuralFoilTask leftTask;
+    leftTask.setModelSize(static_cast<NeuralFoilModelSize>(m_pPolar3d->neuralFoilModelSize()));
     leftTask.initialize(foilA, &LeftSidePolar);
     bool bLeftOK = leftTask.processClList();
 
     NeuralFoilTask rightTask;
+    rightTask.setModelSize(static_cast<NeuralFoilModelSize>(m_pPolar3d->neuralFoilModelSize()));
     rightTask.initialize(foilB, &RightSidePolar);
     bool bRightOK = rightTask.processClList();
 

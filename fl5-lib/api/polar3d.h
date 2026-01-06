@@ -137,6 +137,9 @@ class FL5LIB_EXPORT Polar3d : public XflObject
         bool isNeuralFoilOTF() const {return m_bNeuralFoilOTF;}
         void setNeuralFoilOTF(bool b) {m_bNeuralFoilOTF=b; if(b) m_bViscOnTheFly=false;}
 
+        int neuralFoilModelSize() const {return m_NFModelSize;}
+        void setNeuralFoilModelSize(int size) {m_NFModelSize=size;}
+
         bool isViscFromCl() const {return m_bViscFromCl;}
         void setViscFromCl(bool bFromCl) {m_bViscFromCl=bFromCl;}
 
@@ -275,6 +278,7 @@ class FL5LIB_EXPORT Polar3d : public XflObject
         double   m_XTrTop;             /**< the 2d forced top transition location for on the fly viscous calculations; unit is (x/c) */
         double   m_XTrBot;             /**< the 2d forced bottom transition location for on the fly viscous calculations; unit is (x/c) */
         bool     m_bTransAtHinge;      /**< if true forces the laminar to turbulent transition at the location of the foil's hinge */
+        int      m_NFModelSize;        /**< NeuralFoil model size index (0=xxsmall to 7=xxxlarge), default 5=xlarge */
 
         double   m_BetaSpec;           /**< The sideslip angle for type 1,2, 4 polars */
         double   m_BankAngle;          /**< The bank angle */

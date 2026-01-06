@@ -20,15 +20,15 @@
     If not, see <https://www.gnu.org/licenses/>.
 
 
-*****************************************************************************/
+****************************************************************************/
 
 /**
  * @file neuralfoiltask.h
  * @brief NeuralFoil on-the-fly viscous analysis task
  * 
  * This class provides a C++ interface to NeuralFoil for calculating 
- * viscous polar data during 3D analysis. It mirrors the XFoilTask 
- * interface but uses NeuralFoil through an embedded Python interpreter.
+ * viscous polar data during 3D analysis. It uses pybind11 to embed
+ * Python, with careful GIL management to avoid crashes.
  */
 
 #pragma once
@@ -39,6 +39,23 @@
 
 class Foil;
 class Polar;
+
+/**
+ * @brief Available NeuralFoil model sizes
+ * 
+ * Larger models are more accurate but slower.
+ * xxsmall is fastest, xxxlarge is most accurate.
+ */
+enum class NeuralFoilModelSize {
+    XXSMALL = 0,
+    XSMALL,
+    SMALL,
+    MEDIUM,
+    LARGE,
+    XLARGE,
+    XXLARGE,
+    XXXLARGE
+};
 
 /**
  * @brief Task class for NeuralFoil on-the-fly calculations
@@ -74,16 +91,39 @@ public:
     Polar const* polar() const { return m_pPolar; }
 
     /**
-     * @brief Initialize the Python interpreter (call once at app startup)
-     * @param venvPath Path to the Python virtual environment
-     * @return true if initialization succeeded
+     * @brief Set the NeuralFoil model size
+     * @param size Model size enum
      */
-    static bool initializePython(std::string const &venvPath);
+    void setModelSize(NeuralFoilModelSize size) { m_modelSize = size; }
 
     /**
-     * @brief Finalize the Python interpreter (call once at app shutdown)
+     * @brief Get the current model size
+     * @return Current model size
      */
-    static void finalizePython();
+    NeuralFoilModelSize modelSize() const { return m_modelSize; }
+
+    /**
+     * @brief Convert model size enum to string for Python bridge
+     * @param size Model size enum
+     * @return String representation (e.g., "xlarge")
+     */
+    static std::string modelSizeToString(NeuralFoilModelSize size);
+
+    /**
+     * @brief Convert string to model size enum
+     * @param str String like "xlarge"
+     * @return Corresponding enum value
+     */
+    static NeuralFoilModelSize stringToModelSize(std::string const &str);
+
+    /**
+     * @brief Ensure Python interpreter is initialized (lazy init)
+     * @return true if Python is ready
+     * 
+     * The interpreter is never finalized to avoid segfaults.
+     * This is safe - it stays alive for app lifetime.
+     */
+    static bool ensurePythonReady();
 
     /**
      * @brief Check if Python is initialized
@@ -98,6 +138,7 @@ private:
     double m_NCrit;
     double m_XTrTop;
     double m_XTrBot;
+    NeuralFoilModelSize m_modelSize;
 
     static bool s_bPythonInitialized;
 };

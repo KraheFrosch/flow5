@@ -31,6 +31,7 @@
 #include <QMessageBox>
 #include <QButtonGroup>
 #include <QHeaderView>
+#include <QComboBox>
 
 
 #include "planepolardlg.h"
@@ -197,6 +198,21 @@ void PlanePolarDlg::makeCommonControls()
                 }
                 pMethodLayout->addWidget(m_prbViscOnTheFly);
                 pMethodLayout->addWidget(m_prbNeuralFoilOTF);
+                
+                // NeuralFoil model size selector
+                m_pcbNFModelSize = new QComboBox;
+                m_pcbNFModelSize->addItem("xxsmall (fastest)");
+                m_pcbNFModelSize->addItem("xsmall");
+                m_pcbNFModelSize->addItem("small");
+                m_pcbNFModelSize->addItem("medium");
+                m_pcbNFModelSize->addItem("large");
+                m_pcbNFModelSize->addItem("xlarge (default)");
+                m_pcbNFModelSize->addItem("xxlarge");
+                m_pcbNFModelSize->addItem("xxxlarge (most accurate)");
+                m_pcbNFModelSize->setCurrentIndex(5);  // xlarge default
+                m_pcbNFModelSize->setToolTip("<p>Select NeuralFoil model size. Larger models are more accurate but slower.</p>");
+                pMethodLayout->addWidget(m_pcbNFModelSize);
+                
                 pMethodLayout->addWidget(m_prbViscInterpolated);
                 pMethodLayout->addStretch();
             }
@@ -493,6 +509,7 @@ void PlanePolarDlg::connectSignals()
     connect(m_prbViscInterpolated, SIGNAL(clicked()),               SLOT(onViscous()));
     connect(m_prbViscOnTheFly,     SIGNAL(clicked()),               SLOT(onViscous()));
     connect(m_prbNeuralFoilOTF,    SIGNAL(clicked()),               SLOT(onViscous()));
+    connect(m_pcbNFModelSize,      SIGNAL(currentIndexChanged(int)), SLOT(onViscous()));
     connect(m_prbViscFromAlpha,    SIGNAL(clicked()),               SLOT(onViscous()));
     connect(m_prbViscFromCl,       SIGNAL(clicked()),               SLOT(onViscous()));
 
@@ -557,6 +574,7 @@ void PlanePolarDlg::initPolar3dDlg(const Plane *pPlane, PlanePolar const *pWPola
     m_prbViscInterpolated->setChecked(s_WPolar.isViscInterpolated());
     m_prbViscOnTheFly->setChecked(s_WPolar.isViscOnTheFly());
     m_prbNeuralFoilOTF->setChecked(s_WPolar.isNeuralFoilOTF());
+    m_pcbNFModelSize->setCurrentIndex(s_WPolar.neuralFoilModelSize());
     m_prbViscFromCl->setChecked(s_WPolar.isViscFromCl());
     m_prbViscFromAlpha->setChecked(!s_WPolar.isViscFromCl());
     m_pfeNCrit ->setValuef(s_WPolar.NCrit());
@@ -787,6 +805,7 @@ void PlanePolarDlg::readViscousData()
     else if(m_prbNeuralFoilOTF->isChecked())
     {
         s_WPolar.setNeuralFoilOTF(true);
+        s_WPolar.setNeuralFoilModelSize(m_pcbNFModelSize->currentIndex());
     }
     
     s_WPolar.setViscFromCl(m_prbViscFromCl->isChecked());
