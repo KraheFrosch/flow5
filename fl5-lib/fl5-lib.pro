@@ -88,11 +88,11 @@ linux-g++ {
 
     #----------- PYTHON / PYBIND11 (for NeuralFoil) -------------
     #   Python embedding for NeuralFoil on-the-fly calculations
-    #   Requires Python 3.12 development headers and pybind11
+    #   Requires Python 3.13 development headers and pybind11 (Ubuntu 25.10+)
         DEFINES += NEURALFOIL_ENABLED
-        INCLUDEPATH += /usr/include/python3.12
-        INCLUDEPATH += $$PWD/../../venv/lib/python3.12/site-packages/pybind11/include
-        LIBS += -lpython3.12
+        INCLUDEPATH += /usr/include/python3.13
+        INCLUDEPATH += $$PWD/../../venv/lib/python3.13/site-packages/pybind11/include
+        LIBS += -lpython3.13
 
 }
 
