@@ -133,6 +133,10 @@ class FL5LIB_EXPORT PanelAnalysis
 
         static void clearDebugPts() {s_DebugPts.clear(); s_DebugVecs.clear();}
 
+        // Matrix data accessors for GPU/iterative solver testing
+        std::vector<double> const& matrixDataDouble() const { return m_aijd; }
+        std::vector<float> const& matrixDataFloat() const { return m_aijf; }
+
 
     protected:
         bool LUfactorize();

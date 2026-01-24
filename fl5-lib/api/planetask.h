@@ -46,6 +46,7 @@ class Panel3;
 class Panel4;
 class AngleControl;
 class Polar;
+class Foil;
 class XFoilTask;
 class NeuralFoilPolarCache;
 

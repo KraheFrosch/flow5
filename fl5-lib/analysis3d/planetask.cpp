@@ -46,6 +46,7 @@
 
 
 #include <planetask.h>
+#include <profiler.h>  // Performance profiling
 
 #include <geom_params.h>
 #include <mesh_globals.h>
@@ -2097,21 +2098,26 @@ bool PlaneTask::computeStability(PlaneOpp *pPOpp, bool bOutput)
 
 bool PlaneTask::T123458Loop()
 {
+    PROFILE_SCOPE("T123458Loop");
     QString strange, str, outstring;
 
     traceStdLog("\nSolving the problem... \n\n");
 
     m_pPA->m_nStations = m_pPlane->nStations();// for assertion checks only?
 
+    PROFILE_START("06.MakeWakePanels");
     m_pPA->makeWakePanels(objects::windDirection(0,0), false);
     m_pPA->savePanels();
+    PROFILE_END("06.MakeWakePanels");
 
     setLinearSolution();
 
     traceStdLog("   Making unit panel velocities... ");
+    PROFILE_START("07.LocalVelocities");
     int N = int(m_pPA->m_uVLocal.size());
     std::vector<Vector3d> uVLocal(N), vVLocal(N), wVLocal(N); // keep a copy since these velocity arrays are modified during the calculation of derivatives
     m_pPA->makeLocalVelocities(m_pPA->m_uRHS, m_pPA->m_vRHS, m_pPA->m_wRHS, uVLocal, vVLocal, wVLocal, objects::windDirection(0,0));
+    PROFILE_END("07.LocalVelocities");
 
     traceStdLog("     done\n");
 
@@ -2155,16 +2161,22 @@ bool PlaneTask::T123458Loop()
 
         traceLog(outstring);
 
+        PROFILE_START("08.SourceStrengths");
         traceStdLog("       Creating source strengths...\n");
         m_pPA->makeSourceStrengths(objects::windDirection(m_Alpha, m_Beta));
+        PROFILE_END("08.SourceStrengths");
 
+        PROFILE_START("09.DoubletStrengths");
         traceStdLog("       Calculating doublet strengths...\n");
         m_pPA->makeUnitDoubletStrengths(m_Alpha, m_Beta);
+        PROFILE_END("09.DoubletStrengths");
 
+        PROFILE_START("10.InducedForces");
         traceStdLog("       Calculating far field forces...\n");
 
         computeInducedForces(m_Alpha, m_Beta, 1.0);
         computeInducedDrag(  m_Alpha, m_Beta, 1.0);
+        PROFILE_END("10.InducedForces");
 
         if(m_pPlPolar->isType1() || m_pPlPolar->isType5())
         {
@@ -2200,6 +2212,7 @@ bool PlaneTask::T123458Loop()
 
         if (isCancelled()) return true;
 
+        PROFILE_START("11.OnBodyCp");
         traceStdLog("       Calculating on-body pressure coefficients...\n");
         std::vector<Vector3d> VLocal;
         std::vector<Vector3d> VInf(m_pPA->nPanels());
@@ -2212,11 +2225,14 @@ bool PlaneTask::T123458Loop()
 
         m_pPA->combineLocalVelocities(m_Alpha, m_Beta, VLocal);
         m_pPA->computeOnBodyCp(VInf, VLocal, m_pPA->m_Cp);
+        PROFILE_END("11.OnBodyCp");
         if (isCancelled()) return true;
 
+        PROFILE_START("12.ComputePlane");
         str = "       Calculating plane\n";
         traceLog(str);
         PlaneOpp *pPOpp = computePlane(m_Ctrl, m_Alpha, m_Beta, m_pPlPolar->phi(), m_QInf, mass, CoG, false);
+        PROFILE_END("12.ComputePlane");
         if(!pPOpp)
         {
             traceStdLog("\n          Error generating the operating point... discarding\n\n");
@@ -2227,8 +2243,10 @@ bool PlaneTask::T123458Loop()
 
         if(m_bDerivatives)
         {
+            PROFILE_START("13.Stability");
             traceStdLog("          Calculating derivatives and eigenthings\n");
             computeStability(pPOpp, true);
+            PROFILE_END("13.Stability");
         }
         else
         {
@@ -2581,13 +2599,19 @@ void PlaneTask::setControlPositions(PlaneXfl const *pPlaneXfl, PlanePolar const 
  */
 void PlaneTask::run()
 {
+    PROFILE_RESET();  // Clear previous profiling data
+    PROFILE_SCOPE("PlaneTask::run");
+    
+    PROFILE_START("00.InitializeTask");
     if(!initializeTask())
     {
+        PROFILE_END("00.InitializeTask");
         m_bWarning = m_bError = true;
         m_AnalysisStatus = xfl::FINISHED;
 
         return;
     }
+    PROFILE_END("00.InitializeTask");
 
     m_AnalysisStatus = xfl::RUNNING;
 
@@ -2603,6 +2627,10 @@ void PlaneTask::run()
     m_bError = m_bError || m_pPA->m_bWarning;
 
     if(m_AnalysisStatus!=xfl::CANCELLED) m_AnalysisStatus = xfl::FINISHED;  // finish the analysis before sending the final condition_variable
+    
+    // Output profiling report
+    traceStdLog(PROFILE_REPORT());
+    
     traceStdLog("\nDone plane task.\n"); // final notification after flag is set to FINISHED so that sender thread may exit
 }
 
@@ -3111,12 +3139,15 @@ void PlaneTask::getVelocityVector(Vector3d const &C, double coreradius, bool bMu
 
 bool PlaneTask::setLinearSolution()
 {
+    PROFILE_SCOPE("setLinearSolution");
     QString strange;
 
     auto start = std::chrono::system_clock::now();
 
     traceStdLog("   Making the unit RHS vectors...");
+    PROFILE_START("01.UnitRHSVectors");
     m_pPA->makeUnitRHSVectors();
+    PROFILE_END("01.UnitRHSVectors");
 
     auto end = std::chrono::system_clock::now();
     int duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -3128,7 +3159,9 @@ bool PlaneTask::setLinearSolution()
     if (isCancelled()) return true;
 
     traceStdLog("   Making the influence matrix...");
+    PROFILE_START("02.InfluenceMatrix");
     m_pPA->makeInfluenceMatrix();
+    PROFILE_END("02.InfluenceMatrix");
 
     end = std::chrono::system_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -3147,7 +3180,9 @@ bool PlaneTask::setLinearSolution()
     if(!m_pPlPolar->isVLM())
     {
         traceStdLog("   Adding the wake's contribution...");
+        PROFILE_START("03.WakeContribution");
         m_pPA->addWakeContribution();
+        PROFILE_END("03.WakeContribution");
 
 
         end = std::chrono::system_clock::now();
@@ -3161,13 +3196,16 @@ bool PlaneTask::setLinearSolution()
     if (isCancelled()) return true;
 
     traceStdLog("   LAPACK - LU factorization...");
+    PROFILE_START("04.LUFactorization");
     if (!m_pPA->LUfactorize())
     {
+        PROFILE_END("04.LUFactorization");
         traceStdLog(" singular matrix, aborting\n");
 
         m_bError = true;
         return false;
     }
+    PROFILE_END("04.LUFactorization");
 
     end = std::chrono::system_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -3177,7 +3215,9 @@ bool PlaneTask::setLinearSolution()
     if (isCancelled()) return true;
 
     traceStdLog("   Back-substituting RHS...");
+    PROFILE_START("05.BackSubstitution");
     m_pPA->backSubUnitRHS(m_pPA->m_uRHS.data(), m_pPA->m_vRHS.data(), m_pPA->m_wRHS.data(), m_pPA->m_pRHS.data(), m_pPA->m_qRHS.data(), m_pPA->m_rRHS.data());
+    PROFILE_END("05.BackSubstitution");
 
 
     end = std::chrono::system_clock::now();
