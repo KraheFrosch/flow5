@@ -65,7 +65,7 @@ class FoilRepanelDlg : public FoilDlg
 
         void setupLayout();
 
-        QFrame *m_pBunchBox;
+        QFrame *m_pfrBunch;
         QLabel *m_plabWarning;
         IntEdit  *m_pieNPanels;
 

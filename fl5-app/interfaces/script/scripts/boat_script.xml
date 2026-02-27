@@ -1,3 +1,9 @@
+
+<!-- To run a script from the command line: -->
+<!-- flow5 -h -->
+<!-- flow5 -p -s script.xml -->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE XFL_SCRIPT>
 <xflscript version="1.0">

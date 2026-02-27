@@ -74,7 +74,7 @@ int main()
         pPlaneXfl->makeDefaultPlane();
 
         // Set the inertia properties
-        // All units must be provided in I.S. standard, i.e. meters ang kg
+        // All units must be provided in I.S. standard, i.e. meters and kg
         Inertia &inertia = pPlaneXfl->inertia();
         inertia.appendPointMass(0.20, {-0.35,0,0},  "Nose lead");
         inertia.appendPointMass(0.20, {-0.25,0,0},  "Battery and receiver");
@@ -120,16 +120,16 @@ int main()
 
             //root section
             WingSection &sec0 = mainwing.rootSection(); // or mainwing.section(0);
-            sec0.setDihedral(3.5);
-            sec0.setChord(0.27);
+            sec0.setDihedral(3.5); // degrees
+            sec0.setChord(0.27);   // meters
             sec0.setNY(13);
             sec0.setYDistType(xfl::UNIFORM);
 
             // mid section
             WingSection &sec1 = mainwing.section(1);
             sec1.setXOffset(0.03); // the offset in the X direction
-            sec1.setDihedral(7.5);
-            sec1.setYPosition(0.9);
+            sec1.setDihedral(7.5); // degrees
+            sec1.setYPosition(0.9);  // meters
             sec1.setChord(0.21);
             sec1.setTwist(-2.5); // degrees
             sec1.setNY(19);
@@ -137,7 +137,7 @@ int main()
 
             // tip section
             WingSection &sec2 = mainwing.tipSection(); // or mainwing.section(2);
-            sec2.setYPosition(1.47);
+            sec2.setYPosition(1.47);  // meters
             sec2.setChord(0.13);
             sec2.setTwist(-3.5); // degrees
         }
@@ -257,7 +257,7 @@ int main()
 
                 // Flaps are numbered from left to right
                 // Set their deflection, + is down, unit is degrees
-                // Note: arrays is C are indexed starting at 0
+                // Note: arrays in C are indexed starting at 0
                 mainwingctrls.setValue(0, +5);
                 mainwingctrls.setValue(1, +5);
                 mainwingctrls.setValue(2, +5);

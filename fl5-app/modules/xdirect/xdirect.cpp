@@ -1142,9 +1142,9 @@ void XDirect::onAnalyze()
 {
     if(!s_pCurFoil || !s_pCurPolar) return;
 
-    if(s_pCurFoil->nNodes()>=255)
+    if(s_pCurFoil->nNodes()>IQX-2)
     {
-        s_pMainFrame->displayMessage("XFoil requires that NPanels<255\n\n", true);
+        s_pMainFrame->displayMessage(QString("XFoil requires that NPanels<%1").arg(IQX-2) + EOLch + EOLch, true) ;
         return;
     }
 
@@ -1387,10 +1387,10 @@ void XDirect::onEditCurPolar()
 void XDirect::onDeleteCurFoil()
 {
     QString strong;
-    strong = "Are you sure you want to delete\n"+ QString::fromStdString(s_pCurFoil->name()) +"\n";
-    strong+= "and all associated operating points and polars?";
+    strong = tr("Are you sure you want to delete\n")+ QString::fromStdString(s_pCurFoil->name()) +tr("\n");
+    strong+= tr("and all associated operating points and polars?");
 
-    int resp = QMessageBox::question(s_pMainFrame, "Question", strong,  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    int resp = QMessageBox::question(s_pMainFrame, tr("Question"), strong,  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
     if(resp != QMessageBox::Yes) return;
 
     Foil *pDoomedFoil = s_pCurFoil;
@@ -1463,10 +1463,10 @@ void XDirect::onDeleteCurPolar()
 
     QString str;
 
-    str = "Are you sure you want to delete the polar :\n  " + QString::fromStdString(s_pCurPolar->name());
-    str += "\n and all the associated operating points?";
+    str = tr("Are you sure you want to delete the polar :\n  ") + QString::fromStdString(s_pCurPolar->name());
+    str += tr("\n and all the associated operating points?");
 
-    if (QMessageBox::Yes != QMessageBox::question(s_pMainFrame, "Question", str,
+    if (QMessageBox::Yes != QMessageBox::question(s_pMainFrame, tr("Question"), str,
                                                   QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
     Polar *pPolarToRemove = s_pCurPolar;
@@ -1562,9 +1562,9 @@ void XDirect::onDeleteFoilPolars()
 
     QString strong;
 
-    strong = "Are you sure you want to delete polars and oprating points\n";
-    strong +="associated to "+QString::fromStdString(s_pCurFoil->name()) + "?";
-    if (QMessageBox::Yes != QMessageBox::question(s_pMainFrame, "Question", strong,
+    strong = tr("Are you sure you want to delete polars and oprating points\n");
+    strong +=tr("associated to ")+QString::fromStdString(s_pCurFoil->name()) + tr("?");
+    if (QMessageBox::Yes != QMessageBox::question(s_pMainFrame, tr("Question"), strong,
                                                   QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
         return;
 

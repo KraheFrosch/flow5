@@ -229,14 +229,14 @@ class FL5LIB_EXPORT Foil : public XflObject
 
         // depending on how the foil was constructed, base Top and Bot arrays can be created first
         // and then base Nodes are constructed, or the other way round
-        std::vector<Node2d> m_BaseNode;          /**< the array of base foil points, i.e. non-flapped */
-        std::vector<Node2d> m_BaseTop;	     /**< the upper surface points of the base geometry, i.e. non-flapped */
-        std::vector<Node2d> m_BaseBot;         /**< the lower surface points of the base geometry, i.e. non-flapped */
+        std::vector<Node2d> m_BaseNode;          /**< the array of base foil points, i.e. non-flapped, not repanelled */
+        std::vector<Node2d> m_BaseTop;	     /**< the upper surface points of the base geometry, i.e. non-flapped, not repanelled */
+        std::vector<Node2d> m_BaseBot;         /**< the lower surface points of the base geometry, i.e. non-flapped, not repanelled */
 
-        std::vector<Node2d> m_Node;              /**< the array of coordinates of the flapped foil*/
+        std::vector<Node2d> m_Node;              /**< the array of coordinates of the flapped repanelled foil*/
 
-        std::vector<Node2d> m_Top;	         /**< the upper surface points = base + flapped */
-        std::vector<Node2d> m_Bot;	         /**< the lower surface points = base + flapped  */
+        std::vector<Node2d> m_Top;	         /**< the upper surface points = base + flapped + repanelled */
+        std::vector<Node2d> m_Bot;	         /**< the lower surface points = base + flapped + repanelled */
 
         int m_iLE;                           /**< the index of the leading edge point - defined as the point of min x. */
 

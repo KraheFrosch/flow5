@@ -1,4 +1,7 @@
 
+#    Compilation instructions:
+#    https://flow5.tech/docs/flow5_doc/Source/Compilation.html
+
 DEFINES += QT_DEPRECATED_WARNINGS
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -10,8 +13,8 @@ VERSION = 7.54
 
 QT += opengl widgets xml
 
-greaterThan(QT_VERSION, 6)  {
-   QT += openglwidgets
+greaterThan(QT_MAJOR_VERSION, 5) {
+    QT += openglwidgets
 }
 
 OBJECTS_DIR = ./objects
@@ -24,7 +27,11 @@ CONFIG(release, debug|release) {
     CONFIG += optimize_full
 }
 
-CONFIG += c++17
+greaterThan(QT_MAJOR_VERSION, 5) {
+    CONFIG += c++20
+} else {
+    CONFIG += c++17
+}
 
 # The path to the libraries' header files required by the code at compile time
 INCLUDEPATH += $$PWD/../XFoil-lib/
@@ -37,29 +44,36 @@ INCLUDEPATH += $$PWD/../fl5-lib/api
 
 
 linux-g++ {
+
     CONFIG += thread
 
     # VARIABLES
     isEmpty(PREFIX):PREFIX = /usr/local
     BINDIR = $$PREFIX/bin
-    DATADIR = $$PREFIX/share/flow5
+    SHAREDIR = $$PREFIX/share/flow5
 
     desktop.path = $$(HOME)/.local/share/applications
     desktop.files += ../meta/linux/$${TARGET}.desktop
 
-    icon128.path = $$DATADIR
+    icon128.path = $$SHAREDIR
     icon128.files += ../meta/res/$${TARGET}.png
 
     target.path = $$BINDIR
 
+    translations.path = $$SHAREDIR/translations
+    translations.files = ../meta/translations/*.qm
+
+    target.path = $$BINDIR
+
     # MAKE INSTALL
-    INSTALLS += target desktop icon128
+    INSTALLS += target desktop icon128 translations
+
 
 #    CONFIG += INTEL_MKL
 
     INTEL_MKL {
         #------------ MKL --------------------
-        #    MKL can use the c++ matrices in row major order order
+        #    MKL can use the c++ matrices in row major order
         DEFINES += INTEL_MKL
 
         #   Ensure that the paths to the include files and to the binary libraries
@@ -96,7 +110,7 @@ linux-g++ {
 
     #--------------------- GMSH ------------------------
     INCLUDEPATH += /usr/local/include/
-#    LIBS += -L/usr/local/lib64           # redundant
+    LIBS += -L/usr/local/lib64           # redundant
     LIBS += -lgmsh
 
 
@@ -107,6 +121,7 @@ linux-g++ {
 
 
 win32-msvc {
+
 
     CONFIG += console
     CONFIG -= debug_and_release debug_and_release_target
@@ -156,6 +171,7 @@ win32-msvc {
 
 
 macx {
+
     QMAKE_MAC_SDK = macosx
     QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 
@@ -218,6 +234,7 @@ RESOURCES += \
     resources/sailimages.qrc
 
 
+
 LIBS += -L../fl5-lib -lfl5-lib
 
 LIBS += \
@@ -241,9 +258,11 @@ LIBS += \
     -lTKCDF \
     -lTKFillet \
 
+
 DISTFILES += \
     ../meta/doc/images/flow5.png \
     ../meta/doc/releasenotes.html \
     ../meta/doc/style.css \
     ../meta/win64/flow5.ico \
     ../meta/win64/flow5_doc.ico
+

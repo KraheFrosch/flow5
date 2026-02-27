@@ -116,7 +116,7 @@ class FL5LIB_EXPORT Surface
         void addPanel3Index(int idx);
         void addPanel4Index(int idx);
         void copy(Surface const &pSurface);
-        void createXPoints();
+        void createXPoints(int nRefXFlaps=-1);
         inline void getC4(int kStrip, Vector3d &ptC4, double &tau) const;
         inline void getLeadingPt(int kStrip, Vector3d &C) const;
         inline void getTrailingPt(int kStrip, Vector3d &C) const;

@@ -26,6 +26,7 @@
 
 #include <QString>
 #include <QTextStream>
+#include <QCoreApplication>
 
 
 #include <wingxfl.h>
@@ -59,6 +60,7 @@ WingXfl::WingXfl(xfl::enumType type) : Part()
 
     m_WingType    = type;
     m_NStation = 0;
+    m_nXFlapPanels = 0;
     m_nTipStrips = 1;
     m_bTwoSided       = true;
     m_bSymmetric       = true;
@@ -843,29 +845,33 @@ bool WingXfl::connectSurfaceToNext(int iSurf, std::vector<Panel3> &panels, bool 
  */
 void WingXfl::createXPoints()
 {
-    m_Surface.front().createXPoints();
+    Surface &lefttipsurface = m_Surface.front();
+    lefttipsurface.createXPoints();
+
+    int nxflaps = lefttipsurface.NXFlap();
 
     for(int is=1; is<nSurfaces(); is++)
     {
         Surface &surfA = surface(is-1);
         Surface &surfB = surface(is);
-        surfB.createXPoints(); // left side nodes will be modified next to match those of surfA
 
         if(!surfA.hasTEFlap() && !surfB.hasTEFlap())
         {
             // no flap either side
-            // do nothing
+            surfB.createXPoints();
         }
         else if(surfA.hasTEFlap() && !surfB.hasTEFlap())
         {
             // flap on the left surface but not on the right
             // adapt left side nodes of surfB
+            surfB.createXPoints();
             surfB.setXDistribA(surfA.xDistribB());
         }
         else if(!surfA.hasTEFlap() && surfB.hasTEFlap())
         {
             // flap on the right surface but not on the left
             // adapt right side nodes of surfA
+            surfB.createXPoints(nxflaps);
             surfA.setXDistribB(surfB.xDistribA());
         }
         else if(surfA.hasTEFlap() && surfB.hasTEFlap())
@@ -873,6 +879,7 @@ void WingXfl::createXPoints()
             // flap on both surfaces
             // it is assumed that the hinges are positioned at the same chordwise length
             // this is almost always the case on standard wing designs
+            surfB.createXPoints(nxflaps);
             surfB.setXDistribA(surfA.xDistribB()); // this shouldn't change anything
         }
     }
@@ -906,6 +913,7 @@ void WingXfl::duplicate(WingXfl const &aWing)
     m_ProjectedArea   = aWing.m_ProjectedArea;
     m_MAChord         = aWing.m_MAChord;
 
+    m_nXFlapPanels    = aWing.m_nXFlapPanels;
     m_nTipStrips      = aWing.m_nTipStrips;
     m_bSymmetric      = aWing.m_bSymmetric;
     m_bTwoSided       = aWing.m_bTwoSided;
@@ -2414,13 +2422,15 @@ bool WingXfl::serializePartFl5(QDataStream &ar, bool bIsStoring)
 
         // space allocation for the future storage of more data, without need to change the format
 
-        nIntSpares = 1;
+        nIntSpares = 2;
         ar << nIntSpares;
         ar << m_nTipStrips;
-        for (int i=0; i<nIntSpares-1; i++) ar << 0;
+        ar << m_nXFlapPanels;
+//        for (int i=0; i<nIntSpares-1; i++) ar << 0;
 
+        nDbleSpares = 0;
         ar << nDbleSpares;
-        for (int i=0; i<nDbleSpares; i++) ar << 0.0;
+ //       for (int i=0; i<nDbleSpares; i++) ar << 0.0;
 
         return true;
     }
@@ -2461,9 +2471,16 @@ bool WingXfl::serializePartFl5(QDataStream &ar, bool bIsStoring)
         // space allocation
 
         ar >> nIntSpares;
-        ar >> m_nTipStrips;
-        m_nTipStrips = std::max(m_nTipStrips, 1);
-        for (int i=0; i<nIntSpares-1; i++) ar >> k;
+
+        if(nIntSpares>0)
+        {
+            ar >> m_nTipStrips;
+            m_nTipStrips = std::max(m_nTipStrips, 1);
+        }
+        if(nIntSpares>1)
+            ar >> m_nXFlapPanels;
+
+        for (int i=0; i<nIntSpares-2; i++) ar >> k;
 
         ar >> nDbleSpares;
         for (int i=0; i<nDbleSpares; i++) ar >> dble;
@@ -2645,43 +2662,43 @@ void WingXfl::getProperties(std::string &properties, std::string const &prefx) c
     QString strange;
     QString prefix = QString::fromStdString(prefx);
 
+    constexpr int labelWidth = 17;
+    auto label = [&](const char *sourceText) {
+        return QCoreApplication::translate("WingXfl", sourceText).leftJustified(labelWidth, ' ');
+    };
+
     strange = QString::asprintf("%9.3f", m_PlanformArea*Units::m2toUnit()) + " ";
-    props += prefix + "Wing area         ="+strange+Units::areaUnitQLabel() + "\n";
+    props += prefix + label("Wing area") + "=" + strange + Units::areaUnitQLabel() + "\n";
 
     strange = QString::asprintf("%9.3f", m_PlanformSpan*Units::mtoUnit()) + " ";
-    props += prefix + "Wing span         ="+strange+Units::lengthUnitQLabel() + "\n";
+    props += prefix + label("Wing span") + "=" + strange + Units::lengthUnitQLabel() + "\n";
 
     strange = QString::asprintf("%9.3f", m_ProjectedArea*Units::m2toUnit()) + " ";
-    props += prefix + "Projected area    ="+strange+Units::areaUnitQLabel() + "\n";
+    props += prefix + label("Projected area") + "=" + strange + Units::areaUnitQLabel() + "\n";
 
     strange = QString::asprintf("%9.3f", m_ProjectedSpan*Units::mtoUnit()) + " ";
-    props += prefix + "Projected span    ="+strange+Units::lengthUnitQLabel() + "\n";
+    props += prefix + label("Projected span") + "=" + strange + Units::lengthUnitQLabel() + "\n";
 
     strange = QString::asprintf("%9.3f", GChord()*Units::mtoUnit()) + " ";
-    props += prefix + "Mean geom. chord  ="+strange+Units::lengthUnitQLabel() + "\n";
+    props += prefix + label("Mean geom. chord") + "=" + strange + Units::lengthUnitQLabel() + "\n";
 
     strange = QString::asprintf("%9.3f", m_MAChord*Units::mtoUnit()) + " ";
-    props += prefix + "Mean aero. chord  ="+strange+Units::lengthUnitQLabel() + "\n";
+    props += prefix + label("Mean aero. chord") + "=" + strange + Units::lengthUnitQLabel() + "\n";
 
     strange = QString::asprintf("%9.3f", aspectRatio());
-    props += prefix + "Aspect ratio      ="+strange+ "\n";
+    props += prefix + label("Aspect ratio") + "=" + strange + "\n";
 
     if(tipChord()>0.0) strange = QString::asprintf("%9.3f", taperRatio());
-    else               strange = "Undefined";
-    props += prefix + "Taper ratio       ="+strange+"\n";
+    else               strange = QCoreApplication::translate("WingXfl", "Undefined");
+    props += prefix + label("Taper ratio") + "=" + strange + "\n";
 
     strange = QString::asprintf("%9.3f", averageSweep());
-    props += prefix + "Sweep             =" + strange + DEGch + "\n";
+    props += prefix + label("Sweep") + "=" + strange + DEGch + "\n";
 
 
-    strange = QString::asprintf("VLM panels        =%d\n", quadTotal(true));
-    props += prefix + strange;
-
-    strange = QString::asprintf("Quad panels       =%d\n", quadTotal(false));
-    props += prefix + strange;
-
-    strange = QString::asprintf("Triangular panels =%d", nTriangles());
-    props += prefix + strange;
+    props += prefix + label("VLM panels") + "=" + QString::number(quadTotal(true)) + "\n";
+    props += prefix + label("Quad panels") + "=" + QString::number(quadTotal(false)) + "\n";
+    props += prefix + label("Triangular panels") + "=" + QString::number(nTriangles());
 
     properties = props.toStdString();
 }

@@ -140,11 +140,11 @@ class FL5LIB_EXPORT PlaneXfl : public Plane
         Vector3d const &wingLE(int iWing) const{return m_Wing.at(iWing).position();}
         void setWingLE(int iWing, Vector3d const &LE) {m_Wing[iWing].setPosition(LE);}
 
-        double rxAngle(int iWing) const {return m_Wing[iWing].m_rx;}
-        void setRxAngle(int iWing, double rx) {m_Wing[iWing].m_rx=rx;}
+        double rxAngle(int iWing) const {return m_Wing[iWing].rx();}
+        void setRxAngle(int iWing, double rx) {m_Wing[iWing].setRx(rx);}
 
-        double ryAngle(int iWing) const {return m_Wing[iWing].m_ry;}
-        void setRyAngle(int iWing, double ry) {m_Wing[iWing].m_ry=ry;}
+        double ryAngle(int iWing) const {return m_Wing[iWing].ry();}
+        void setRyAngle(int iWing, double ry) {m_Wing[iWing].setRy(ry);}
 
         WingXfl *wing(int iw) override;
         WingXfl const*wingAt(int iw) const override;

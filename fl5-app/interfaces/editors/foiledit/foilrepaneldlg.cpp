@@ -34,6 +34,7 @@
 #include <interfaces/editors/foiledit/foilwt.h>
 #include <api/cubicspline.h>
 #include <api/foil.h>
+#include <xfoil_params.h>
 #include <interfaces/widgets/customwts/floatedit.h>
 #include <interfaces/widgets/customwts/intedit.h>
 #include <interfaces/widgets/line/linebtn.h>
@@ -70,32 +71,33 @@ void FoilRepanelDlg::resizeEvent(QResizeEvent *pEvent)
     FoilDlg::resizeEvent(pEvent);
     int h = m_pFoilWt->height();
 
-    QPoint pos1(0, h-m_pBunchBox->height());
-    m_pBunchBox->move(pos1);
+    QPoint pos1(0, h-m_pfrBunch->height());
+    m_pfrBunch->move(pos1);
 }
 
 
 void FoilRepanelDlg::setupLayout()
 {
-    setWindowTitle("Foil panel refinement");
+    setWindowTitle(tr("Foil panel refinement"));
 
-    m_pBunchBox = new QFrame(m_pFoilWt);
+    m_pfrBunch = new QFrame(m_pFoilWt);
     {
-        m_pBunchBox->setCursor(Qt::ArrowCursor);
-        m_pBunchBox->setAutoFillBackground(false);
-        m_pBunchBox->setPalette(m_Palette);
-        m_pBunchBox->setAttribute(Qt::WA_NoSystemBackground);
+        m_pfrBunch->setCursor(Qt::ArrowCursor);
+        m_pfrBunch->setAutoFillBackground(false);
+        m_pfrBunch->setPalette(m_Palette);
+        m_pfrBunch->setAttribute(Qt::WA_NoSystemBackground);
         QVBoxLayout *pBoxLayout = new QVBoxLayout;
         {
             QHBoxLayout *pNbLayout = new QHBoxLayout;
             {
-                QLabel *plabNPanels = new QLabel("Number of panels");
+                QLabel *plabNPanels = new QLabel(tr("Number of panels"));
                 plabNPanels->setPalette(m_Palette);
                 plabNPanels->setAttribute(Qt::WA_NoSystemBackground);
                 m_pieNPanels = new IntEdit;
-                QString tip= "<p>CAUTION: XFoil does not accept number of panels greater than 255. "
-                             "Adjust the number of panels and the bunching parameters to "
-                             "achieve the desired point distribution.</p>";
+                QString tip= tr("<p>CAUTION: XFoil does not accept number of panels &gt;%1.</p>"
+                             "<p>Adjust the number of panels and the bunching parameters to "
+                             "achieve the desired point distribution.</p>"
+                            "<p>Recommendation: ~150 panels</p>").arg(IQX-2);
                 m_pieNPanels->setToolTip(tip);
 
                 m_plabWarning = new QLabel();
@@ -110,11 +112,11 @@ void FoilRepanelDlg::setupLayout()
 
             QGridLayout *pBunchLayout = new QGridLayout;
             {
-                QLabel *plabNoAmp = new QLabel("Uniform");
+                QLabel *plabNoAmp = new QLabel(tr("Uniform"));
                 plabNoAmp->setPalette(m_Palette);
                 plabNoAmp->setAttribute(Qt::WA_NoSystemBackground);
                 plabNoAmp->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
-                QLabel *plabAmp = new QLabel("Bunched");
+                QLabel *plabAmp = new QLabel(tr("Bunched"));
                 plabAmp->setPalette(m_Palette);
                 plabAmp->setAttribute(Qt::WA_NoSystemBackground);
                 plabAmp->setAlignment(Qt::AlignVCenter|Qt::AlignLeft);
@@ -135,7 +137,7 @@ void FoilRepanelDlg::setupLayout()
             pBoxLayout->addLayout(pNbLayout);
             pBoxLayout->addLayout(pBunchLayout);
         }
-        m_pBunchBox->setLayout(pBoxLayout);
+        m_pfrBunch->setLayout(pBoxLayout);
     }
 
     QVBoxLayout *pMainLayout = new QVBoxLayout;
@@ -162,8 +164,8 @@ void FoilRepanelDlg::onBufferStyle(LineStyle ls)
 
 void FoilRepanelDlg::onNPanels(int npanels)
 {
-    if(npanels>255)
-        m_plabWarning->setText("<p><font color=red>XFoil requires NPanels&lt;255</font></p>");
+    if(npanels>IQX-2)
+        m_plabWarning->setText(tr("<p><font color=red>")+QString("XFoil requires NPanels&le;%1").arg(IQX-2) + QString("</font></p>"));
     else
         m_plabWarning->clear();
     onApply();

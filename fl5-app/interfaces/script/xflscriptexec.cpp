@@ -793,6 +793,8 @@ bool XflScriptExec::runScript(QString const &scriptpath)
     PanelAnalysis::setDoublePrecision(m_pScriptReader->m_bDoublePrecision);
 
     m_bMakePlaneOpps = m_pScriptReader->bMakePlaneOpps();
+    m_bCompStabDerivatives = m_pScriptReader->bCompStabDerivatives();
+
     runPlaneAnalyses();
     if(isCancelled()) return false;
 

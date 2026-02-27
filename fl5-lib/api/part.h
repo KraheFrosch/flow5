@@ -134,7 +134,7 @@ class FL5LIB_EXPORT Part
         void setStructuralMass(double mass){m_Inertia.setStructuralMass(mass);}
         Vector3d CoG_t() const {return m_Inertia.CoG_t();}
         Vector3d CoG_s() const {return m_Inertia.CoG_s();}
-        void setCoG_s(Vector3d cog) {m_Inertia.setCoG_s(cog);}
+        void setCoG_s(Vector3d const &cog) {m_Inertia.setCoG_s(cog);}
 
         double Ixx_s() const {return m_Inertia.Ixx_s();}
         double Iyy_s() const {return m_Inertia.Iyy_s();}

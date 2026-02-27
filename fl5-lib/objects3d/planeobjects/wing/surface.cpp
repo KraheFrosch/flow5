@@ -1074,9 +1074,10 @@ void Surface::translate(double tx, double ty, double tz)
  * The chordwise panel distribution is set i.a.w. with the flap hinges, if any.
  * The positions are stored in the member variables m_xPointA and m_xPointB.
  */
-void Surface::createXPoints()
+void Surface::createXPoints(int nRefXFlaps)
 {
     int NXFlapA=0, NXFlapB=0, NXLeadA=0, NXLeadB=0;
+
 
     double xHingeA=0, xHingeB=0;
 
@@ -1091,18 +1092,25 @@ void Surface::createXPoints()
     if(pFoilB && pFoilB->hasTEFlap()) xHingeB=pFoilB->TEXHinge();
     else                              xHingeB=1.0;
 
-    NXFlapA = int((1.0-xHingeA) * double(m_NXPanels)*(1.000+LENGTHPRECISION));// to avoid numerical errors if exact division
-    NXFlapB = int((1.0-xHingeB) * double(m_NXPanels)*(1.000+LENGTHPRECISION));
-
-    if(pFoilA && pFoilA->hasTEFlap() /* && NXFlapA==0 */) NXFlapA++;
-    if(pFoilB && pFoilB->hasTEFlap() /* && NXFlapB==0 */) NXFlapB++;
-
-    // uniformize the number of flap panels if flaps are defined at each end */
-    if(NXFlapA>0 && NXFlapB>0)
+    if(nRefXFlaps>0)
     {
-        int n = (NXFlapA+NXFlapB)/2;
-        NXFlapA = n;
-        NXFlapB = n;
+        NXFlapA = NXFlapB = nRefXFlaps;
+    }
+    else
+    {
+        NXFlapA = int((1.0-xHingeA) * double(m_NXPanels)*(1.000+LENGTHPRECISION));// to avoid numerical errors if exact division
+        NXFlapB = int((1.0-xHingeB) * double(m_NXPanels)*(1.000+LENGTHPRECISION));
+
+        if(pFoilA && pFoilA->hasTEFlap()) NXFlapA++;
+        if(pFoilB && pFoilB->hasTEFlap()) NXFlapB++;
+
+        // uniformize the number of flap panels if flaps are defined at each end
+        if(NXFlapA>0 && NXFlapB>0)
+        {
+            int n = (NXFlapA+NXFlapB)/2;
+            NXFlapA = n;
+            NXFlapB = n;
+        }
     }
 
     NXLeadA = m_NXPanels - NXFlapA;

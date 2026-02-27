@@ -72,7 +72,7 @@ WingDefDlg::WingDefDlg(QWidget *pParent) : WingDlg(pParent)
     setupLayout();
     connectSignals();
 
-    m_pTableContextMenu = new QMenu("Section",this);
+    m_pTableContextMenu = new QMenu(tr("Section"),this);
     {
         m_pTableContextMenu->addAction(m_pInsertBefore);
         m_pTableContextMenu->addAction(m_pInsertAfter);
@@ -119,7 +119,7 @@ void WingDefDlg::makeWingTable()
 {
     m_pcptSections = new CPTableView(this);
     m_pcptSections->setEditable(true);
-    m_pcptSections->setWindowTitle("Wing definition");
+    m_pcptSections->setWindowTitle(tr("Wing definition"));
     m_pcptSections->setWordWrap(false);
 
     m_pcptSections->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -154,12 +154,12 @@ void WingDefDlg::setupLayout()
             {
                 QHBoxLayout *pSectionLayout = new QHBoxLayout;
                 {
-                    m_pchTwoSided   = new QCheckBox("two-sided");
-                    m_pchsymmetric  = new QCheckBox("symmetric");
-                    m_prbRightSide  = new QRadioButton("Right Side");
-                    m_prbLeftSide   = new QRadioButton("Left Side");
+                    m_pchTwoSided   = new QCheckBox(tr("Two-sided"));
+                    m_pchsymmetric  = new QCheckBox(tr("Symmetric"));
+                    m_prbRightSide  = new QRadioButton(tr("Right side"));
+                    m_prbLeftSide   = new QRadioButton(tr("Left side"));
 
-                    m_pchCloseInnerSide = new QCheckBox("Close inner side");
+                    m_pchCloseInnerSide = new QCheckBox(tr("Close inner side"));
 
                     pSectionLayout->addWidget(m_pchTwoSided);
                     pSectionLayout->addWidget(m_pchsymmetric);
@@ -196,7 +196,7 @@ void WingDefDlg::setupLayout()
                 pfrMeta->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
                 QVBoxLayout *pMetaLayout = new QVBoxLayout;
                 {
-                    QLabel *plabWingDescription = new QLabel("Description:");
+                    QLabel *plabWingDescription = new QLabel(tr("Description:"));
 
                     pMetaLayout->addWidget(m_plabPlaneName);
                     pMetaLayout->addWidget(m_pleWingName);
@@ -209,9 +209,9 @@ void WingDefDlg::setupLayout()
             QHBoxLayout *pTipStripLayout = new QHBoxLayout;
             {
                 m_pieTipStrips = new IntEdit();
-                m_pieTipStrips->setToolTip("Number of horizontal panel strips at the wing tips.\n"
-                                           "Recommendation 2-5.");
-                pTipStripLayout->addWidget(new QLabel("Tip strips"));
+                m_pieTipStrips->setToolTip(tr("<p>Number of horizontal panel strips at the wing tips.<br>"
+                                           "Recommendation: 1</p>"));
+                pTipStripLayout->addWidget(new QLabel(tr("Tip strips")));
                 pTipStripLayout->addWidget(m_pieTipStrips);
                 pTipStripLayout->addStretch();
             }
@@ -409,9 +409,6 @@ void WingDefDlg::onWingTableClicked(QModelIndex index)
         case 10:
         {
             QRect itemrect = m_pcptSections->visualRect(index);
-            /*                QPoint dlgpos = pos();
-            QPoint tablepos = m_pPartTable->pos();
-            QPoint menupos = dlgpos + tablepos +  itemrect.topLeft();*/
             QPoint menupos = m_pcptSections->mapToGlobal(itemrect.topLeft());
             QMenu *pWingTableRowMenu = new QMenu("Section", this);
             {

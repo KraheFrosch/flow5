@@ -78,9 +78,9 @@ class gl3dFlowVtx : public gl3dTestGLView
         int m_Period;
 
         QOpenGLShaderProgram m_shadCompute;
-        QOpenGLBuffer m_vboBoids, m_vboTraces;
+        QOpenGLBuffer m_vboTraces;
         QOpenGLBuffer m_vboVortices;
-        QOpenGLBuffer m_ssboVortices;
+        QOpenGLBuffer m_ssboBoids, m_ssboVortices;
 
         int m_locGamma;
         int m_locVInf;

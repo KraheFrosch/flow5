@@ -98,7 +98,7 @@ void Task3d::traceStdLog(std::string const &str)
     // output to the terminal
     if(m_bStdOut)
     {
-        std::cout << str.c_str() << std::endl;
+        std::cout << str.c_str();
     }
 }
 

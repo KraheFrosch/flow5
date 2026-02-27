@@ -20,6 +20,51 @@
                 </h1>
 
                 <h3>
+                    flow5 v7.55, , 2026
+                </h3>
+                <ul>
+                    <li>General
+                        <ul>
+                            <li></li>
+                        </ul>
+                    </li>
+                    <li>Modelling/Meshing
+                        <ul>
+                            <li>raised the upper limit of the number of foil panels from 255 to 300</li>
+                            <li>fixed <a href="https://github.com/techwinder/flow5/issues/16">issue #16</a></li>
+                        </ul>
+                    </li>
+                    <li>Analysis
+                        <ul>
+                            <li>added an option to request the calculation of derivatives when running a plane script</li>
+                            <li>fixed <a href="https://github.com/techwinder/flow5/issues/3">issue #3</a></li>
+                        </ul>
+                    </li>
+                    <li>API
+                        <ul>
+                            <li>fixed stack memory issues in the XFoilRun example</li>
+                        </ul>
+                    </li>
+                    <li>Post-processing
+                        <ul>
+                            <li></li>
+                        </ul>
+                    </li>
+                    <li>UI
+                        <ul>
+                            <li>fixed issues with Zink on Linux apparently not handling GL_POINTS in the geometry shader</li>
+                            <li>fixed potential issues when highlighting a section in the 3d view of the wing editor</li>
+                        </ul>
+                    </li>
+                    <li>Other
+                        <ul>
+                            <li></li>
+                        </ul>
+                    </li>
+                </ul>
+                <br>
+                <br>
+                <h3>
                     flow5 v7.54, January 1st, 2026
                 </h3>
                 <ul>
@@ -34,7 +79,7 @@
                             <li>all meshing interfaces modified to use the Gmsh library in addition to the built-in custom mesher</li>
                             <li>added an option to build fuse meshes conforming to the wings mid-camber line</li>
                             <li>removed panel connections at the edges of flaps; slight impact on pitching moment</li>
-                            <li>removed panel connections between fuselage anbd wings; slight impact on pitching moment</li>
+                            <li>removed panel connections between fuselage and wings; slight impact on pitching moment</li>
                             <li>removed IGES import and export options due to changes of symbol names in the OCC library</li>
                             <li>changed the evaluation of inertia properties in the case of an xfl-type fuselage to use OCC instead of the built-in custom evaluator; slight impact on evaluations</li>
                             <li>minor improvements to the export of wings to AVL</li>

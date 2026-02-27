@@ -44,27 +44,31 @@ int main()
     std::cout << pPolar->properties() << std::endl << std::endl;
 
     bool bKeepOpps=true; // otherwise will still store the results in the polar but will discard (and delete) the operating point objects
-    XFoilTask task;
+
+
+    XFoilTask *pTask = new XFoilTask;
 
     std::cout << "Initializing XFoil task" << std::endl;
 
-    task.initialize(*pFoil, pPolar, bKeepOpps);
-    task.appendRange({true, 0.0, 11.0, 1.0});
-    task.appendRange({true, 0.0, -7.0, 1.0});
+    pTask->initialize(*pFoil, pPolar, bKeepOpps);
+    pTask->appendRange({true, 0.0, 11.0, 1.0});
+    pTask->appendRange({true, 0.0, -7.0, 1.0});
 
     std::cout << "Running XFoil task" << std::endl;
-    task.run();
-    printf(task.log().c_str());
+    pTask->run();
+    printf(pTask->log().c_str());
     printf("\n");
     std::cout << "XFoil task done" << std::endl << std::endl;
 
     // Retrieve the results and insert them one by one in the database so that they are
     // stored in sorted order.
     // This ensures that they will be properly deleted and the memory released on exit.
-    for(OpPoint *pOpp : task.operatingPoints())
+    for(OpPoint *pOpp : pTask->operatingPoints())
     {
         Objects2d::insertOpPoint(pOpp); 
     }
+
+    delete pTask;
 
     // print the content of the database if needed
 /*    for(OpPoint const *pOpp : Objects2d::operatingPoints())
@@ -76,13 +80,14 @@ int main()
 
     // export the content of the polar
 
-    //void exportPolar(std::string &outstring, std::string const &versionName, bool bDataOnly, bool bCSV) const
     std::string exportstr;
     pPolar->exportToString(exportstr, false, true);
 
     printf(exportstr.c_str());
 
     std::cout << "done" << std::endl;
+
+    globals::saveFl5Project("/tmp/XFoilRun.fl5");
 
 
 

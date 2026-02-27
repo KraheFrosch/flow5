@@ -25,6 +25,7 @@
 #include <QElapsedTimer>
 #include <QString>
 #include <QDebug>
+#include <QCoreApplication>
 
 #include <planexfl.h>
 #include <fusenurbs.h>
@@ -95,19 +96,13 @@ void PlaneXfl::makeDefaultPlane()
     m_Wing[2].makeDefaultFin();
     m_Wing[2].computeGeometry();
 
-    m_Wing[0].m_LE.x = 0.400;
-    m_Wing[0].m_LE.y = 0.000;
-    m_Wing[0].m_LE.z = 0.000;
+    m_Wing[0].setPosition(0.400, 0.000, 0.000);
 
-    m_Wing[1].m_LE.x = 1.350;
-    m_Wing[1].m_LE.y = 0.000;
-    m_Wing[1].m_LE.z = 0.025;
-    m_Wing[1].m_ry   = -1.5;
+    m_Wing[1].setPosition(1.350, 0.000, 0.025);
+    m_Wing[1].setRy(-1.5);
 
-    m_Wing[2].m_LE.x = 1.350;
-    m_Wing[2].m_LE.y = 0.000;
-    m_Wing[2].m_LE.z = 0.050;
-    m_Wing[2].m_rx = m_Wing[2].isFin() ? -90 : 0.0;
+    m_Wing[2].setPosition(1.350, 0.000, 0.050);
+    m_Wing[2].setRx(m_Wing[2].isFin() ? -90 : 0.0);
 
     m_Inertia.reset();
 
@@ -152,13 +147,13 @@ double PlaneXfl::tailVolumeHorizontal() const
         if (m_Wing[iw].wingType()==xfl::Main)
         {
             pMainWing = &m_Wing[iw];
-            MainWingLE = m_Wing[iw].m_LE;
+            MainWingLE = m_Wing[iw].position();
         }
 
         if (m_Wing[iw].wingType()==xfl::Elevator)
         {
             pStab = &m_Wing[iw];
-            StabLE = m_Wing[iw].m_LE;
+            StabLE = m_Wing[iw].position();
         }
     }
 
@@ -200,13 +195,13 @@ double PlaneXfl::tailVolumeVertical() const
         if (pWing->wingType()==xfl::Main)
         {
             pMainWing = pWing;
-            MainWingLE = pWing->m_LE;
+            MainWingLE = pWing->position();
         }
 
         if (pWing->wingType()==xfl::Fin)
         {
             pFin = pWing;
-            FinLE = pWing->m_LE;
+            FinLE = pWing->position();
         }
     }
 
@@ -600,8 +595,8 @@ bool PlaneXfl::serializePlaneXFL(QDataStream &ar, bool bIsStoring)
             if(fabs(pz)  >1000.0) pz = 0.0;
             if(fabs(dble)>1000.0) dble = 0.0;
 
-            m_Wing[iw].m_LE.set(px, py, pz);
-            m_Wing[iw].m_ry = dble;
+            m_Wing[iw].setPosition(px, py, pz);
+            m_Wing[iw].setRy(dble);
             if(m_Wing[iw].isFin())
             {
                 m_Wing[iw].setTwoSided(bDouble);
@@ -612,7 +607,7 @@ bool PlaneXfl::serializePlaneXFL(QDataStream &ar, bool bIsStoring)
         {
             //            m_Wing[3].isDoubleFin() = bDouble;
             //            m_Wing[3].setSymFin(bSym);
-            m_Wing[3].m_rx = -90.0;
+            m_Wing[3].setRx(-90.0);
         }
 
         ar >> bFuse;
@@ -1572,84 +1567,84 @@ std::string PlaneXfl::planeData(bool bOtherWings) const
     QString Result;
     QString str1;
     QString strange;
-    QString lengthlab, arealab, masslab;
-    lengthlab = Units::lengthUnitQLabel();
-    arealab = Units::areaUnitQLabel();
-    masslab = Units::massUnitQLabel();
+
+    QString lengthlab = Units::lengthUnitQLabel();
+    QString arealab = Units::areaUnitQLabel();
+    QString masslab = Units::massUnitQLabel();
 
     WingXfl const *pMainWing = mainWing();
 
+    constexpr int labelWidth = 15;
+    auto label = [=](const char *sourceText) {
+        return QCoreApplication::translate("PlaneXfl", sourceText).leftJustified(labelWidth, ' ');
+    };
 
-    str1 = QString::asprintf("Wing span       = %9.3f ", planformSpan()*Units::mtoUnit());
-    str1 += lengthlab;
-    strange += str1 +"\n";
+    str1 = QString("%1 = %2 ").arg(label("Wing span")).arg(planformSpan()*Units::mtoUnit(), 9, 'f', 3);
+    strange += str1 + lengthlab + "\n";
 
-    str1 = QString::asprintf("xyProj. span    = %9.3f ", projectedSpan()*Units::mtoUnit());
-    str1 += lengthlab;
-    strange += str1 +"\n";
+    str1 = QString("%1 = %2 ").arg(label("xyProj. span")).arg(projectedSpan()*Units::mtoUnit(), 9, 'f', 3);
+    strange += str1 + lengthlab + "\n";
 
-    str1 = QString::asprintf("Wing area       = %9.3f ", planformArea(bOtherWings) * Units::m2toUnit());
-    str1 += arealab;
-    strange += str1 +"\n";
+    str1 = QString("%1 = %2 ").arg(label("Wing area")).arg(planformArea(bOtherWings) * Units::m2toUnit(), 9, 'f', 3);
+    strange += str1 + arealab + "\n";
 
-    str1   = QString::asprintf("Projected area  = %9.3f ", projectedArea(bOtherWings) * Units::m2toUnit());
-    str1 += arealab;
-    strange += str1 +"\n";
+    str1 = QString("%1 = %2 ").arg(label("Projected area")).arg(projectedArea(bOtherWings) * Units::m2toUnit(), 9, 'f', 3);
+    strange += str1 + arealab + "\n";
 
-    Result = QString::asprintf("Mass            = %9.3f ", totalMass()*Units::kgtoUnit());
-    Result += masslab;
-    strange += Result +"\n";
+    Result = QString("%1 = %2 ").arg(label("Mass")).arg(totalMass()*Units::kgtoUnit(), 9, 'f', 3);
+    strange += Result + masslab + "\n";
 
-    Result = QString::asprintf("CoG = (%.3f, %.3f, %.3f) ", m_Inertia.CoG_t().x*Units::mtoUnit(), m_Inertia.CoG_t().y*Units::mtoUnit(), m_Inertia.CoG_t().z*Units::mtoUnit());
-    Result += lengthlab;
-    strange += Result +"\n";
+    Result = QString("%1 = (%2, %3, %4) ")
+                 .arg(QCoreApplication::translate("PlaneXfl", "CoG"))
+                 .arg(m_Inertia.CoG_t().x*Units::mtoUnit(), 0, 'f', 3)
+                 .arg(m_Inertia.CoG_t().y*Units::mtoUnit(), 0, 'f', 3)
+                 .arg(m_Inertia.CoG_t().z*Units::mtoUnit(), 0, 'f', 3);
+    strange += Result + lengthlab + "\n";
 
     if(pMainWing)
     {
-        Result = QString::asprintf("Wing load       = %9.3f", totalMass()*Units::kgtoUnit()/projectedArea(bOtherWings)/Units::m2toUnit());
-        Result += " "+ masslab + "/" + arealab;
-        strange += Result +"\n";
+        Result = QString("%1 = %2")
+                     .arg(label("Wing load"))
+                     .arg(totalMass()*Units::kgtoUnit()/projectedArea(bOtherWings)/Units::m2toUnit(), 9, 'f', 3);
+        strange += Result + " " + masslab + "/" + arealab + "\n";
     }
 
     if(hasStab())
     {
-        str1 = QString::asprintf("Tail volume (H) = %9.3f", tailVolumeHorizontal());
-        strange += str1 +"\n";
+        str1 = QString("%1 = %2").arg(label("Tail volume (H)")).arg(tailVolumeHorizontal(), 9, 'f', 3);
+        strange += str1 + "\n";
     }
-
 
     if(hasFin())
     {
-        str1 = QString::asprintf("Tail volume (V) = %9.3f", tailVolumeVertical());
-        strange += str1 +"\n";
+        str1 = QString("%1 = %2").arg(label("Tail volume (V)")).arg(tailVolumeVertical(), 9, 'f', 3);
+        strange += str1 + "\n";
     }
 
     if(pMainWing)
     {
-        str1 = QString::asprintf("Root chord      = %9.3f ", pMainWing->rootChord()*Units::mtoUnit());
-        Result = str1+ lengthlab;
-        strange += Result +"\n";
+        str1 = QString("%1 = %2 ").arg(label("Root chord")).arg(pMainWing->rootChord()*Units::mtoUnit(), 9, 'f', 3);
+        strange += str1 + lengthlab + "\n";
     }
 
-    str1 = QString::asprintf("MAC             = %9.3f ", mac()*Units::mtoUnit());
-    Result = str1+ lengthlab;
-    strange += Result +"\n";
+    str1 = QString("%1 = %2 ").arg(label("MAC")).arg(mac()*Units::mtoUnit(), 9, 'f', 3);
+    strange += str1 + lengthlab + "\n";
 
     if(pMainWing)
     {
-        str1 = QString::asprintf("Tip twist       = %9.3f", pMainWing->tipTwist()) + DEGch;
-        strange += str1 +"\n";
+        str1 = QString("%1 = %2").arg(label("Tip twist")).arg(pMainWing->tipTwist(), 9, 'f', 3) + DEGch;
+        strange += str1 + "\n";
     }
 
-    str1 = QString::asprintf("Aspect Ratio    = %9.3f", aspectRatio());
-    strange += str1 +"\n";
+    str1 = QString("%1 = %2").arg(label("Aspect Ratio")).arg(aspectRatio(), 9, 'f', 3);
+    strange += str1 + "\n";
 
-    str1 = QString::asprintf("Taper Ratio     = %9.3f", taperRatio());
-    strange += str1 +"\n";
+    str1 = QString("%1 = %2").arg(label("Taper Ratio")).arg(taperRatio(), 9, 'f', 3);
+    strange += str1 + "\n";
 
     if(pMainWing)
     {
-        str1 = QString::asprintf("Root-Tip Sweep  = %9.3f",pMainWing->averageSweep()) + DEGch;
+        str1 = QString("%1 = %2").arg(label("Root-Tip Sweep")).arg(pMainWing->averageSweep(), 9, 'f', 3) + DEGch;
         strange += str1;
     }
 
@@ -1740,7 +1735,7 @@ void PlaneXfl::computeStructuralInertia()
     for(int iw=0; iw<nWings(); iw++)
     {
         WingXfl const &aWing = m_Wing.at(iw);
-        Vector3d d = (aWing.CoG_t()+aWing.m_LE) - cogs;
+        Vector3d d = (aWing.CoG_t()+aWing.position()) - cogs;
 
         ixx_s += aWing.Ixx_t() + aWing.totalMass()*(d.y*d.y+d.z*d.z);
         ixy_s += aWing.Ixy_t() + aWing.totalMass()*(d.x*d.y);

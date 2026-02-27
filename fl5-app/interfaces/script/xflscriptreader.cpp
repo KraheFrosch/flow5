@@ -84,6 +84,7 @@ XflScriptReader::XflScriptReader() : QXmlStreamReader()
     m_bMakeProjectFile = true;
     m_bMultiThreading = false;
     m_bMakePOpps = m_bOutputPOppsText = m_bExportPanelCp = m_bExportStlMesh = false;
+    m_bCompStabDerivatives = false;
     m_bCsvOutput = false;
     m_bOutputWPolarsText = false;
     m_nMaxThreads = 1;
@@ -471,6 +472,10 @@ bool XflScriptReader::readPlaneAnalysisOutput()
         else if(name().compare(QString("export_stl_mesh"), Qt::CaseInsensitive)==0)
         {
             m_bExportStlMesh = xfl::stringToBool(readElementText());
+        }
+        else if(name().compare(QString("Compute_derivatives"), Qt::CaseInsensitive)==0)
+        {
+            m_bCompStabDerivatives = xfl::stringToBool(readElementText());
         }
         else
             skipCurrentElement();

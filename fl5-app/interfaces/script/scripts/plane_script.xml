@@ -1,5 +1,12 @@
+
+<!-- To run a script from the command line: -->
+<!-- flow5 -h -->
+<!-- flow5 -p -s script.xml -->
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE XFL_SCRIPT>
+
+
 <xflscript version="1.0">
     <!-- For convenience, all field names are case-insensitive, as an exception to the standard xml specification -->
     <!-- Where applicable, default values will be used for all undefined fields -->
@@ -72,8 +79,10 @@
             <!-- Set this field to true if the plane operating points are to be stored in the project file. -->
             <make_oppoints>true</make_oppoints>
             <!-- Set this field to true if the plane operating points are to be exported as csv files.
-                 Requires that the previous field is set to ue.-->
+                 Requires that the previous field is set to true.-->
             <make_oppoints_text_file>true</make_oppoints_text_file>
+            <!-- Set this field to true to compute the stability and control derivatives in linear polars-->
+            <compute_derivatives>false</compute_derivatives>
             <!-- Set this field to true to export the panel data to the text file; default is false -->
             <export_oppoint_Cp>false</export_oppoint_Cp>
             <!-- Set this field to true to output one text or csv file for each plane polar -->

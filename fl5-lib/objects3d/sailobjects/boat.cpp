@@ -112,7 +112,7 @@ void Boat::makeRefTriMesh(bool bIncludeHull, bool bMultiThread)
     {
         Sail *pSail = m_Sail[is];
 
-        pSail->makeTriPanels(pSail->m_LE);
+        pSail->makeTriPanels(pSail->position());
 
         m_RefTriMesh.appendMesh(pSail->triMesh());
         pSail->setFirstPanel3Index(p0);

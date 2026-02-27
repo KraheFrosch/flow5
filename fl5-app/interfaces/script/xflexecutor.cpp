@@ -29,6 +29,7 @@
 //#define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
 
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QFileInfo>
 #include <QDir>
 
@@ -776,8 +777,10 @@ void XflExecutor::runPanelTask(PlaneTask *pPlaneTask)
 
     PlanePolar *pWPolar = pPlaneTask->wPolar();
 
-    if(pWPolar->isVLM())      bThickSurfaces = false;
-    if(pWPolar->bThinSurfaces())    bThickSurfaces = false;
+    if(pWPolar->isVLM())         bThickSurfaces = false;
+    if(pWPolar->bThinSurfaces()) bThickSurfaces = false;
+
+    pPlaneTask->setComputeDerivatives(m_bCompStabDerivatives);
 
     Plane * pPlane = pPlaneTask->plane();
     //and make the mesh

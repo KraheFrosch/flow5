@@ -124,6 +124,8 @@ class XflScriptReader : public QXmlStreamReader
         bool bMakePlaneOpps() const {return m_bMakePOpps;}
         bool bMakeBtOpps()    const {return m_bMakeBtOpps;}
 
+        bool bCompStabDerivatives() const {return m_bCompStabDerivatives;}
+
         bool bMakeProjectFile() const {return m_bMakeProjectFile;}
 
         //Viscous loop
@@ -190,6 +192,7 @@ class XflScriptReader : public QXmlStreamReader
         // Plane variables
         QStringList m_PlaneFileList;                   /**< the list of planes >*/
         QStringList m_WPolarFileList;                  /**< the list of plane analyses loaded from xml files >*/
+        bool m_bCompStabDerivatives;
         bool m_bMakePOpps;
         bool m_bCsvOutput;
         bool m_bOutputWPolarsText;

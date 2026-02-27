@@ -1,4 +1,7 @@
 
+#    Compilation instructions:
+#    https://flow5.tech/docs/flow5_doc/Source/Compilation.html
+
 QT -= gui  # not using QColor
 
 TARGET = fl5-lib
@@ -11,7 +14,11 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 
 
-CONFIG += c++17
+greaterThan(QT_MAJOR_VERSION, 5) {
+    CONFIG += c++20
+} else {
+    CONFIG += c++17
+}
 
 
 # The path to the libraries' header files required by the code at compile time
@@ -27,6 +34,7 @@ RCC_DIR     = ./rcc
 
 
 linux-g++ {
+
 
     DEFINES += LINUX_OS
 
@@ -135,6 +143,7 @@ win32-msvc {
 
 
 macx {
+
     DEFINES += MAC_OS
     DEFINES += GL_SILENCE_DEPRECATION   #Shame
 
@@ -170,6 +179,7 @@ include (fl5-lib.pri)
 
 
 #----- OCC -----
+
 LIBS += \
     -lTKBO \
     -lTKBRep \
@@ -190,3 +200,4 @@ LIBS += \
     -lTKTopAlgo \
     -lTKXSBase \
     -lTKernel \
+

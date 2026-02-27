@@ -114,7 +114,7 @@ class FuseXflDefDlg : public FuseXflDlg
 
         QFrame *m_pNURBSParams;
         QFrame *m_pFrameTables;
-        QGroupBox *m_pUVParamsBox, *m_pFitBox;
+        QGroupBox *m_pgbUVParams, *m_pgbFit;
         QPushButton *m_ppbUndo, *m_ppbRedo;
 
         QSlider *m_pslEdgeWeight;
@@ -123,7 +123,7 @@ class FuseXflDefDlg : public FuseXflDlg
         IntEdit *m_pieNXPanels, *m_pieNHoopPanels;
         QComboBox *m_pcbXDegree, *m_pcbHoopDegree;
 
-        FloatEdit *m_pdeFitPrecision;
+        FloatEdit *m_pfeFitPrecision;
 
         CPTableView *m_pcptFrameTable;
         ActionItemModel *m_pFrameModel;

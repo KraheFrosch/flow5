@@ -57,7 +57,7 @@ gl3dFlowVtx::gl3dFlowVtx(QWidget *pParent) : gl3dTestGLView(pParent)
 
     m_bAxes = false;
 
-    m_stackInterval.resize(50, 0);
+    m_stackInterval.resize(50);
 
     QPalette palette;
     palette.setColor(QPalette::WindowText, DisplayOptions::textColor());
@@ -306,7 +306,7 @@ void gl3dFlowVtx::initializeGL()
         n=n/2;
     }while(n>1);
 
-    m_plabNMaxGroups->setText(QString("Max. number of groups = 2<sup>")+QString::asprintf("%d", pow)+QString("</sup>"));
+    m_plabNMaxGroups->setText(tr("Max. number of groups = 2<sup>%1</sup>").arg(pow));
 #endif
 }
 
@@ -315,7 +315,7 @@ void gl3dFlowVtx::glMake3dObjects()
 {
     if(m_bResetVortices)
     {
-        // Create a VBO and an SSBO for the vortices
+        // Create a VBO and a SSBO for the vortices
         // VBO is used for display and SSBO is used in the compute shader
 
         // create the minimal SSBO
@@ -353,31 +353,31 @@ void gl3dFlowVtx::glMake3dObjects()
         BufferArray.resize(buffersize);
         iv=0;
 
-            Vortex const &vortex = m_Vortex;
+        Vortex const &vortex = m_Vortex;
 
-            BufferArray[iv++] = vortex.vertexAt(0).xf()+5.0f;
-            BufferArray[iv++] = vortex.vertexAt(0).yf();
-            BufferArray[iv++] = vortex.vertexAt(0).zf();
+        BufferArray[iv++] = vortex.vertexAt(0).xf()+5.0f;
+        BufferArray[iv++] = vortex.vertexAt(0).yf();
+        BufferArray[iv++] = vortex.vertexAt(0).zf();
 
-            BufferArray[iv++] = vortex.vertexAt(0).xf();
-            BufferArray[iv++] = vortex.vertexAt(0).yf();
-            BufferArray[iv++] = vortex.vertexAt(0).zf();
+        BufferArray[iv++] = vortex.vertexAt(0).xf();
+        BufferArray[iv++] = vortex.vertexAt(0).yf();
+        BufferArray[iv++] = vortex.vertexAt(0).zf();
 
-            BufferArray[iv++] = vortex.vertexAt(0).xf();
-            BufferArray[iv++] = vortex.vertexAt(0).yf();
-            BufferArray[iv++] = vortex.vertexAt(0).zf();
+        BufferArray[iv++] = vortex.vertexAt(0).xf();
+        BufferArray[iv++] = vortex.vertexAt(0).yf();
+        BufferArray[iv++] = vortex.vertexAt(0).zf();
 
-            BufferArray[iv++] = vortex.vertexAt(1).xf();
-            BufferArray[iv++] = vortex.vertexAt(1).yf();
-            BufferArray[iv++] = vortex.vertexAt(1).zf();
+        BufferArray[iv++] = vortex.vertexAt(1).xf();
+        BufferArray[iv++] = vortex.vertexAt(1).yf();
+        BufferArray[iv++] = vortex.vertexAt(1).zf();
 
-            BufferArray[iv++] = vortex.vertexAt(1).xf();
-            BufferArray[iv++] = vortex.vertexAt(1).yf();
-            BufferArray[iv++] = vortex.vertexAt(1).zf();
+        BufferArray[iv++] = vortex.vertexAt(1).xf();
+        BufferArray[iv++] = vortex.vertexAt(1).yf();
+        BufferArray[iv++] = vortex.vertexAt(1).zf();
 
-            BufferArray[iv++] = vortex.vertexAt(1).xf()+5.0f;
-            BufferArray[iv++] = vortex.vertexAt(1).yf();
-            BufferArray[iv++] = vortex.vertexAt(1).zf();
+        BufferArray[iv++] = vortex.vertexAt(1).xf()+5.0f;
+        BufferArray[iv++] = vortex.vertexAt(1).yf();
+        BufferArray[iv++] = vortex.vertexAt(1).zf();
 
         Q_ASSERT(iv==buffersize);
 
@@ -396,7 +396,7 @@ void gl3dFlowVtx::glMake3dObjects()
     {
         // use only one buffer object used both as VBO and SSBO
         int NBoids = s_NGroups * GROUP_SIZE;
-        m_plabNParticles->setText(QString::asprintf("Number of particles = %d", NBoids));
+        m_plabNParticles->setText(tr("Number of particles = %1").arg(NBoids));
         //need to use v4 vertices for velocity due to std140/430 padding constraints for vec3:
         int buffersize = NBoids*(4+4+4); //4 vertices + 4 velocity + 4 color components for each boid
 
@@ -423,13 +423,13 @@ void gl3dFlowVtx::glMake3dObjects()
         }
         Q_ASSERT(iv==buffersize);
 
-        if(m_vboBoids.isCreated()) m_vboBoids.destroy();
-        m_vboBoids.create();
-        m_vboBoids.bind();
+        if(m_ssboBoids.isCreated()) m_ssboBoids.destroy();
+        m_ssboBoids.create();
+        m_ssboBoids.bind();
         {
-            m_vboBoids.allocate(BufferArray.data(), buffersize * sizeof(GLfloat));
+            m_ssboBoids.allocate(BufferArray.data(), buffersize * sizeof(GLfloat));
         }
-        m_vboBoids.release();
+        m_ssboBoids.release();
 
 
 
@@ -485,7 +485,7 @@ void gl3dFlowVtx::moveThem()
         m_shadCompute.setUniformValue(m_locVInf,      s_VInf);
         m_shadCompute.setUniformValue(m_locDt,        s_dt);
 
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vboBoids.bufferId());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_ssboBoids.bufferId());
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_ssboVortices.bufferId());
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_vboTraces.bufferId());
 

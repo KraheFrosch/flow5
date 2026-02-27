@@ -482,6 +482,22 @@ bool gl3dFuseView::intersectTheObject(const Vector3d &AA, const Vector3d &BB, Ve
 void gl3dFuseView::paintEditTriMesh(bool bBackground)
 {
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
+    m_shadLine.bind();
+    {
+        m_shadLine.setUniformValue(m_locLine.m_UniColor,  xfl::fromfl5Clr(W3dPrefs::s_PanelStyle.m_Color));
+        m_shadLine.setUniformValue(m_locLine.m_Pattern,   gl::stipple(W3dPrefs::s_PanelStyle.m_Stipple));
+        m_shadLine.setUniformValue(m_locLine.m_Thickness, float(W3dPrefs::s_PanelStyle.m_Width));
+
+        m_vboTriPanelEdges.bind();
+        {
+            m_shadLine.enableAttributeArray(m_locSurf.m_attrVertex);
+            m_shadLine.setAttributeBuffer(m_locSurf.m_attrVertex, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+            int nLines = m_vboTriPanelEdges.size()/2/3/int(sizeof(float));
+            glDrawArrays(GL_LINES, 0, nLines*2);
+        }
+        m_vboTriPanelEdges.release();
+    }
+    m_shadLine.release();
 
     m_shadSurf.bind();
     {
@@ -489,14 +505,6 @@ void gl3dFuseView::paintEditTriMesh(bool bBackground)
 
         m_shadSurf.setUniformValue(m_locSurf.m_Light, 0);
 
-        m_vboTriPanelEdges.bind();
-        {
-            m_shadSurf.enableAttributeArray(m_locSurf.m_attrVertex);
-            m_shadSurf.setAttributeBuffer(m_locSurf.m_attrVertex, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
-            int nLines = m_vboTriPanelEdges.size()/2/3/int(sizeof(float));
-            glDrawArrays(GL_LINES, 0, nLines*2);
-        }
-        m_vboTriPanelEdges.release();
 
         if(bBackground)
         {

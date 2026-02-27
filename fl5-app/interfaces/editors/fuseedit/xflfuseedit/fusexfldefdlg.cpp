@@ -122,7 +122,7 @@ void FuseXflDefDlg::connectSignals()
 
     connect(m_pFrameView,    SIGNAL(frameSelected(int)),    SLOT(onSelectFrame(int)));
 
-    connect(m_pdeFitPrecision, SIGNAL(floatChanged(float)), SLOT(onFitPrecision()));
+    connect(m_pfeFitPrecision, SIGNAL(floatChanged(float)), SLOT(onFitPrecision()));
 }
 
 
@@ -782,13 +782,13 @@ void FuseXflDefDlg::initDialog(Fuse*pFuse)
     if(!pFuseXfl) return;
 
     if(pFuseXfl->isFlatFaceType()) m_ptwDefinition->removeTab(1);
-    if(!pFuseXfl->isSplineType()) m_pUVParamsBox->hide();
-    if(!pFuseXfl->isSectionType()) m_pFitBox->hide();
+    if(!pFuseXfl->isSplineType()) m_pgbUVParams->hide();
+    if(!pFuseXfl->isSectionType()) m_pgbFit->hide();
     else
     {
         FuseSections const *pFuseSections = dynamic_cast<FuseSections const *>(pFuseXfl);
         if(pFuseSections)
-            m_pdeFitPrecision->setValue(pFuseSections->fitPrecision()*Units::mtoUnit());
+            m_pfeFitPrecision->setValue(pFuseSections->fitPrecision()*Units::mtoUnit());
     }
 
     setBody(pFuseXfl);
@@ -822,7 +822,7 @@ void FuseXflDefDlg::setupLayout()
 //                    m_pNURBSParams->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
                     QVBoxLayout *pParamsLayout = new QVBoxLayout;
                     {
-                        m_pUVParamsBox = new QGroupBox("UV parameters");
+                        m_pgbUVParams = new QGroupBox("UV parameters");
                         {
                             QGridLayout *pSplineParamsLayout = new QGridLayout;
                             {
@@ -844,26 +844,26 @@ void FuseXflDefDlg::setupLayout()
                                 pSplineParamsLayout->addWidget(m_pcbXDegree,2,2);
                                 pSplineParamsLayout->addWidget(m_pcbHoopDegree,2,3);
                             }
-                            m_pUVParamsBox->setLayout(pSplineParamsLayout);
+                            m_pgbUVParams->setLayout(pSplineParamsLayout);
                         }
 
-                        m_pFitBox = new QGroupBox("NURBS fit");
+                        m_pgbFit = new QGroupBox("NURBS fit");
                         {
                             QHBoxLayout *pFitLayout = new QHBoxLayout;
                             {
                                 QLabel *pLabFit = new QLabel("Fit tolerance");
                                 QLabel *pLabLengthUnit = new QLabel(Units::lengthUnitQLabel());
-                                m_pdeFitPrecision = new FloatEdit;
+                                m_pfeFitPrecision = new FloatEdit;
                                 QString tip("<p>Defines the precision with which the spline will be fit to the control points.<br>"
                                             "Reduce this precision for a better fit with the risk of potential NURBS oscillations.<br>"
                                             "Increase this precision to get a smoother NURBS with a less precise fit.</p>");
-                                m_pdeFitPrecision->setToolTip(tip);
+                                m_pfeFitPrecision->setToolTip(tip);
 
                                 pFitLayout->addWidget(pLabFit);
-                                pFitLayout->addWidget(m_pdeFitPrecision);
+                                pFitLayout->addWidget(m_pfeFitPrecision);
                                 pFitLayout->addWidget(pLabLengthUnit);
                             }
-                            m_pFitBox->setLayout(pFitLayout);
+                            m_pgbFit->setLayout(pFitLayout);
                         }
 
                         QGroupBox *pBunchParams = new QGroupBox("Quad panels");
@@ -909,8 +909,8 @@ void FuseXflDefDlg::setupLayout()
                             pBunchParams->setLayout(pMeshLayout);
                         }
 
-                        pParamsLayout->addWidget(m_pUVParamsBox);
-                        pParamsLayout->addWidget(m_pFitBox);
+                        pParamsLayout->addWidget(m_pgbUVParams);
+                        pParamsLayout->addWidget(m_pgbFit);
                         pParamsLayout->addWidget(pBunchParams);
                         pParamsLayout->addStretch();
                     }
@@ -1249,7 +1249,7 @@ void FuseXflDefDlg::onFitPrecision()
 {
     if(!m_pFuseXfl->isSectionType()) return;
     FuseSections *pFuseSections = dynamic_cast<FuseSections *>(m_pFuseXfl);
-    pFuseSections->setFitPrecision(m_pdeFitPrecision->value()/Units::mtoUnit());
+    pFuseSections->setFitPrecision(m_pfeFitPrecision->value()/Units::mtoUnit());
     updateFuseXfl();
     m_pglFuseView->resetFuse();
     updateView();

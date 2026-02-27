@@ -476,8 +476,6 @@ void gl3dWingView::glMakeWingSectionHighlight(WingXfl const *pWing, int iSection
 
 void gl3dWingView::glMakeWingSectionHighlight_seg(WingXfl const *pWing, int iSectionHighLight)
 {
-    Node node;
-
     if(iSectionHighLight<0 || iSectionHighLight>pWing->nSections())
     {
         m_vboSectionHighlight.destroy();
@@ -485,8 +483,9 @@ void gl3dWingView::glMakeWingSectionHighlight_seg(WingXfl const *pWing, int iSec
     }
 
     int CHORDPOINTS = W3dPrefs::s_iChordwiseRes;
+    CHORDPOINTS = std::max(CHORDPOINTS,2);
+
     int iSection = 0;
-    int jSurf = 0;
     for(int jSection=0; jSection<pWing->nSections(); jSection++)
     {
         if(jSection==iSectionHighLight) break;
@@ -495,21 +494,22 @@ void gl3dWingView::glMakeWingSectionHighlight_seg(WingXfl const *pWing, int iSec
     }
 
     std::vector<Node> PtTopLeft, PtTopRight, PtBotLeft, PtBotRight;
-    std::vector<float> HighlightVA;
+    std::vector<float> HighlightVertexArray;
 
     int stride = 6; // 2 vertices/segment x3 space coordinates
 
     int iv=0;
+    int buffersize = (CHORDPOINTS-1)   // number of segments
+                     *2                // top and bottom
+                     *stride;
+    if(pWing->isTwoSided()) buffersize *= 2;
+
+    HighlightVertexArray.resize(buffersize);
+
     if(pWing->isTwoSided())
     {
-        int buffersize = (CHORDPOINTS-1)   // number of segments
-                         *2                // top and bottom
-                         *2                // left and right
-                         *stride;
-        HighlightVA.resize(buffersize);
-
         // left side
-        jSurf = pWing->nSurfaces()/2 - iSection;
+        int jSurf = pWing->nSurfaces()/2 - iSection;
 
         Surface const &lsurf = pWing->surfaceAt(jSurf);
         lsurf.getSidePoints_1(xfl::TOPSURFACE, nullptr, PtTopLeft, PtTopRight, CHORDPOINTS, xfl::COSINE);
@@ -518,23 +518,24 @@ void gl3dWingView::glMakeWingSectionHighlight_seg(WingXfl const *pWing, int iSec
         for(int i=0; i<CHORDPOINTS-1; i++)
         {
             // top segment
-            HighlightVA[iv++] = PtTopLeft.at(i).xf();
-            HighlightVA[iv++] = PtTopLeft.at(i).yf();
-            HighlightVA[iv++] = PtTopLeft.at(i).zf();
+            HighlightVertexArray[iv++] = PtTopLeft.at(i).xf();
+            HighlightVertexArray[iv++] = PtTopLeft.at(i).yf();
+            HighlightVertexArray[iv++] = PtTopLeft.at(i).zf();
 
-            HighlightVA[iv++] = PtTopLeft.at(i+1).xf();
-            HighlightVA[iv++] = PtTopLeft.at(i+1).yf();
-            HighlightVA[iv++] = PtTopLeft.at(i+1).zf();
+            HighlightVertexArray[iv++] = PtTopLeft.at(i+1).xf();
+            HighlightVertexArray[iv++] = PtTopLeft.at(i+1).yf();
+            HighlightVertexArray[iv++] = PtTopLeft.at(i+1).zf();
 
             // bot segment
-            HighlightVA[iv++] = PtBotLeft.at(i).xf();
-            HighlightVA[iv++] = PtBotLeft.at(i).yf();
-            HighlightVA[iv++] = PtBotLeft.at(i).zf();
+            HighlightVertexArray[iv++] = PtBotLeft.at(i).xf();
+            HighlightVertexArray[iv++] = PtBotLeft.at(i).yf();
+            HighlightVertexArray[iv++] = PtBotLeft.at(i).zf();
 
-            HighlightVA[iv++] = PtBotLeft.at(i+1).xf();
-            HighlightVA[iv++] = PtBotLeft.at(i+1).yf();
-            HighlightVA[iv++] = PtBotLeft.at(i+1).zf();
+            HighlightVertexArray[iv++] = PtBotLeft.at(i+1).xf();
+            HighlightVertexArray[iv++] = PtBotLeft.at(i+1).yf();
+            HighlightVertexArray[iv++] = PtBotLeft.at(i+1).zf();
         }
+
         // right side
         jSurf = pWing->nSurfaces()/2 + iSection -1;
 
@@ -545,33 +546,94 @@ void gl3dWingView::glMakeWingSectionHighlight_seg(WingXfl const *pWing, int iSec
         for(int i=0; i<CHORDPOINTS-1; i++)
         {
             // top segment
-            HighlightVA[iv++] = PtTopRight.at(i).xf();
-            HighlightVA[iv++] = PtTopRight.at(i).yf();
-            HighlightVA[iv++] = PtTopRight.at(i).zf();
+            HighlightVertexArray[iv++] = PtTopRight.at(i).xf();
+            HighlightVertexArray[iv++] = PtTopRight.at(i).yf();
+            HighlightVertexArray[iv++] = PtTopRight.at(i).zf();
 
-            HighlightVA[iv++] = PtTopRight.at(i+1).xf();
-            HighlightVA[iv++] = PtTopRight.at(i+1).yf();
-            HighlightVA[iv++] = PtTopRight.at(i+1).zf();
+            HighlightVertexArray[iv++] = PtTopRight.at(i+1).xf();
+            HighlightVertexArray[iv++] = PtTopRight.at(i+1).yf();
+            HighlightVertexArray[iv++] = PtTopRight.at(i+1).zf();
 
             // bot segment
-            HighlightVA[iv++] = PtBotRight.at(i).xf();
-            HighlightVA[iv++] = PtBotRight.at(i).yf();
-            HighlightVA[iv++] = PtBotRight.at(i).zf();
+            HighlightVertexArray[iv++] = PtBotRight.at(i).xf();
+            HighlightVertexArray[iv++] = PtBotRight.at(i).yf();
+            HighlightVertexArray[iv++] = PtBotRight.at(i).zf();
 
-            HighlightVA[iv++] = PtBotRight.at(i+1).xf();
-            HighlightVA[iv++] = PtBotRight.at(i+1).yf();
-            HighlightVA[iv++] = PtBotRight.at(i+1).zf();
+            HighlightVertexArray[iv++] = PtBotRight.at(i+1).xf();
+            HighlightVertexArray[iv++] = PtBotRight.at(i+1).yf();
+            HighlightVertexArray[iv++] = PtBotRight.at(i+1).zf();
         }
+    }
+    else
+    {
+        // one-sided left wing
 
-            Q_ASSERT(iv==buffersize);
+        if(iSection==0)
+        {
+            int jSurf = pWing->nSurfaces()-1 - iSection;
 
+            Surface const &lsurf = pWing->surfaceAt(jSurf);
+            lsurf.getSidePoints_1(xfl::TOPSURFACE, nullptr, PtTopLeft, PtTopRight, CHORDPOINTS, xfl::COSINE);
+            lsurf.getSidePoints_1(xfl::BOTSURFACE, nullptr, PtBotLeft, PtBotRight, CHORDPOINTS, xfl::COSINE);
+
+            for(int i=0; i<CHORDPOINTS-1; i++)
+            {
+                // top segment
+                HighlightVertexArray[iv++] = PtTopRight.at(i).xf();
+                HighlightVertexArray[iv++] = PtTopRight.at(i).yf();
+                HighlightVertexArray[iv++] = PtTopRight.at(i).zf();
+
+                HighlightVertexArray[iv++] = PtTopRight.at(i+1).xf();
+                HighlightVertexArray[iv++] = PtTopRight.at(i+1).yf();
+                HighlightVertexArray[iv++] = PtTopRight.at(i+1).zf();
+
+                // bot segment
+                HighlightVertexArray[iv++] = PtBotRight.at(i).xf();
+                HighlightVertexArray[iv++] = PtBotRight.at(i).yf();
+                HighlightVertexArray[iv++] = PtBotRight.at(i).zf();
+
+                HighlightVertexArray[iv++] = PtBotRight.at(i+1).xf();
+                HighlightVertexArray[iv++] = PtBotRight.at(i+1).yf();
+                HighlightVertexArray[iv++] = PtBotRight.at(i+1).zf();
+            }
+        }
+        else
+        {
+            int jSurf = pWing->nSurfaces() - iSection;
+
+            Surface const &lsurf = pWing->surfaceAt(jSurf);
+            lsurf.getSidePoints_1(xfl::TOPSURFACE, nullptr, PtTopLeft, PtTopRight, CHORDPOINTS, xfl::COSINE);
+            lsurf.getSidePoints_1(xfl::BOTSURFACE, nullptr, PtBotLeft, PtBotRight, CHORDPOINTS, xfl::COSINE);
+
+            for(int i=0; i<CHORDPOINTS-1; i++)
+            {
+                // top segment
+                HighlightVertexArray[iv++] = PtTopLeft.at(i).xf();
+                HighlightVertexArray[iv++] = PtTopLeft.at(i).yf();
+                HighlightVertexArray[iv++] = PtTopLeft.at(i).zf();
+
+                HighlightVertexArray[iv++] = PtTopLeft.at(i+1).xf();
+                HighlightVertexArray[iv++] = PtTopLeft.at(i+1).yf();
+                HighlightVertexArray[iv++] = PtTopLeft.at(i+1).zf();
+
+                // bot segment
+                HighlightVertexArray[iv++] = PtBotLeft.at(i).xf();
+                HighlightVertexArray[iv++] = PtBotLeft.at(i).yf();
+                HighlightVertexArray[iv++] = PtBotLeft.at(i).zf();
+
+                HighlightVertexArray[iv++] = PtBotLeft.at(i+1).xf();
+                HighlightVertexArray[iv++] = PtBotLeft.at(i+1).yf();
+                HighlightVertexArray[iv++] = PtBotLeft.at(i+1).zf();
+            }
+        }
     }
 
+    Q_ASSERT(iv==buffersize);
 
     m_vboSectionHighlight.destroy();
     m_vboSectionHighlight.create();
     m_vboSectionHighlight.bind();
-    m_vboSectionHighlight.allocate(HighlightVA.data(), int(HighlightVA.size()*sizeof(float)));
+    m_vboSectionHighlight.allocate(HighlightVertexArray.data(), int(HighlightVertexArray.size()*sizeof(float)));
     m_vboSectionHighlight.release();
 }
 

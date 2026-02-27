@@ -327,6 +327,8 @@ class FL5LIB_EXPORT WingXfl : public Part
 
         int m_nTipStrips;                /**< the number of horizontal panel strips in the left and right tip patches; introduced in v7.01 beta 09 */
 
+        int m_nXFlapPanels;              /**< teh number of panels on the flaps in the chordwise direction; unused as of v7.55; provision for future mod. */
+
         int m_nFlaps;                    /**< the number of T.E. flaps, numbered from left wing to right wing; for a main wing this number is even*/
         std::vector<double> m_FlapMoment;      /**< the flap moments resulting from the panel of VLM analysis */
 
