@@ -37,6 +37,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 
+#include "fusexfldefdlg.h"
 
 
 #include <api/frame.h>
@@ -44,9 +45,9 @@
 #include <api/fusexfl.h>
 #include <api/quad3d.h>
 #include <api/units.h>
+
 #include <interfaces/editors/fuseedit/xflfuseedit/fuseframewt.h>
 #include <interfaces/editors/fuseedit/xflfuseedit/fuselinewt.h>
-#include <interfaces/editors/fuseedit/xflfuseedit/fusexfldefdlg.h>
 #include <interfaces/opengl/controls/gl3dgeomcontrols.h>
 #include <interfaces/opengl/fl5views/gl3dfuseview.h>
 #include <interfaces/widgets/customwts/actionitemmodel.h>
@@ -132,13 +133,13 @@ void FuseXflDefDlg::setTableUnits()
     length = Units::lengthUnitQLabel();
 
     m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
-    m_pFrameModel->setHeaderData(1, Qt::Horizontal, "NPanels");
-    m_pFrameModel->setHeaderData(2, Qt::Horizontal, "Actions");
+    m_pFrameModel->setHeaderData(1, Qt::Horizontal, tr("NPanels"));
+    m_pFrameModel->setHeaderData(2, Qt::Horizontal, tr("Actions"));
 
     m_pPointModel->setHeaderData(0, Qt::Horizontal, "y ("+length+")");
     m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
-    m_pPointModel->setHeaderData(2, Qt::Horizontal, "NPanels");
-    m_pPointModel->setHeaderData(3, Qt::Horizontal, "Actions");
+    m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
+    m_pPointModel->setHeaderData(3, Qt::Horizontal, tr("Actions"));
 }
 
 
@@ -297,17 +298,17 @@ void FuseXflDefDlg::onPointItemClicked(const QModelIndex &index)
     {
         QRect itemrect = m_pcptPointTable->visualRect(index);
         QPoint menupos = m_pcptPointTable->mapToGlobal(itemrect.topLeft());
-        QMenu *pRowMenu = new QMenu("Section",this);
+        QMenu *pRowMenu = new QMenu(tr("Section"),this);
 
-        QAction *pInsertBefore = new QAction("Insert before", this);
+        QAction *pInsertBefore = new QAction(tr("Insert before"), this);
         connect(pInsertBefore, SIGNAL(triggered(bool)), this, SLOT(onInsertPointBefore()));
         pRowMenu->addAction(pInsertBefore);
 
-        QAction *pInsertAfter = new QAction("Insert after", this);
+        QAction *pInsertAfter = new QAction(tr("Insert after"), this);
         connect(pInsertAfter, SIGNAL(triggered(bool)), this, SLOT(onInsertPointAfter()));
         pRowMenu->addAction(pInsertAfter);
 
-        QAction *pDeleteRow = new QAction("Delete", this);
+        QAction *pDeleteRow = new QAction(tr("Delete"), this);
         connect(pDeleteRow, SIGNAL(triggered(bool)), this, SLOT(onRemoveSelectedPoint()));
         pRowMenu->addAction(pDeleteRow);
 
@@ -404,17 +405,17 @@ void FuseXflDefDlg::onFrameItemClicked(const QModelIndex &index)
     {
         QRect itemrect = m_pcptFrameTable->visualRect(index);
         QPoint menupos = m_pcptFrameTable->mapToGlobal(itemrect.topLeft());
-        QMenu *pRowMenu = new QMenu("Section",this);
+        QMenu *pRowMenu = new QMenu(tr("Section"),this);
 
-        QAction *pInsertBefore = new QAction("Insert before", this);
+        QAction *pInsertBefore = new QAction(tr("Insert before"), this);
         connect(pInsertBefore, SIGNAL(triggered(bool)), this, SLOT(onInsertFrameBefore()));
         pRowMenu->addAction(pInsertBefore);
 
-        QAction *pInsertAfter = new QAction("Insert after", this);
+        QAction *pInsertAfter = new QAction(tr("Insert after"), this);
         connect(pInsertAfter, SIGNAL(triggered(bool)), this, SLOT(onInsertFrameAfter()));
         pRowMenu->addAction(pInsertAfter);
 
-        QAction *pDeleteRow = new QAction("Delete", this);
+        QAction *pDeleteRow = new QAction(tr("Delete"), this);
         connect(pDeleteRow, SIGNAL(triggered(bool)), this, SLOT(onRemoveSelectedFrame()));
         pRowMenu->addAction(pDeleteRow);
 
@@ -591,12 +592,11 @@ void FuseXflDefDlg::onSelChangeXDegree(int sel)
     if(!m_pFuseXfl) return;
     if (sel <0) return;
 
-
     int deg = sel+1;
     if(deg>=m_pFuseXfl->nurbs().frameCount())
     {
-        QString strange = "The degree must be less than the number of frames";
-        QMessageBox::warning(this, "Warning", strange);
+        QString strange = tr("<p>The degree must be less than the number of frames</p>");
+        QMessageBox::warning(this, tr("Warning"), strange);
         deg=m_pFuseXfl->nurbs().frameCount();
         m_pcbXDegree->setCurrentIndex(m_pFuseXfl->nurbs().frameCount()-2);
     }
@@ -621,8 +621,8 @@ void FuseXflDefDlg::onSelChangeHoopDegree(int sel)
     int deg = sel+1;
     if(deg>=m_pFuseXfl->nurbs().framePointCount())
     {
-        QString strange("The degree must be less than the number of side lines");
-        QMessageBox::warning(this, "Warning", strange);
+        QString strange(tr("<p>The degree must be less than the number of side lines</p>"));
+        QMessageBox::warning(this, tr("Warning"), strange);
         deg=m_pFuseXfl->nurbs().framePointCount();
         m_pcbHoopDegree->setCurrentIndex(m_pFuseXfl->nurbs().framePointCount()-2);
     }
@@ -822,13 +822,13 @@ void FuseXflDefDlg::setupLayout()
 //                    m_pNURBSParams->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
                     QVBoxLayout *pParamsLayout = new QVBoxLayout;
                     {
-                        m_pgbUVParams = new QGroupBox("UV parameters");
+                        m_pgbUVParams = new QGroupBox(tr("UV parameters"));
                         {
                             QGridLayout *pSplineParamsLayout = new QGridLayout;
                             {
-                                QLabel *pLab1 = new QLabel("x");
-                                QLabel *pLab2 = new QLabel("Hoop");
-                                QLabel *pLab3 = new QLabel("Degree");
+                                QLabel *plab1 = new QLabel("x");
+                                QLabel *plab2 = new QLabel(tr("Hoop"));
+                                QLabel *plab3 = new QLabel(tr("Degree"));
                                 m_pcbXDegree = new QComboBox;
                                 m_pcbHoopDegree = new QComboBox;
 
@@ -838,43 +838,43 @@ void FuseXflDefDlg::setupLayout()
                                 m_pcbXDegree->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
                                 m_pcbHoopDegree->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 */
-                                pSplineParamsLayout->addWidget(pLab1,1,2, Qt::AlignCenter);
-                                pSplineParamsLayout->addWidget(pLab2,1,3, Qt::AlignCenter);
-                                pSplineParamsLayout->addWidget(pLab3,2,1, Qt::AlignRight);
+                                pSplineParamsLayout->addWidget(plab1,1,2, Qt::AlignCenter);
+                                pSplineParamsLayout->addWidget(plab2,1,3, Qt::AlignCenter);
+                                pSplineParamsLayout->addWidget(plab3,2,1, Qt::AlignRight);
                                 pSplineParamsLayout->addWidget(m_pcbXDegree,2,2);
                                 pSplineParamsLayout->addWidget(m_pcbHoopDegree,2,3);
                             }
                             m_pgbUVParams->setLayout(pSplineParamsLayout);
                         }
 
-                        m_pgbFit = new QGroupBox("NURBS fit");
+                        m_pgbFit = new QGroupBox(tr("NURBS fit"));
                         {
                             QHBoxLayout *pFitLayout = new QHBoxLayout;
                             {
-                                QLabel *pLabFit = new QLabel("Fit tolerance");
-                                QLabel *pLabLengthUnit = new QLabel(Units::lengthUnitQLabel());
+                                QLabel *plabFit = new QLabel(tr("Fit tolerance"));
+                                QLabel *plabLengthUnit = new QLabel(Units::lengthUnitQLabel());
                                 m_pfeFitPrecision = new FloatEdit;
                                 QString tip("<p>Defines the precision with which the spline will be fit to the control points.<br>"
                                             "Reduce this precision for a better fit with the risk of potential NURBS oscillations.<br>"
                                             "Increase this precision to get a smoother NURBS with a less precise fit.</p>");
                                 m_pfeFitPrecision->setToolTip(tip);
 
-                                pFitLayout->addWidget(pLabFit);
+                                pFitLayout->addWidget(plabFit);
                                 pFitLayout->addWidget(m_pfeFitPrecision);
-                                pFitLayout->addWidget(pLabLengthUnit);
+                                pFitLayout->addWidget(plabLengthUnit);
                             }
                             m_pgbFit->setLayout(pFitLayout);
                         }
 
-                        QGroupBox *pBunchParams = new QGroupBox("Quad panels");
+                        QGroupBox *pBunchParams = new QGroupBox(tr("Quad panels"));
                         {
                             QVBoxLayout *pMeshLayout = new QVBoxLayout;
                             {
                                 QGridLayout *pSplineParamsLayout = new QGridLayout;
                                 {
                                     QLabel *plab1 = new QLabel("x");
-                                    QLabel *plab2 = new QLabel("Hoop");
-                                    QLabel *plab4 = new QLabel("Quad panels");
+                                    QLabel *plab2 = new QLabel(tr("Hoop"));
+                                    QLabel *plab4 = new QLabel(tr("Quad panels"));
                                     m_pieNXPanels = new IntEdit;
                                     m_pieNHoopPanels = new IntEdit;
 
@@ -887,9 +887,9 @@ void FuseXflDefDlg::setupLayout()
 
                                 QGridLayout *pBunchParamsLayout = new QGridLayout;
                                 {
-                                    QLabel *plabCenter = new QLabel("Uniform");
+                                    QLabel *plabCenter = new QLabel(tr("Uniform"));
                                     plabCenter->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
-                                    QLabel *plabEndPoints = new QLabel("End points");
+                                    QLabel *plabEndPoints = new QLabel(tr("End points"));
                                     plabEndPoints->setAlignment(Qt::AlignVCenter|Qt::AlignLeft);
 
                                     m_pslBunchAmp = new QSlider(Qt::Horizontal);
@@ -924,10 +924,10 @@ void FuseXflDefDlg::setupLayout()
                     {
                         QVBoxLayout * pFramePosLayout = new QVBoxLayout;
                         {
-                            QLabel *pLabelFrame = new QLabel("Frame positions");
-                            pLabelFrame->setStyleSheet("font-weight: bold");
-                            pLabelFrame->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-                            pFramePosLayout->addWidget(pLabelFrame);
+                            QLabel *plabFrame = new QLabel(tr("Frame positions"));
+                            plabFrame->setStyleSheet("font-weight: bold");
+                            plabFrame->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+                            pFramePosLayout->addWidget(plabFrame);
                             pFramePosLayout->addWidget(m_pcptFrameTable);
                         }
                         pFramePosFrame->setLayout(pFramePosLayout);
@@ -936,10 +936,10 @@ void FuseXflDefDlg::setupLayout()
                     {
                         QVBoxLayout * pFramePointLayout = new QVBoxLayout;
                         {
-                            QLabel *pLabelPoints = new QLabel("Active frame points");
-                            pLabelPoints->setStyleSheet("font-weight: bold");
-                            pLabelPoints->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-                            pFramePointLayout->addWidget(pLabelPoints);
+                            QLabel *plabPoints = new QLabel(tr("Active frame points"));
+                            plabPoints->setStyleSheet("font-weight: bold");
+                            plabPoints->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+                            pFramePointLayout->addWidget(plabPoints);
                             pFramePointLayout->addWidget(m_pcptPointTable);
                         }
                         pFramePointFrame->setLayout(pFramePointLayout);
@@ -949,15 +949,15 @@ void FuseXflDefDlg::setupLayout()
                     m_pTableSplitter->addWidget(pFramePointFrame);
                 }
 
-                m_ptwDefinition->addTab(m_pMetaFrame,     "Meta");
-                m_ptwDefinition->addTab(m_pNURBSParams,   "NURBS parameters");
-                m_ptwDefinition->addTab(m_pTableSplitter, "Tables");
+                m_ptwDefinition->addTab(m_pMetaFrame,     tr("Meta"));
+                m_ptwDefinition->addTab(m_pNURBSParams,   tr("NURBS parameters"));
+                m_ptwDefinition->addTab(m_pTableSplitter, tr("Tables"));
             }
 
             QHBoxLayout *pUndoRedoLayout = new QHBoxLayout;
             {
-                m_ppbUndo = new QPushButton(QIcon(":/icons/OnUndo.png"), "Undo");
-                m_ppbRedo = new QPushButton(QIcon(":/icons/OnRedo.png"), "Redo");
+                m_ppbUndo = new QPushButton(QIcon(":/icons/OnUndo.png"), tr("Undo"));
+                m_ppbRedo = new QPushButton(QIcon(":/icons/OnRedo.png"), tr("Redo"));
                 pUndoRedoLayout->addWidget(m_ppbUndo);
                 pUndoRedoLayout->addWidget(m_ppbRedo);
             }

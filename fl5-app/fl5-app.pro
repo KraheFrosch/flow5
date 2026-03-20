@@ -9,7 +9,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 TEMPLATE = app
 TARGET = flow5
 
-VERSION = 7.54
+VERSION = 7.55
 
 QT += opengl widgets xml
 
@@ -45,8 +45,6 @@ INCLUDEPATH += $$PWD/../fl5-lib/api
 
 linux-g++ {
 
-    CONFIG += thread
-
     # VARIABLES
     isEmpty(PREFIX):PREFIX = /usr/local
     BINDIR = $$PREFIX/bin
@@ -58,17 +56,15 @@ linux-g++ {
     icon128.path = $$SHAREDIR
     icon128.files += ../meta/res/$${TARGET}.png
 
-    target.path = $$BINDIR
-
     translations.path = $$SHAREDIR/translations
-    translations.files = ../meta/translations/*.qm
+    translations.files += ../meta/translations/*.qm
 
     target.path = $$BINDIR
 
     # MAKE INSTALL
     INSTALLS += target desktop icon128 translations
 
-
+    #comment out to use OpenBLAS
 #    CONFIG += INTEL_MKL
 
     INTEL_MKL {
@@ -89,11 +85,16 @@ linux-g++ {
         #   LIBS += -lgomp
         ##    LIBS += -lmkl_intel_thread -lmkl_sequential
     } else {
-        # ---------------- system LAPACK/LAPACKE + CBLAS/OpenBLAS-----------------------------
+        # ---------------- system OpenBLAS -----------------------------
         DEFINES += OPENBLAS
 
-            LIBS += -llapack -llapacke
-            LIBS += -lopenblas
+        # Fedora libs in /usr/lib64:
+        #   openblas:  single-threaded library
+        #   openblaso: built with USE_OPENMP=1
+        #   openblasp: multi-threading with OMP
+        LIBS += -lopenblas
+#        LIBS += -lopenblaso
+#        LIBS += -lopenblasp
 
     }
 

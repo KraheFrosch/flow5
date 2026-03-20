@@ -25,19 +25,22 @@
                 <ul>
                     <li>General
                         <ul>
-                            <li></li>
+                            <li>Moved the fuselage triangulation to the plane initialisation phase in order to speed up project loading</li>
                         </ul>
                     </li>
                     <li>Modelling/Meshing
                         <ul>
                             <li>raised the upper limit of the number of foil panels from 255 to 300</li>
                             <li>fixed <a href="https://github.com/techwinder/flow5/issues/16">issue #16</a></li>
+                            <li>added an option in the preferences to customize the default gmsh tessellation parameters</li>
                         </ul>
                     </li>
                     <li>Analysis
                         <ul>
                             <li>added an option to request the calculation of derivatives when running a plane script</li>
                             <li>fixed <a href="https://github.com/techwinder/flow5/issues/3">issue #3</a></li>
+                            <li>fixed <a href="https://github.com/techwinder/flow5/issues/25">issue #25</a></li>
+                            <li>fixed <a href="https://github.com/techwinder/flow5/issues/30">issue #30</a></li>
                         </ul>
                     </li>
                     <li>API
@@ -54,6 +57,8 @@
                         <ul>
                             <li>fixed issues with Zink on Linux apparently not handling GL_POINTS in the geometry shader</li>
                             <li>fixed potential issues when highlighting a section in the 3d view of the wing editor</li>
+                            <li>added app translation framework and translation to Chinese(thanks to wdf-nudtaa)</li>
+                            <li>initialized translation to French</li>
                         </ul>
                     </li>
                     <li>Other

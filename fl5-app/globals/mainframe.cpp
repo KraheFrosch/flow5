@@ -45,6 +45,14 @@
 
 #include <gmsh.h>
 
+#ifdef OPENBLAS
+    #include <openblas/cblas.h>
+#elif defined INTEL_MKL
+    #include <mkl.h>
+#endif
+
+#include "mainframe.h"
+
 
 #include <core/displayoptions.h>
 #include <core/saveoptions.h>
@@ -53,7 +61,6 @@
 #include <globals/aboutf5.h>
 #include <globals/creditsdlg.h>
 #include <globals/gui_params.h>
-#include <globals/mainframe.h>
 #include <interfaces/controls/poppctrls/crossflowctrls.h>
 #include <interfaces/controls/poppctrls/flowctrls.h>
 #include <interfaces/controls/poppctrls/opp3dscalesctrls.h>
@@ -249,7 +256,7 @@ MainFrame::MainFrame(QWidget *parent) : QMainWindow(parent)
 
     if(oglversion<2)
     {
-        QString strong = tr("flow5 requires OpenGL 3.3 or greater.\n");
+        QString strong = tr("flow5 requires OpenGL 3.3 or greater.") + EOLch;
         QString strange = tr("Your system provides by default OpenGL %1.%2")
                                     .arg(QSurfaceFormat::defaultFormat().majorVersion())
                                     .arg(QSurfaceFormat::defaultFormat().minorVersion());
@@ -300,6 +307,7 @@ MainFrame::MainFrame(QWidget *parent) : QMainWindow(parent)
     strange += QString::asprintf("Application device pixel ratio = %d\n\n", devicePixelRatio());
 #endif
 
+
     gl2dView::setImageSize(pScreen->size());
 
     displayMessage(strange + EOLch, false);
@@ -316,6 +324,40 @@ MainFrame::MainFrame(QWidget *parent) : QMainWindow(parent)
     strange += tr("   File exports:     ") + SaveOptions::lastExportDirName() + EOLch;
 
     displayMessage(strange + EOLch, false);
+
+
+
+#ifdef OPENBLAS
+    strange.clear();
+    switch(openblas_get_parallel())
+    {
+        //        https://github.com/OpenMathLib/OpenBLAS/wiki/Faq/a15b786986841d2e4e4e84e3f2ecff9c3b263b32
+        //openblas_get_parallel() will return 0 for a single-threaded library, 1 if multithreading without OpenMP, 2 if built with USE_OPENMP=1
+        case 0: strange = "OpenBlas: single-threaded library";   break;
+        case 1:
+        {
+            strange = "OpenBlas: multi-threading with OMP";
+            break;
+        }
+        case 2: strange = "OpenBlas: built with USE_OPENMP=1";   break;
+        default:
+            strange = "openblas_get_parallel() return error";
+    }
+
+        displayMessage(strange + EOLch + EOLch, false);
+#elif defined INTEL_MKL
+    //https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2025-0/mkl-get-dynamic.html
+    strange.clear();
+    int nt = mkl_get_max_threads();
+
+    if (1 == mkl_get_dynamic())
+        strange = QString::asprintf("Intel MKL may use less than %i threads for a large problem", nt);
+    else
+        strange = QString::asprintf("Intel MKL should use %i threads for a large problem", nt);
+    displayMessage(strange + EOLch + EOLch, false);
+#endif
+
+
 
     if(SaveOptions::bAutoSave())
     {
@@ -1227,10 +1269,10 @@ void MainFrame::deleteProject()
 
 void MainFrame::keyPressEvent(QKeyEvent *pEvent)
 {
-
     bool bCtrl = (pEvent->modifiers() & Qt::ControlModifier);
     bool bAlt = (pEvent->modifiers() & Qt::AltModifier);
     bool bShift = (pEvent->modifiers() & Qt::ShiftModifier);
+
     if(s_iApp == xfl::XDIRECT && m_pXDirect)
     {
         m_pXDirect->keyPressEvent(pEvent);
@@ -1352,112 +1394,6 @@ void MainFrame::keyPressEvent(QKeyEvent *pEvent)
                 }
                 break;
             }
-            case Qt::Key_F1:
-            {
-                gl3dView *pTestView = new gl3dFlowVtx;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F2:
-            {
-                gl2dFractal *pTestView = new gl2dFractal;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F3:
-            {
-                gl2dQuat *pTestView = new gl2dQuat;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-
-            }
-            case Qt::Key_F4:
-            {
-                gl2dNewton *pTestView  = new gl2dNewton;
-//                gl3dTexture *pTestView  = new gl3dTexture;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F5:
-            {
-                gl3dView *pTestView = new gl3dHydrogen;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F6:
-            {
-#ifdef Q_OS_MAC
-                gl3dView *pTestView = new gl3dLorenz;
-#else
-                gl3dView *pTestView = new gl3dLorenz2;
-#endif
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F7:
-            {
-                gl3dAttractors *pTestView = new gl3dAttractors;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F8:
-            {
-                gl3dTestGLView *pTestView = new gl3dSolarSys;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F9:
-            {
-                gl3dTestGLView *pTestView = new gl3dSagittarius;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F10:
-            {
-                gl3dTestGLView *pTestView = new gl3dSpace;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F11:
-            {
-                gl3dOptim2d *pTestView = new gl3dOptim2d;
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
-            case Qt::Key_F12:
-            {
-#ifdef Q_OS_MAC
-                gl3dTestGLView * pTestView = new gl3dBoids;
-#else
-                gl3dTestGLView * pTestView = new gl3dBoids2;
-#endif
-                pTestView->setAttribute(Qt::WA_DeleteOnClose);
-                pTestView->show();
-                pTestView->activateWindow();
-                break;
-            }
             default:
                 pEvent->ignore();
                 return;
@@ -1514,36 +1450,40 @@ void MainFrame::handleIOResults(bool bError)
     else if(Objects3d::nPlanes())  iApp = xfl::XPLANE;
     else                           iApp = xfl::XDIRECT;
 
-
-    if(iApp==xfl::XDIRECT)
+    switch (iApp)
     {
-        m_pXDirect->setFoil();
-//        m_pXDirect->setPolar();
-
-        setSavedState(false);
-
-        if(iApp==xfl::XDIRECT)
+        case xfl::XDIRECT:
         {
-            m_pXDirect->setControls();
-        }
+            m_pXDirect->setFoil();
 
-        onXDirect();
-    }
-    else if(iApp==xfl::XPLANE)
-    {
-        for(Plane *pPlane : Objects3d::planes())
-        {
-            Objects3d::makePlaneTriangulation(pPlane);
+            setSavedState(false);
+
+            if(iApp==xfl::XDIRECT)
+            {
+                m_pXDirect->setControls();
+            }
+
+            onXDirect();
+            break;
         }
-        onXPlane();
-    }
-    else if(iApp==xfl::XSAIL)
-    {
-        for(Boat *pBoat : SailObjects::boats())
+        case xfl::XPLANE:
         {
-            Objects3d::makeBoatTriangulation(pBoat);
+//            for(Plane *pPlane : Objects3d::planes())
+//                Objects3d::makePlaneTriangulation(pPlane);
+
+            onXPlane();
+            break;
         }
-        onXSail();
+        case xfl::XSAIL:
+        {
+            for(Boat *pBoat : SailObjects::boats())
+            {
+                Objects3d::makeBoatTriangulation(pBoat);
+            }
+            onXSail();
+            break;
+        }
+        case xfl::NOAPP: break;
     }
 
     if(!bError)
@@ -3007,7 +2947,6 @@ void MainFrame::saveSettings()
     Section2dOptions::saveSettings(settings);
     SelectionDlg::saveSettings(settings);
     SeparatorsDlg::saveSettings(settings);
-    Stab3dCtrls::saveSettings(settings);
     Stab3dCtrls::saveSettings(settings);
     StreamLineCtrls::saveSettings(settings);
     VortonTestDlg::saveSettings(settings);

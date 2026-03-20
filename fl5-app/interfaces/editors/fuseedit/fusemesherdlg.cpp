@@ -244,9 +244,10 @@ void FuseMesherDlg::setupLayout()
 
                         m_pButtonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Discard);
                         {
-                            QPushButton *pClearOutput = new QPushButton("Clear output");
-                            m_pButtonBox->addButton(pClearOutput, QDialogButtonBox::ActionRole);
-                            connect(pClearOutput, SIGNAL(clicked()), m_ppto,  SLOT(clear()));
+                            QPushButton *ppbClear = new QPushButton(tr("Clear output"));
+                            ppbClear->setToolTip(tr("<p>Clears the text output</p>"));
+                            m_pButtonBox->addButton(ppbClear, QDialogButtonBox::ActionRole);
+                            connect(ppbClear, SIGNAL(clicked()), m_ppto,  SLOT(clear()));
                             connect(m_pButtonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(onButton(QAbstractButton*)));
                         }
                         pBotLayout->addWidget(m_ppto);
@@ -714,7 +715,6 @@ void FuseMesherDlg::customEvent(QEvent *pEvent)
             strange = QString::asprintf("Node count     = %d\n", int(m_pFuse->nodes().size()));
             strange += "\n_______\n\n";
             m_ppto->onAppendQText(strange);
-//            gmsh::write("/home/techwinder/temp/gmesh.msh");
         }
 
         QVector<int> high;
