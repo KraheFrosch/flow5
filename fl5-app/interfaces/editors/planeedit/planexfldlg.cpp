@@ -33,6 +33,7 @@
 #include <QHeaderView>
 #include <QButtonGroup>
 #include <QFileDialog>
+#include <QToolButton>
 
 #include <BRepAlgoAPI_Cut.hxx>
 #include <BRepAlgoAPI_Splitter.hxx>
@@ -248,7 +249,9 @@ void PlaneXflDlg::setupLayout()
                                 makePartTable();
                                 QHBoxLayout *pEditCmdLayout = new QHBoxLayout;
                                 {
-                                    QPushButton *ppbInsertBtn = new QPushButton(tr("Insert"));
+                                    QToolButton *ppbInsertBtn = new QToolButton(this);
+                                    ppbInsertBtn->setText(tr("Insert"));
+                                    ppbInsertBtn->setPopupMode(QToolButton::InstantPopup);
                                     QMenu *pInsertMenu = new QMenu(this);
                                     {
                                         QMenu *pInsertWingMenu = pInsertMenu->addMenu(tr("Wing"));

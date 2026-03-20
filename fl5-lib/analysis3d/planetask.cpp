@@ -2241,12 +2241,16 @@ bool PlaneTask::T123458Loop()
 
         if (isCancelled()) return true;
 
-        if(m_bDerivatives)
+        if(m_bDerivatives && std::fabs(m_Beta) < 0.01)
         {
             PROFILE_START("13.Stability");
             traceStdLog("          Calculating derivatives and eigenthings\n");
             computeStability(pPOpp, true);
             PROFILE_END("13.Stability");
+        }
+        else if(m_bDerivatives)
+        {
+            traceStdLog("          Skipping derivatives (beta!=0, derivatives are beta-invariant)\n");
         }
         else
         {

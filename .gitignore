@@ -8,5 +8,21 @@ XFoil-lib/*.pro.user
 XFoil-lib/*.pro.user*
 *.autosave
 
+# Build artifacts (compiled output)
+*.o
+*.so
+*.so.*
+*.a
+Makefile
+.qmake.stash
 
+# Generated moc files
+moc/
 
+# Compiled app binary
+fl5-app/flow5
+fl5-lib/libfl5-lib.so*
+
+# Build directories
+build/
+objects/
