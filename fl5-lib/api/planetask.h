@@ -48,7 +48,7 @@ class AngleControl;
 class Polar;
 class Foil;
 class XFoilTask;
-class NeuralFoilPolarCache;
+
 
 
 class FL5LIB_EXPORT PlaneTask : public Task3d
@@ -112,14 +112,7 @@ class FL5LIB_EXPORT PlaneTask : public Task3d
         bool computeSurfaceDragOTF(Surface const &surf, int iStartStation, double theta, SpanDistribs &spandist);
         bool computeSectionDragOTF(XFoilTask *pTask) const;
 
-#ifdef NEURALFOIL_ENABLED
-        bool computeViscousDragNF(WingXfl *pWing, double alpha, double beta, double QInf, const PlanePolar *pWPolar, Vector3d const &cog, const AngleControl &TEFlapAngles, SpanDistribs &SpanResFF, std::string &logmsg);
-        bool computeSurfaceDragNF(Surface const &surf, int iStartStation, double theta, SpanDistribs &spandist);
-        
-        // Vectorized NeuralFoil with interpolation (faster than OTF)
-        bool computeViscousDragNFInterpolated(WingXfl *pWing, double alpha, double beta, double QInf, const PlanePolar *pWPolar, Vector3d const &cog, const AngleControl &TEFlapAngles, SpanDistribs &SpanResFF, std::string &logmsg);
-        void ensureNFPolarCache(Foil const &foil, double reMin, double reMax, double alphaMin, double alphaMax);
-#endif
+
 
         PlaneOpp *createPlaneOpp(double ctrl, double alpha, double beta, double phi, double QInf, double mass, const Vector3d &CoG, const double *Cp, const double *Gamma, const double *Sigma, bool bCpOnly=false) const;
         void addTwistedVelField(double Qinf, double alpha, std::vector<Vector3d> &VField) const;
@@ -168,9 +161,7 @@ class FL5LIB_EXPORT PlaneTask : public Task3d
 
         std::vector<double> m_gamma;    /**< the virtual twist angle for each span section; cf. Computationally Efficient Transonic and Viscous Potential Flow Aero-Structural Method for Rapid Multidisciplinary Design Optimization of Aeroelastic Wing Shaping Control, by Eric Ting and Daniel Chaparro,  Advanced Modeling and Simulation (AMS) Seminar Series, Advanced Advanced Air Air Vehicles Transport Program Technology Project NASA Ames Research Center, June 28, 2017 */
 
-#ifdef NEURALFOIL_ENABLED
-        std::map<std::string, NeuralFoilPolarCache*> m_NFPolarCaches;  /**< Per-foil polar caches for NF interpolated mode */
-#endif
+
 
     private:
         static bool s_bViscInitTwist;

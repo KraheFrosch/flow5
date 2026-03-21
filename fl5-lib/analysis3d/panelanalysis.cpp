@@ -47,7 +47,7 @@
     #include <mkl.h>
 #elif defined OPENBLAS
     #include <openblas/cblas.h>
-    #include <openblas/lapack.h>
+    #include <lapack.h>
 #endif
 
 

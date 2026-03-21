@@ -128,20 +128,11 @@ class FL5LIB_EXPORT Polar3d : public XflObject
         bool isViscous() const {return m_bViscous;}
         void setViscous(bool bViscous) {m_bViscous = bViscous;}
 
-        bool isViscInterpolated() const {return !m_bViscOnTheFly && !m_bNeuralFoilOTF;}
-        void setViscInterpolated(bool b) {if(b) {m_bViscOnTheFly=false; m_bNeuralFoilOTF=false;}}
+        bool isViscInterpolated() const {return !m_bViscOnTheFly;}
+        void setViscInterpolated(bool b) {if(b) m_bViscOnTheFly=false;}
 
-        bool isViscOnTheFly() const {return m_bViscOnTheFly && !m_bNeuralFoilOTF;}
-        void setViscOnTheFly(bool b) {m_bViscOnTheFly=b; if(b) m_bNeuralFoilOTF=false;}
-
-        bool isNeuralFoilOTF() const {return m_bNeuralFoilOTF && !m_bNeuralFoilInterp;}
-        void setNeuralFoilOTF(bool b) {m_bNeuralFoilOTF=b; if(b) {m_bViscOnTheFly=false; m_bNeuralFoilInterp=false;}}
-
-        bool isNeuralFoilInterpolated() const {return m_bNeuralFoilOTF && m_bNeuralFoilInterp;}
-        void setNeuralFoilInterpolated(bool b) {m_bNeuralFoilInterp=b; if(b) {m_bNeuralFoilOTF=true; m_bViscOnTheFly=false;}}
-
-        int neuralFoilModelSize() const {return m_NFModelSize;}
-        void setNeuralFoilModelSize(int size) {m_NFModelSize=size;}
+        bool isViscOnTheFly() const {return m_bViscOnTheFly;}
+        void setViscOnTheFly(bool b) {m_bViscOnTheFly=b;}
 
         bool isViscFromCl() const {return m_bViscFromCl;}
         void setViscFromCl(bool bFromCl) {m_bViscFromCl=bFromCl;}
@@ -275,14 +266,11 @@ class FL5LIB_EXPORT Polar3d : public XflObject
 
         bool     m_bViscous;           /**< true if the analysis is viscous */
         bool     m_bViscOnTheFly;      /**< true if XFoil on the fly viscous, false if interpolated */
-        bool     m_bNeuralFoilOTF;     /**< true if NeuralFoil viscous calculations enabled */
-        bool     m_bNeuralFoilInterp;  /**< true if NeuralFoil uses interpolated polars, false for on-the-fly */
         bool     m_bViscFromCl;        /**< true if the viscous properties are interpolated from the lift coefficient, i.e. xflr5 method */
         double   m_NCrit;              /**< the 2d free transition parameter for on the fly viscous calculations */
         double   m_XTrTop;             /**< the 2d forced top transition location for on the fly viscous calculations; unit is (x/c) */
         double   m_XTrBot;             /**< the 2d forced bottom transition location for on the fly viscous calculations; unit is (x/c) */
         bool     m_bTransAtHinge;      /**< if true forces the laminar to turbulent transition at the location of the foil's hinge */
-        int      m_NFModelSize;        /**< NeuralFoil model size index (0=xxsmall to 7=xxxlarge), default 5=xlarge */
 
         double   m_BetaSpec;           /**< The sideslip angle for type 1,2, 4 polars */
         double   m_BankAngle;          /**< The bank angle */

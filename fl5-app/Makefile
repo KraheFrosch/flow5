@@ -16,7 +16,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x060000 -DOPENBLAS -DQT_NO_DEBUG -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O3 -D_REENTRANT -Wall -Wextra $(DEFINES)
-CXXFLAGS      = -pipe -O3 -std=gnu++1z -D_REENTRANT -Wall -Wextra $(DEFINES)
+CXXFLAGS      = -pipe -O3 -std=gnu++2a -D_REENTRANT -Wall -Wextra $(DEFINES)
 INCPATH       = -I. -I../XFoil-lib -I../fl5-lib -I../fl5-lib/api -I/usr/local/include/opencascade/ -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -Imoc -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake6
 DEL_FILE      = rm -f
@@ -40,7 +40,7 @@ DISTNAME      = flow57.54
 DISTDIR = /home/luca/Loftimizer-V2/flow5/fl5-app/objects/flow57.54
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath-link,/usr/lib/x86_64-linux-gnu
-LIBS          = $(SUBLIBS) -llapack -llapacke -lopenblas -L/usr/local/lib/ -lgmsh -L../XFoil-lib -lXFoil -L../fl5-lib -lfl5-lib -lTKBRep -lTKBO -lTKG3d -lTKGeomAlgo -lTKGeomBase -lTKLCAF -lTKMath -lTKMesh -lTKOffset -lTKPrim -lTKDESTEP -lTKShHealing -lTKTopAlgo -lTKXSBase -lTKernel -lTKBool -lTKG2d -lTKCDF -lTKFillet -lpthread /usr/lib/x86_64-linux-gnu/libQt6OpenGLWidgets.so /usr/lib/x86_64-linux-gnu/libQt6OpenGL.so /usr/lib/x86_64-linux-gnu/libQt6Widgets.so /usr/lib/x86_64-linux-gnu/libQt6Gui.so /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libQt6Xml.so /usr/lib/x86_64-linux-gnu/libQt6Core.so -lGLX -lOpenGL   
+LIBS          = $(SUBLIBS) -llapack -llapacke -lopenblas -L/usr/local/lib/ -L/usr/local/lib64 -lgmsh -L../XFoil-lib -lXFoil -L../fl5-lib -lfl5-lib -lTKBRep -lTKBO -lTKG3d -lTKGeomAlgo -lTKGeomBase -lTKLCAF -lTKMath -lTKMesh -lTKOffset -lTKPrim -lTKDESTEP -lTKShHealing -lTKTopAlgo -lTKXSBase -lTKernel -lTKBool -lTKG2d -lTKCDF -lTKFillet -lpthread /usr/lib/x86_64-linux-gnu/libQt6OpenGLWidgets.so /usr/lib/x86_64-linux-gnu/libQt6OpenGL.so /usr/lib/x86_64-linux-gnu/libQt6Widgets.so /usr/lib/x86_64-linux-gnu/libQt6Gui.so /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libQt6Xml.so /usr/lib/x86_64-linux-gnu/libQt6Core.so -lGLX -lOpenGL   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -444,12 +444,16 @@ SOURCES       = core/displayoptions.cpp \
 		moc/moc_planestlinertiadlg.cpp \
 		moc/moc_planexflinertiadlg.cpp \
 		moc/moc_pointmasstable.cpp \
+		moc/moc_objecttreeview.cpp \
 		moc/moc_planedlg.cpp \
 		moc/moc_planepartdelegate.cpp \
 		moc/moc_planepartmodel.cpp \
 		moc/moc_planestldlg.cpp \
 		moc/moc_planexfldlg.cpp \
+		moc/moc_rotatedlg.cpp \
+		moc/moc_scaledlg.cpp \
 		moc/moc_shapedlg.cpp \
+		moc/moc_translatedlg.cpp \
 		moc/moc_wingdefdlg.cpp \
 		moc/moc_wingdlg.cpp \
 		moc/moc_wingobjectdlg.cpp \
@@ -577,6 +581,7 @@ SOURCES       = core/displayoptions.cpp \
 		moc/moc_stabtimectrls.cpp \
 		moc/moc_targetcurvedlg.cpp \
 		moc/moc_wingseldlg.cpp \
+		moc/moc_xplanewt.cpp \
 		moc/moc_gl3dxplaneview.cpp \
 		moc/moc_cpgraphctrls.cpp \
 		moc/moc_cpviewwt.cpp \
@@ -1005,12 +1010,16 @@ OBJECTS       = objects/displayoptions.o \
 		objects/moc_planestlinertiadlg.o \
 		objects/moc_planexflinertiadlg.o \
 		objects/moc_pointmasstable.o \
+		objects/moc_objecttreeview.o \
 		objects/moc_planedlg.o \
 		objects/moc_planepartdelegate.o \
 		objects/moc_planepartmodel.o \
 		objects/moc_planestldlg.o \
 		objects/moc_planexfldlg.o \
+		objects/moc_rotatedlg.o \
+		objects/moc_scaledlg.o \
 		objects/moc_shapedlg.o \
+		objects/moc_translatedlg.o \
 		objects/moc_wingdefdlg.o \
 		objects/moc_wingdlg.o \
 		objects/moc_wingobjectdlg.o \
@@ -1138,6 +1147,7 @@ OBJECTS       = objects/displayoptions.o \
 		objects/moc_stabtimectrls.o \
 		objects/moc_targetcurvedlg.o \
 		objects/moc_wingseldlg.o \
+		objects/moc_xplanewt.o \
 		objects/moc_gl3dxplaneview.o \
 		objects/moc_cpgraphctrls.o \
 		objects/moc_cpviewwt.o \
@@ -2383,14 +2393,14 @@ compiler_moc_predefs_make_all: moc/moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc/moc_predefs.h
 moc/moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O3 -std=gnu++1z -D_REENTRANT -Wall -Wextra -dM -E -o moc/moc_predefs.h /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
+	g++ -pipe -O3 -std=gnu++2a -D_REENTRANT -Wall -Wextra -dM -E -o moc/moc_predefs.h /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc/moc_stlreaderdlg.cpp moc/moc_aboutf5.cpp moc/moc_creditsdlg.cpp moc/moc_mainframe.cpp moc/moc_analysisrangetable.cpp moc/moc_t8rangetable.cpp moc/moc_w3dprefs.cpp moc/moc_splineapproxdlg.cpp moc/moc_splinectrl.cpp moc/moc_splinefoilctrls.cpp moc/moc_crossflowctrls.cpp moc/moc_flowctrls.cpp moc/moc_opp3dscalesctrls.cpp moc/moc_streamlinesctrls.cpp moc/moc_t1234578polardlg.cpp moc/moc_sailnurbsdlg.cpp moc/moc_sailoccdlg.cpp moc/moc_sailsplinedlg.cpp moc/moc_sailstldlg.cpp moc/moc_sailwingdlg.cpp moc/moc_analysisseldlg.cpp moc/moc_foilpolardlg.cpp moc/moc_polarautonamedlg.cpp moc/moc_aerodatadlg.cpp moc/moc_btpolarautonamedlg.cpp moc/moc_btpolardlg.cpp moc/moc_extradragdlg.cpp moc/moc_extradragwt.cpp moc/moc_planepolardlg.cpp moc/moc_polar3ddlg.cpp moc/moc_t6polardlg.cpp moc/moc_wpolarautonamedlg.cpp moc/moc_boatdlg.cpp moc/moc_externalsaildlg.cpp moc/moc_thinsaildlg.cpp moc/moc_sailcadreaderdlg.cpp moc/moc_saildlg.cpp moc/moc_sailscaledlg.cpp moc/moc_sailsectionview.cpp moc/moc_wingsailsectionmodel.cpp moc/moc_editplrdlg.cpp moc/moc_foil1splinedlg.cpp moc/moc_foil2splinedlg.cpp moc/moc_foilcamberdlg.cpp moc/moc_foilcoorddlg.cpp moc/moc_foildlg.cpp moc/moc_foilflapdlg.cpp moc/moc_foilledlg.cpp moc/moc_foilnacadlg.cpp moc/moc_foilnormalizedlg.cpp moc/moc_foilrepaneldlg.cpp moc/moc_foilscaledlg.cpp moc/moc_foiltegapdlg.cpp moc/moc_foilwt.cpp moc/moc_interpolatefoilsdlg.cpp moc/moc_bodyscaledlg.cpp moc/moc_bodytransdlg.cpp moc/moc_flatfaceconverterdlg.cpp moc/moc_fusedlg.cpp moc/moc_fusemesherdlg.cpp moc/moc_fuseoccdlg.cpp moc/moc_fusestldlg.cpp moc/moc_shapefixerdlg.cpp moc/moc_fuseframewt.cpp moc/moc_fuselinewt.cpp moc/moc_fusexfldefdlg.cpp moc/moc_fusexfldlg.cpp moc/moc_fusexflobjectdlg.cpp moc/moc_importobjectdlg.cpp moc/moc_partinertiadelegate.cpp moc/moc_partinertiadlg.cpp moc/moc_partinertiamodel.cpp moc/moc_planeinertiadlg.cpp moc/moc_planeinertiamodel.cpp moc/moc_planestlinertiadlg.cpp moc/moc_planexflinertiadlg.cpp moc/moc_pointmasstable.cpp moc/moc_planedlg.cpp moc/moc_planepartdelegate.cpp moc/moc_planepartmodel.cpp moc/moc_planestldlg.cpp moc/moc_planexfldlg.cpp moc/moc_shapedlg.cpp moc/moc_wingdefdlg.cpp moc/moc_wingdlg.cpp moc/moc_wingobjectdlg.cpp moc/moc_wingscaledlg.cpp moc/moc_cadexportdlg.cpp moc/moc_stlwriterdlg.cpp moc/moc_wingexportdlg.cpp moc/moc_fastgraphwt.cpp moc/moc_graphwt.cpp moc/moc_legendwt.cpp moc/moc_splinedgraphwt.cpp moc/moc_graphdlg.cpp moc/moc_graphoptions.cpp moc/moc_graphtilectrls.cpp moc/moc_graphtiles.cpp moc/moc_afmesher.cpp moc/moc_gmesher.cpp moc/moc_gmesherwt.cpp moc/moc_gmshctrlswt.cpp moc/moc_mesherwt.cpp moc/moc_occtessctrlswt.cpp moc/moc_panelcheckdlg.cpp moc/moc_tesscontrolsdlg.cpp moc/moc_gl3dgeomcontrols.cpp moc/moc_fine3dcontrols.cpp moc/moc_gl3dcontrols.cpp moc/moc_gllightdlg.cpp moc/moc_gl3dboatview.cpp moc/moc_gl3doptimxflview.cpp moc/moc_gl3dplanestlview.cpp moc/moc_gl3dplanexflview.cpp moc/moc_gl3dsailview.cpp moc/moc_gl3dxflview.cpp moc/moc_opengldlg.cpp moc/moc_gl2dcomplex.cpp moc/moc_gl2dfractal.cpp moc/moc_gl2dnewton.cpp moc/moc_gl2dquat.cpp moc/moc_gl3dattractors.cpp moc/moc_gl3dboids.cpp moc/moc_gl3dboids2.cpp moc/moc_gl3dflowvtx.cpp moc/moc_gl3dhydrogen.cpp moc/moc_gl3dlorenz.cpp moc/moc_gl3dlorenz2.cpp moc/moc_gl3dquat.cpp moc/moc_gl3dsagittarius.cpp moc/moc_gl3dshadow.cpp moc/moc_gl3dsolarsys.cpp moc/moc_gl3dspace.cpp moc/moc_gl3dtestglview.cpp moc/moc_gl3dtexture.cpp moc/moc_gl2dview.cpp moc/moc_gl3dview.cpp moc/moc_optimplanedlg.cpp moc/moc_psotask.cpp moc/moc_xflexecutor.cpp moc/moc_colorbtn.cpp moc/moc_colorgraddlg.cpp moc/moc_textclrbtn.cpp moc/moc_gridsettingsdlg.cpp moc/moc_helpimgdlg.cpp moc/moc_imagedlg.cpp moc/moc_intvaluesdlg.cpp moc/moc_logmessagedlg.cpp moc/moc_moddlg.cpp moc/moc_newnamedlg.cpp moc/moc_objectpropsdlg.cpp moc/moc_renamedlg.cpp moc/moc_selectiondlg.cpp moc/moc_separatorsdlg.cpp moc/moc_stringvaluedlg.cpp moc/moc_textdlg.cpp moc/moc_xfldialog.cpp moc/moc_actionitemmodel.cpp moc/moc_cptableview.cpp moc/moc_crosscheckbox.cpp moc/moc_ctrltabledelegate.cpp moc/moc_floatedit.cpp moc/moc_formattextoutput.cpp moc/moc_gridcontrol.cpp moc/moc_intedit.cpp moc/moc_logwt.cpp moc/moc_numedit.cpp moc/moc_plaintextoutput.cpp moc/moc_popup.cpp moc/moc_xfldelegate.cpp moc/moc_legendbtn.cpp moc/moc_lineaction.cpp moc/moc_linebtn.cpp moc/moc_linecbbox.cpp moc/moc_linemenu.cpp moc/moc_linepicker.cpp moc/moc_expandabletreeview.cpp moc/moc_objecttreemodel.cpp moc/moc_section2doptions.cpp moc/moc_section2dwt.cpp moc/moc_analysis2dsettings.cpp moc/moc_batchaltdlg.cpp moc/moc_batchdlg.cpp moc/moc_batchxfoildlg.cpp moc/moc_xfoilanalysisdlg.cpp moc/moc_analysis2dctrls.cpp moc/moc_foilexplorer.cpp moc/moc_foiltable.cpp moc/moc_lecircledlg.cpp moc/moc_oppointctrls.cpp moc/moc_blgraphctrls.cpp moc/moc_xdirectlegendwt.cpp moc/moc_xdirectactions.cpp moc/moc_foilplrlistdlg.cpp moc/moc_dfoillegendwt.cpp moc/moc_dfoilwt.cpp moc/moc_oppointwt.cpp moc/moc_xdirect.cpp moc/moc_analysis3dsettings.cpp moc/moc_batchplanedlg.cpp moc/moc_batchxmldlg.cpp moc/moc_lltanalysisdlg.cpp moc/moc_planeanalysisdlg.cpp moc/moc_analysis3dctrls.cpp moc/moc_planeexplorer.cpp moc/moc_popp3dctrls.cpp moc/moc_stab3dctrls.cpp moc/moc_stabtimectrls.cpp moc/moc_targetcurvedlg.cpp moc/moc_wingseldlg.cpp moc/moc_gl3dxplaneview.cpp moc/moc_cpgraphctrls.cpp moc/moc_cpviewwt.cpp moc/moc_poppgraphctrls.cpp moc/moc_xplanelegendwt.cpp moc/moc_xplaneactions.cpp moc/moc_xplane.cpp moc/moc_boatanalysisdlg.cpp moc/moc_boatexplorer.cpp moc/moc_xsailanalysisctrls.cpp moc/moc_xsaildisplayctrls.cpp moc/moc_xsailactions.cpp moc/moc_gl3dxsailview.cpp moc/moc_xsaillegendwt.cpp moc/moc_xsail.cpp moc/moc_prefsdlg.cpp moc/moc_saveoptionswt.cpp moc/moc_unitswt.cpp moc/moc_gl3daxesview.cpp moc/moc_gl3dcontourview.cpp moc/moc_gl3dflightview.cpp moc/moc_gl3doptim2d.cpp moc/moc_gl3dpanelfield.cpp moc/moc_gl3dquadfield.cpp moc/moc_gl3dsingularity.cpp moc/moc_gl3dsurfaceplot.cpp moc/moc_gl3dvortonfield.cpp moc/moc_threadtestdlg.cpp moc/moc_attractor2d.cpp moc/moc_onevortontestdlg.cpp moc/moc_panel3testdlg.cpp moc/moc_panelanalysistest.cpp moc/moc_textoutputtestdlg.cpp moc/moc_vortontestdlg.cpp moc/moc_streamtestdlg.cpp
+compiler_moc_header_make_all: moc/moc_stlreaderdlg.cpp moc/moc_aboutf5.cpp moc/moc_creditsdlg.cpp moc/moc_mainframe.cpp moc/moc_analysisrangetable.cpp moc/moc_t8rangetable.cpp moc/moc_w3dprefs.cpp moc/moc_splineapproxdlg.cpp moc/moc_splinectrl.cpp moc/moc_splinefoilctrls.cpp moc/moc_crossflowctrls.cpp moc/moc_flowctrls.cpp moc/moc_opp3dscalesctrls.cpp moc/moc_streamlinesctrls.cpp moc/moc_t1234578polardlg.cpp moc/moc_sailnurbsdlg.cpp moc/moc_sailoccdlg.cpp moc/moc_sailsplinedlg.cpp moc/moc_sailstldlg.cpp moc/moc_sailwingdlg.cpp moc/moc_analysisseldlg.cpp moc/moc_foilpolardlg.cpp moc/moc_polarautonamedlg.cpp moc/moc_aerodatadlg.cpp moc/moc_btpolarautonamedlg.cpp moc/moc_btpolardlg.cpp moc/moc_extradragdlg.cpp moc/moc_extradragwt.cpp moc/moc_planepolardlg.cpp moc/moc_polar3ddlg.cpp moc/moc_t6polardlg.cpp moc/moc_wpolarautonamedlg.cpp moc/moc_boatdlg.cpp moc/moc_externalsaildlg.cpp moc/moc_thinsaildlg.cpp moc/moc_sailcadreaderdlg.cpp moc/moc_saildlg.cpp moc/moc_sailscaledlg.cpp moc/moc_sailsectionview.cpp moc/moc_wingsailsectionmodel.cpp moc/moc_editplrdlg.cpp moc/moc_foil1splinedlg.cpp moc/moc_foil2splinedlg.cpp moc/moc_foilcamberdlg.cpp moc/moc_foilcoorddlg.cpp moc/moc_foildlg.cpp moc/moc_foilflapdlg.cpp moc/moc_foilledlg.cpp moc/moc_foilnacadlg.cpp moc/moc_foilnormalizedlg.cpp moc/moc_foilrepaneldlg.cpp moc/moc_foilscaledlg.cpp moc/moc_foiltegapdlg.cpp moc/moc_foilwt.cpp moc/moc_interpolatefoilsdlg.cpp moc/moc_bodyscaledlg.cpp moc/moc_bodytransdlg.cpp moc/moc_flatfaceconverterdlg.cpp moc/moc_fusedlg.cpp moc/moc_fusemesherdlg.cpp moc/moc_fuseoccdlg.cpp moc/moc_fusestldlg.cpp moc/moc_shapefixerdlg.cpp moc/moc_fuseframewt.cpp moc/moc_fuselinewt.cpp moc/moc_fusexfldefdlg.cpp moc/moc_fusexfldlg.cpp moc/moc_fusexflobjectdlg.cpp moc/moc_importobjectdlg.cpp moc/moc_partinertiadelegate.cpp moc/moc_partinertiadlg.cpp moc/moc_partinertiamodel.cpp moc/moc_planeinertiadlg.cpp moc/moc_planeinertiamodel.cpp moc/moc_planestlinertiadlg.cpp moc/moc_planexflinertiadlg.cpp moc/moc_pointmasstable.cpp moc/moc_objecttreeview.cpp moc/moc_planedlg.cpp moc/moc_planepartdelegate.cpp moc/moc_planepartmodel.cpp moc/moc_planestldlg.cpp moc/moc_planexfldlg.cpp moc/moc_rotatedlg.cpp moc/moc_scaledlg.cpp moc/moc_shapedlg.cpp moc/moc_translatedlg.cpp moc/moc_wingdefdlg.cpp moc/moc_wingdlg.cpp moc/moc_wingobjectdlg.cpp moc/moc_wingscaledlg.cpp moc/moc_cadexportdlg.cpp moc/moc_stlwriterdlg.cpp moc/moc_wingexportdlg.cpp moc/moc_fastgraphwt.cpp moc/moc_graphwt.cpp moc/moc_legendwt.cpp moc/moc_splinedgraphwt.cpp moc/moc_graphdlg.cpp moc/moc_graphoptions.cpp moc/moc_graphtilectrls.cpp moc/moc_graphtiles.cpp moc/moc_afmesher.cpp moc/moc_gmesher.cpp moc/moc_gmesherwt.cpp moc/moc_gmshctrlswt.cpp moc/moc_mesherwt.cpp moc/moc_occtessctrlswt.cpp moc/moc_panelcheckdlg.cpp moc/moc_tesscontrolsdlg.cpp moc/moc_gl3dgeomcontrols.cpp moc/moc_fine3dcontrols.cpp moc/moc_gl3dcontrols.cpp moc/moc_gllightdlg.cpp moc/moc_gl3dboatview.cpp moc/moc_gl3doptimxflview.cpp moc/moc_gl3dplanestlview.cpp moc/moc_gl3dplanexflview.cpp moc/moc_gl3dsailview.cpp moc/moc_gl3dxflview.cpp moc/moc_opengldlg.cpp moc/moc_gl2dcomplex.cpp moc/moc_gl2dfractal.cpp moc/moc_gl2dnewton.cpp moc/moc_gl2dquat.cpp moc/moc_gl3dattractors.cpp moc/moc_gl3dboids.cpp moc/moc_gl3dboids2.cpp moc/moc_gl3dflowvtx.cpp moc/moc_gl3dhydrogen.cpp moc/moc_gl3dlorenz.cpp moc/moc_gl3dlorenz2.cpp moc/moc_gl3dquat.cpp moc/moc_gl3dsagittarius.cpp moc/moc_gl3dshadow.cpp moc/moc_gl3dsolarsys.cpp moc/moc_gl3dspace.cpp moc/moc_gl3dtestglview.cpp moc/moc_gl3dtexture.cpp moc/moc_gl2dview.cpp moc/moc_gl3dview.cpp moc/moc_optimplanedlg.cpp moc/moc_psotask.cpp moc/moc_xflexecutor.cpp moc/moc_colorbtn.cpp moc/moc_colorgraddlg.cpp moc/moc_textclrbtn.cpp moc/moc_gridsettingsdlg.cpp moc/moc_helpimgdlg.cpp moc/moc_imagedlg.cpp moc/moc_intvaluesdlg.cpp moc/moc_logmessagedlg.cpp moc/moc_moddlg.cpp moc/moc_newnamedlg.cpp moc/moc_objectpropsdlg.cpp moc/moc_renamedlg.cpp moc/moc_selectiondlg.cpp moc/moc_separatorsdlg.cpp moc/moc_stringvaluedlg.cpp moc/moc_textdlg.cpp moc/moc_xfldialog.cpp moc/moc_actionitemmodel.cpp moc/moc_cptableview.cpp moc/moc_crosscheckbox.cpp moc/moc_ctrltabledelegate.cpp moc/moc_floatedit.cpp moc/moc_formattextoutput.cpp moc/moc_gridcontrol.cpp moc/moc_intedit.cpp moc/moc_logwt.cpp moc/moc_numedit.cpp moc/moc_plaintextoutput.cpp moc/moc_popup.cpp moc/moc_xfldelegate.cpp moc/moc_legendbtn.cpp moc/moc_lineaction.cpp moc/moc_linebtn.cpp moc/moc_linecbbox.cpp moc/moc_linemenu.cpp moc/moc_linepicker.cpp moc/moc_expandabletreeview.cpp moc/moc_objecttreemodel.cpp moc/moc_section2doptions.cpp moc/moc_section2dwt.cpp moc/moc_analysis2dsettings.cpp moc/moc_batchaltdlg.cpp moc/moc_batchdlg.cpp moc/moc_batchxfoildlg.cpp moc/moc_xfoilanalysisdlg.cpp moc/moc_analysis2dctrls.cpp moc/moc_foilexplorer.cpp moc/moc_foiltable.cpp moc/moc_lecircledlg.cpp moc/moc_oppointctrls.cpp moc/moc_blgraphctrls.cpp moc/moc_xdirectlegendwt.cpp moc/moc_xdirectactions.cpp moc/moc_foilplrlistdlg.cpp moc/moc_dfoillegendwt.cpp moc/moc_dfoilwt.cpp moc/moc_oppointwt.cpp moc/moc_xdirect.cpp moc/moc_analysis3dsettings.cpp moc/moc_batchplanedlg.cpp moc/moc_batchxmldlg.cpp moc/moc_lltanalysisdlg.cpp moc/moc_planeanalysisdlg.cpp moc/moc_analysis3dctrls.cpp moc/moc_planeexplorer.cpp moc/moc_popp3dctrls.cpp moc/moc_stab3dctrls.cpp moc/moc_stabtimectrls.cpp moc/moc_targetcurvedlg.cpp moc/moc_wingseldlg.cpp moc/moc_xplanewt.cpp moc/moc_gl3dxplaneview.cpp moc/moc_cpgraphctrls.cpp moc/moc_cpviewwt.cpp moc/moc_poppgraphctrls.cpp moc/moc_xplanelegendwt.cpp moc/moc_xplaneactions.cpp moc/moc_xplane.cpp moc/moc_boatanalysisdlg.cpp moc/moc_boatexplorer.cpp moc/moc_xsailanalysisctrls.cpp moc/moc_xsaildisplayctrls.cpp moc/moc_xsailactions.cpp moc/moc_gl3dxsailview.cpp moc/moc_xsaillegendwt.cpp moc/moc_xsail.cpp moc/moc_prefsdlg.cpp moc/moc_saveoptionswt.cpp moc/moc_unitswt.cpp moc/moc_gl3daxesview.cpp moc/moc_gl3dcontourview.cpp moc/moc_gl3dflightview.cpp moc/moc_gl3doptim2d.cpp moc/moc_gl3dpanelfield.cpp moc/moc_gl3dquadfield.cpp moc/moc_gl3dsingularity.cpp moc/moc_gl3dsurfaceplot.cpp moc/moc_gl3dvortonfield.cpp moc/moc_threadtestdlg.cpp moc/moc_attractor2d.cpp moc/moc_onevortontestdlg.cpp moc/moc_panel3testdlg.cpp moc/moc_panelanalysistest.cpp moc/moc_textoutputtestdlg.cpp moc/moc_vortontestdlg.cpp moc/moc_streamtestdlg.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc/moc_stlreaderdlg.cpp moc/moc_aboutf5.cpp moc/moc_creditsdlg.cpp moc/moc_mainframe.cpp moc/moc_analysisrangetable.cpp moc/moc_t8rangetable.cpp moc/moc_w3dprefs.cpp moc/moc_splineapproxdlg.cpp moc/moc_splinectrl.cpp moc/moc_splinefoilctrls.cpp moc/moc_crossflowctrls.cpp moc/moc_flowctrls.cpp moc/moc_opp3dscalesctrls.cpp moc/moc_streamlinesctrls.cpp moc/moc_t1234578polardlg.cpp moc/moc_sailnurbsdlg.cpp moc/moc_sailoccdlg.cpp moc/moc_sailsplinedlg.cpp moc/moc_sailstldlg.cpp moc/moc_sailwingdlg.cpp moc/moc_analysisseldlg.cpp moc/moc_foilpolardlg.cpp moc/moc_polarautonamedlg.cpp moc/moc_aerodatadlg.cpp moc/moc_btpolarautonamedlg.cpp moc/moc_btpolardlg.cpp moc/moc_extradragdlg.cpp moc/moc_extradragwt.cpp moc/moc_planepolardlg.cpp moc/moc_polar3ddlg.cpp moc/moc_t6polardlg.cpp moc/moc_wpolarautonamedlg.cpp moc/moc_boatdlg.cpp moc/moc_externalsaildlg.cpp moc/moc_thinsaildlg.cpp moc/moc_sailcadreaderdlg.cpp moc/moc_saildlg.cpp moc/moc_sailscaledlg.cpp moc/moc_sailsectionview.cpp moc/moc_wingsailsectionmodel.cpp moc/moc_editplrdlg.cpp moc/moc_foil1splinedlg.cpp moc/moc_foil2splinedlg.cpp moc/moc_foilcamberdlg.cpp moc/moc_foilcoorddlg.cpp moc/moc_foildlg.cpp moc/moc_foilflapdlg.cpp moc/moc_foilledlg.cpp moc/moc_foilnacadlg.cpp moc/moc_foilnormalizedlg.cpp moc/moc_foilrepaneldlg.cpp moc/moc_foilscaledlg.cpp moc/moc_foiltegapdlg.cpp moc/moc_foilwt.cpp moc/moc_interpolatefoilsdlg.cpp moc/moc_bodyscaledlg.cpp moc/moc_bodytransdlg.cpp moc/moc_flatfaceconverterdlg.cpp moc/moc_fusedlg.cpp moc/moc_fusemesherdlg.cpp moc/moc_fuseoccdlg.cpp moc/moc_fusestldlg.cpp moc/moc_shapefixerdlg.cpp moc/moc_fuseframewt.cpp moc/moc_fuselinewt.cpp moc/moc_fusexfldefdlg.cpp moc/moc_fusexfldlg.cpp moc/moc_fusexflobjectdlg.cpp moc/moc_importobjectdlg.cpp moc/moc_partinertiadelegate.cpp moc/moc_partinertiadlg.cpp moc/moc_partinertiamodel.cpp moc/moc_planeinertiadlg.cpp moc/moc_planeinertiamodel.cpp moc/moc_planestlinertiadlg.cpp moc/moc_planexflinertiadlg.cpp moc/moc_pointmasstable.cpp moc/moc_planedlg.cpp moc/moc_planepartdelegate.cpp
-	-$(DEL_FILE) moc/moc_planepartmodel.cpp moc/moc_planestldlg.cpp moc/moc_planexfldlg.cpp moc/moc_shapedlg.cpp moc/moc_wingdefdlg.cpp moc/moc_wingdlg.cpp moc/moc_wingobjectdlg.cpp moc/moc_wingscaledlg.cpp moc/moc_cadexportdlg.cpp moc/moc_stlwriterdlg.cpp moc/moc_wingexportdlg.cpp moc/moc_fastgraphwt.cpp moc/moc_graphwt.cpp moc/moc_legendwt.cpp moc/moc_splinedgraphwt.cpp moc/moc_graphdlg.cpp moc/moc_graphoptions.cpp moc/moc_graphtilectrls.cpp moc/moc_graphtiles.cpp moc/moc_afmesher.cpp moc/moc_gmesher.cpp moc/moc_gmesherwt.cpp moc/moc_gmshctrlswt.cpp moc/moc_mesherwt.cpp moc/moc_occtessctrlswt.cpp moc/moc_panelcheckdlg.cpp moc/moc_tesscontrolsdlg.cpp moc/moc_gl3dgeomcontrols.cpp moc/moc_fine3dcontrols.cpp moc/moc_gl3dcontrols.cpp moc/moc_gllightdlg.cpp moc/moc_gl3dboatview.cpp moc/moc_gl3doptimxflview.cpp moc/moc_gl3dplanestlview.cpp moc/moc_gl3dplanexflview.cpp moc/moc_gl3dsailview.cpp moc/moc_gl3dxflview.cpp moc/moc_opengldlg.cpp moc/moc_gl2dcomplex.cpp moc/moc_gl2dfractal.cpp moc/moc_gl2dnewton.cpp moc/moc_gl2dquat.cpp moc/moc_gl3dattractors.cpp moc/moc_gl3dboids.cpp moc/moc_gl3dboids2.cpp moc/moc_gl3dflowvtx.cpp moc/moc_gl3dhydrogen.cpp moc/moc_gl3dlorenz.cpp moc/moc_gl3dlorenz2.cpp moc/moc_gl3dquat.cpp moc/moc_gl3dsagittarius.cpp moc/moc_gl3dshadow.cpp moc/moc_gl3dsolarsys.cpp moc/moc_gl3dspace.cpp moc/moc_gl3dtestglview.cpp moc/moc_gl3dtexture.cpp moc/moc_gl2dview.cpp moc/moc_gl3dview.cpp moc/moc_optimplanedlg.cpp moc/moc_psotask.cpp moc/moc_xflexecutor.cpp moc/moc_colorbtn.cpp moc/moc_colorgraddlg.cpp moc/moc_textclrbtn.cpp moc/moc_gridsettingsdlg.cpp moc/moc_helpimgdlg.cpp moc/moc_imagedlg.cpp moc/moc_intvaluesdlg.cpp moc/moc_logmessagedlg.cpp moc/moc_moddlg.cpp moc/moc_newnamedlg.cpp moc/moc_objectpropsdlg.cpp moc/moc_renamedlg.cpp moc/moc_selectiondlg.cpp moc/moc_separatorsdlg.cpp moc/moc_stringvaluedlg.cpp moc/moc_textdlg.cpp moc/moc_xfldialog.cpp moc/moc_actionitemmodel.cpp moc/moc_cptableview.cpp moc/moc_crosscheckbox.cpp moc/moc_ctrltabledelegate.cpp moc/moc_floatedit.cpp moc/moc_formattextoutput.cpp
-	-$(DEL_FILE) moc/moc_gridcontrol.cpp moc/moc_intedit.cpp moc/moc_logwt.cpp moc/moc_numedit.cpp moc/moc_plaintextoutput.cpp moc/moc_popup.cpp moc/moc_xfldelegate.cpp moc/moc_legendbtn.cpp moc/moc_lineaction.cpp moc/moc_linebtn.cpp moc/moc_linecbbox.cpp moc/moc_linemenu.cpp moc/moc_linepicker.cpp moc/moc_expandabletreeview.cpp moc/moc_objecttreemodel.cpp moc/moc_section2doptions.cpp moc/moc_section2dwt.cpp moc/moc_analysis2dsettings.cpp moc/moc_batchaltdlg.cpp moc/moc_batchdlg.cpp moc/moc_batchxfoildlg.cpp moc/moc_xfoilanalysisdlg.cpp moc/moc_analysis2dctrls.cpp moc/moc_foilexplorer.cpp moc/moc_foiltable.cpp moc/moc_lecircledlg.cpp moc/moc_oppointctrls.cpp moc/moc_blgraphctrls.cpp moc/moc_xdirectlegendwt.cpp moc/moc_xdirectactions.cpp moc/moc_foilplrlistdlg.cpp moc/moc_dfoillegendwt.cpp moc/moc_dfoilwt.cpp moc/moc_oppointwt.cpp moc/moc_xdirect.cpp moc/moc_analysis3dsettings.cpp moc/moc_batchplanedlg.cpp moc/moc_batchxmldlg.cpp moc/moc_lltanalysisdlg.cpp moc/moc_planeanalysisdlg.cpp moc/moc_analysis3dctrls.cpp moc/moc_planeexplorer.cpp moc/moc_popp3dctrls.cpp moc/moc_stab3dctrls.cpp moc/moc_stabtimectrls.cpp moc/moc_targetcurvedlg.cpp moc/moc_wingseldlg.cpp moc/moc_gl3dxplaneview.cpp moc/moc_cpgraphctrls.cpp moc/moc_cpviewwt.cpp moc/moc_poppgraphctrls.cpp moc/moc_xplanelegendwt.cpp moc/moc_xplaneactions.cpp moc/moc_xplane.cpp moc/moc_boatanalysisdlg.cpp moc/moc_boatexplorer.cpp moc/moc_xsailanalysisctrls.cpp moc/moc_xsaildisplayctrls.cpp moc/moc_xsailactions.cpp moc/moc_gl3dxsailview.cpp moc/moc_xsaillegendwt.cpp moc/moc_xsail.cpp moc/moc_prefsdlg.cpp moc/moc_saveoptionswt.cpp moc/moc_unitswt.cpp moc/moc_gl3daxesview.cpp moc/moc_gl3dcontourview.cpp moc/moc_gl3dflightview.cpp moc/moc_gl3doptim2d.cpp moc/moc_gl3dpanelfield.cpp moc/moc_gl3dquadfield.cpp moc/moc_gl3dsingularity.cpp moc/moc_gl3dsurfaceplot.cpp moc/moc_gl3dvortonfield.cpp moc/moc_threadtestdlg.cpp moc/moc_attractor2d.cpp moc/moc_onevortontestdlg.cpp moc/moc_panel3testdlg.cpp moc/moc_panelanalysistest.cpp moc/moc_textoutputtestdlg.cpp
-	-$(DEL_FILE) moc/moc_vortontestdlg.cpp moc/moc_streamtestdlg.cpp
+	-$(DEL_FILE) moc/moc_stlreaderdlg.cpp moc/moc_aboutf5.cpp moc/moc_creditsdlg.cpp moc/moc_mainframe.cpp moc/moc_analysisrangetable.cpp moc/moc_t8rangetable.cpp moc/moc_w3dprefs.cpp moc/moc_splineapproxdlg.cpp moc/moc_splinectrl.cpp moc/moc_splinefoilctrls.cpp moc/moc_crossflowctrls.cpp moc/moc_flowctrls.cpp moc/moc_opp3dscalesctrls.cpp moc/moc_streamlinesctrls.cpp moc/moc_t1234578polardlg.cpp moc/moc_sailnurbsdlg.cpp moc/moc_sailoccdlg.cpp moc/moc_sailsplinedlg.cpp moc/moc_sailstldlg.cpp moc/moc_sailwingdlg.cpp moc/moc_analysisseldlg.cpp moc/moc_foilpolardlg.cpp moc/moc_polarautonamedlg.cpp moc/moc_aerodatadlg.cpp moc/moc_btpolarautonamedlg.cpp moc/moc_btpolardlg.cpp moc/moc_extradragdlg.cpp moc/moc_extradragwt.cpp moc/moc_planepolardlg.cpp moc/moc_polar3ddlg.cpp moc/moc_t6polardlg.cpp moc/moc_wpolarautonamedlg.cpp moc/moc_boatdlg.cpp moc/moc_externalsaildlg.cpp moc/moc_thinsaildlg.cpp moc/moc_sailcadreaderdlg.cpp moc/moc_saildlg.cpp moc/moc_sailscaledlg.cpp moc/moc_sailsectionview.cpp moc/moc_wingsailsectionmodel.cpp moc/moc_editplrdlg.cpp moc/moc_foil1splinedlg.cpp moc/moc_foil2splinedlg.cpp moc/moc_foilcamberdlg.cpp moc/moc_foilcoorddlg.cpp moc/moc_foildlg.cpp moc/moc_foilflapdlg.cpp moc/moc_foilledlg.cpp moc/moc_foilnacadlg.cpp moc/moc_foilnormalizedlg.cpp moc/moc_foilrepaneldlg.cpp moc/moc_foilscaledlg.cpp moc/moc_foiltegapdlg.cpp moc/moc_foilwt.cpp moc/moc_interpolatefoilsdlg.cpp moc/moc_bodyscaledlg.cpp moc/moc_bodytransdlg.cpp moc/moc_flatfaceconverterdlg.cpp moc/moc_fusedlg.cpp moc/moc_fusemesherdlg.cpp moc/moc_fuseoccdlg.cpp moc/moc_fusestldlg.cpp moc/moc_shapefixerdlg.cpp moc/moc_fuseframewt.cpp moc/moc_fuselinewt.cpp moc/moc_fusexfldefdlg.cpp moc/moc_fusexfldlg.cpp moc/moc_fusexflobjectdlg.cpp moc/moc_importobjectdlg.cpp moc/moc_partinertiadelegate.cpp moc/moc_partinertiadlg.cpp moc/moc_partinertiamodel.cpp moc/moc_planeinertiadlg.cpp moc/moc_planeinertiamodel.cpp moc/moc_planestlinertiadlg.cpp moc/moc_planexflinertiadlg.cpp moc/moc_pointmasstable.cpp moc/moc_objecttreeview.cpp moc/moc_planedlg.cpp
+	-$(DEL_FILE) moc/moc_planepartdelegate.cpp moc/moc_planepartmodel.cpp moc/moc_planestldlg.cpp moc/moc_planexfldlg.cpp moc/moc_rotatedlg.cpp moc/moc_scaledlg.cpp moc/moc_shapedlg.cpp moc/moc_translatedlg.cpp moc/moc_wingdefdlg.cpp moc/moc_wingdlg.cpp moc/moc_wingobjectdlg.cpp moc/moc_wingscaledlg.cpp moc/moc_cadexportdlg.cpp moc/moc_stlwriterdlg.cpp moc/moc_wingexportdlg.cpp moc/moc_fastgraphwt.cpp moc/moc_graphwt.cpp moc/moc_legendwt.cpp moc/moc_splinedgraphwt.cpp moc/moc_graphdlg.cpp moc/moc_graphoptions.cpp moc/moc_graphtilectrls.cpp moc/moc_graphtiles.cpp moc/moc_afmesher.cpp moc/moc_gmesher.cpp moc/moc_gmesherwt.cpp moc/moc_gmshctrlswt.cpp moc/moc_mesherwt.cpp moc/moc_occtessctrlswt.cpp moc/moc_panelcheckdlg.cpp moc/moc_tesscontrolsdlg.cpp moc/moc_gl3dgeomcontrols.cpp moc/moc_fine3dcontrols.cpp moc/moc_gl3dcontrols.cpp moc/moc_gllightdlg.cpp moc/moc_gl3dboatview.cpp moc/moc_gl3doptimxflview.cpp moc/moc_gl3dplanestlview.cpp moc/moc_gl3dplanexflview.cpp moc/moc_gl3dsailview.cpp moc/moc_gl3dxflview.cpp moc/moc_opengldlg.cpp moc/moc_gl2dcomplex.cpp moc/moc_gl2dfractal.cpp moc/moc_gl2dnewton.cpp moc/moc_gl2dquat.cpp moc/moc_gl3dattractors.cpp moc/moc_gl3dboids.cpp moc/moc_gl3dboids2.cpp moc/moc_gl3dflowvtx.cpp moc/moc_gl3dhydrogen.cpp moc/moc_gl3dlorenz.cpp moc/moc_gl3dlorenz2.cpp moc/moc_gl3dquat.cpp moc/moc_gl3dsagittarius.cpp moc/moc_gl3dshadow.cpp moc/moc_gl3dsolarsys.cpp moc/moc_gl3dspace.cpp moc/moc_gl3dtestglview.cpp moc/moc_gl3dtexture.cpp moc/moc_gl2dview.cpp moc/moc_gl3dview.cpp moc/moc_optimplanedlg.cpp moc/moc_psotask.cpp moc/moc_xflexecutor.cpp moc/moc_colorbtn.cpp moc/moc_colorgraddlg.cpp moc/moc_textclrbtn.cpp moc/moc_gridsettingsdlg.cpp moc/moc_helpimgdlg.cpp moc/moc_imagedlg.cpp moc/moc_intvaluesdlg.cpp moc/moc_logmessagedlg.cpp moc/moc_moddlg.cpp moc/moc_newnamedlg.cpp moc/moc_objectpropsdlg.cpp moc/moc_renamedlg.cpp moc/moc_selectiondlg.cpp moc/moc_separatorsdlg.cpp moc/moc_stringvaluedlg.cpp moc/moc_textdlg.cpp moc/moc_xfldialog.cpp moc/moc_actionitemmodel.cpp moc/moc_cptableview.cpp
+	-$(DEL_FILE) moc/moc_crosscheckbox.cpp moc/moc_ctrltabledelegate.cpp moc/moc_floatedit.cpp moc/moc_formattextoutput.cpp moc/moc_gridcontrol.cpp moc/moc_intedit.cpp moc/moc_logwt.cpp moc/moc_numedit.cpp moc/moc_plaintextoutput.cpp moc/moc_popup.cpp moc/moc_xfldelegate.cpp moc/moc_legendbtn.cpp moc/moc_lineaction.cpp moc/moc_linebtn.cpp moc/moc_linecbbox.cpp moc/moc_linemenu.cpp moc/moc_linepicker.cpp moc/moc_expandabletreeview.cpp moc/moc_objecttreemodel.cpp moc/moc_section2doptions.cpp moc/moc_section2dwt.cpp moc/moc_analysis2dsettings.cpp moc/moc_batchaltdlg.cpp moc/moc_batchdlg.cpp moc/moc_batchxfoildlg.cpp moc/moc_xfoilanalysisdlg.cpp moc/moc_analysis2dctrls.cpp moc/moc_foilexplorer.cpp moc/moc_foiltable.cpp moc/moc_lecircledlg.cpp moc/moc_oppointctrls.cpp moc/moc_blgraphctrls.cpp moc/moc_xdirectlegendwt.cpp moc/moc_xdirectactions.cpp moc/moc_foilplrlistdlg.cpp moc/moc_dfoillegendwt.cpp moc/moc_dfoilwt.cpp moc/moc_oppointwt.cpp moc/moc_xdirect.cpp moc/moc_analysis3dsettings.cpp moc/moc_batchplanedlg.cpp moc/moc_batchxmldlg.cpp moc/moc_lltanalysisdlg.cpp moc/moc_planeanalysisdlg.cpp moc/moc_analysis3dctrls.cpp moc/moc_planeexplorer.cpp moc/moc_popp3dctrls.cpp moc/moc_stab3dctrls.cpp moc/moc_stabtimectrls.cpp moc/moc_targetcurvedlg.cpp moc/moc_wingseldlg.cpp moc/moc_xplanewt.cpp moc/moc_gl3dxplaneview.cpp moc/moc_cpgraphctrls.cpp moc/moc_cpviewwt.cpp moc/moc_poppgraphctrls.cpp moc/moc_xplanelegendwt.cpp moc/moc_xplaneactions.cpp moc/moc_xplane.cpp moc/moc_boatanalysisdlg.cpp moc/moc_boatexplorer.cpp moc/moc_xsailanalysisctrls.cpp moc/moc_xsaildisplayctrls.cpp moc/moc_xsailactions.cpp moc/moc_gl3dxsailview.cpp moc/moc_xsaillegendwt.cpp moc/moc_xsail.cpp moc/moc_prefsdlg.cpp moc/moc_saveoptionswt.cpp moc/moc_unitswt.cpp moc/moc_gl3daxesview.cpp moc/moc_gl3dcontourview.cpp moc/moc_gl3dflightview.cpp moc/moc_gl3doptim2d.cpp moc/moc_gl3dpanelfield.cpp moc/moc_gl3dquadfield.cpp moc/moc_gl3dsingularity.cpp moc/moc_gl3dsurfaceplot.cpp moc/moc_gl3dvortonfield.cpp moc/moc_threadtestdlg.cpp moc/moc_attractor2d.cpp
+	-$(DEL_FILE) moc/moc_onevortontestdlg.cpp moc/moc_panel3testdlg.cpp moc/moc_panelanalysistest.cpp moc/moc_textoutputtestdlg.cpp moc/moc_vortontestdlg.cpp moc/moc_streamtestdlg.cpp
 moc/moc_stlreaderdlg.cpp: core/stlreaderdlg.h \
 		../fl5-lib/api/triangle3d.h \
 		../fl5-lib/api/cartesianframe.h \
@@ -3494,6 +3504,11 @@ moc/moc_pointmasstable.cpp: interfaces/editors/inertia/pointmasstable.h \
 		/usr/lib/qt6/libexec/moc
 	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include interfaces/editors/inertia/pointmasstable.h -o moc/moc_pointmasstable.cpp
 
+moc/moc_objecttreeview.cpp: interfaces/editors/objecttreeview.h \
+		moc/moc_predefs.h \
+		/usr/lib/qt6/libexec/moc
+	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include interfaces/editors/objecttreeview.h -o moc/moc_objecttreeview.cpp
+
 moc/moc_planedlg.cpp: interfaces/editors/planeedit/planedlg.h \
 		../fl5-lib/api/triangle3d.h \
 		../fl5-lib/api/cartesianframe.h \
@@ -3596,6 +3611,22 @@ moc/moc_planexfldlg.cpp: interfaces/editors/planeedit/planexfldlg.h \
 		/usr/lib/qt6/libexec/moc
 	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include interfaces/editors/planeedit/planexfldlg.h -o moc/moc_planexfldlg.cpp
 
+moc/moc_rotatedlg.cpp: interfaces/editors/rotatedlg.h \
+		interfaces/widgets/customdlg/xfldialog.h \
+		../fl5-lib/api/vector3d.h \
+		../fl5-lib/api/fl5lib_global.h \
+		../fl5-lib/api/geom_params.h \
+		../fl5-lib/api/constants.h \
+		moc/moc_predefs.h \
+		/usr/lib/qt6/libexec/moc
+	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include interfaces/editors/rotatedlg.h -o moc/moc_rotatedlg.cpp
+
+moc/moc_scaledlg.cpp: interfaces/editors/scaledlg.h \
+		interfaces/widgets/customdlg/xfldialog.h \
+		moc/moc_predefs.h \
+		/usr/lib/qt6/libexec/moc
+	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include interfaces/editors/scaledlg.h -o moc/moc_scaledlg.cpp
+
 moc/moc_shapedlg.cpp: interfaces/editors/shapedlg.h \
 		../fl5-lib/api/quaternion.h \
 		../fl5-lib/api/vector3d.h \
@@ -3605,6 +3636,16 @@ moc/moc_shapedlg.cpp: interfaces/editors/shapedlg.h \
 		moc/moc_predefs.h \
 		/usr/lib/qt6/libexec/moc
 	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include interfaces/editors/shapedlg.h -o moc/moc_shapedlg.cpp
+
+moc/moc_translatedlg.cpp: interfaces/editors/translatedlg.h \
+		../fl5-lib/api/vector3d.h \
+		../fl5-lib/api/fl5lib_global.h \
+		../fl5-lib/api/geom_params.h \
+		../fl5-lib/api/constants.h \
+		interfaces/widgets/customdlg/xfldialog.h \
+		moc/moc_predefs.h \
+		/usr/lib/qt6/libexec/moc
+	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include interfaces/editors/translatedlg.h -o moc/moc_translatedlg.cpp
 
 moc/moc_wingdefdlg.cpp: interfaces/editors/wingedit/wingdefdlg.h \
 		interfaces/editors/wingedit/wingdlg.h \
@@ -5062,6 +5103,11 @@ moc/moc_wingseldlg.cpp: modules/xplane/controls/wingseldlg.h \
 		moc/moc_predefs.h \
 		/usr/lib/qt6/libexec/moc
 	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include modules/xplane/controls/wingseldlg.h -o moc/moc_wingseldlg.cpp
+
+moc/moc_xplanewt.cpp: modules/xplane/controls/xplanewt.h \
+		moc/moc_predefs.h \
+		/usr/lib/qt6/libexec/moc
+	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-app/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-app -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include modules/xplane/controls/xplanewt.h -o moc/moc_xplanewt.cpp
 
 moc/moc_gl3dxplaneview.cpp: modules/xplane/glview/gl3dxplaneview.h \
 		interfaces/opengl/fl5views/gl3dxflview.h \
@@ -8513,6 +8559,7 @@ objects/foilrepaneldlg.o: interfaces/editors/foiledit/foilrepaneldlg.cpp interfa
 		../fl5-lib/api/mathelem.h \
 		../fl5-lib/api/foil.h \
 		../fl5-lib/api/xflobject.h \
+		../XFoil-lib/xfoil_params.h \
 		interfaces/widgets/customwts/floatedit.h \
 		interfaces/widgets/customwts/numedit.h \
 		interfaces/widgets/customwts/intedit.h \
@@ -11249,15 +11296,17 @@ objects/gmesher.o: interfaces/mesh/gmesher.cpp interfaces/mesh/gmesher.h \
 		../fl5-lib/api/sailnurbs.h \
 		../fl5-lib/api/nurbssurface.h \
 		../fl5-lib/api/utils.h \
-		../fl5-lib/api/frame.h
+		../fl5-lib/api/frame.h \
+		interfaces/mesh/gmesh_globals.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/gmesher.o interfaces/mesh/gmesher.cpp
 
-objects/gmesherwt.o: interfaces/mesh/gmesherwt.cpp interfaces/mesh/gmesherwt.h \
+objects/gmesherwt.o: interfaces/mesh/gmesherwt.cpp interfaces/mesh/gmesh_globals.h \
+		../fl5-lib/api/fl5lib_global.h \
+		interfaces/mesh/gmesherwt.h \
 		../fl5-lib/api/gmshparams.h \
 		../fl5-lib/api/node.h \
 		../fl5-lib/api/geom_enums.h \
 		../fl5-lib/api/vector3d.h \
-		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/geom_params.h \
 		../fl5-lib/api/constants.h \
 		../fl5-lib/api/wingxfl.h \
@@ -11319,7 +11368,6 @@ objects/gmesherwt.o: interfaces/mesh/gmesherwt.cpp interfaces/mesh/gmesherwt.h \
 		../fl5-lib/api/wingsailsection.h \
 		../fl5-lib/api/units.h \
 		core/xflcore.h \
-		interfaces/mesh/gmesh_globals.h \
 		interfaces/mesh/gmesher.h \
 		interfaces/mesh/meshevent.h \
 		interfaces/mesh/slg3d.h \
@@ -18525,6 +18573,9 @@ objects/moc_planexflinertiadlg.o: moc/moc_planexflinertiadlg.cpp
 objects/moc_pointmasstable.o: moc/moc_pointmasstable.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_pointmasstable.o moc/moc_pointmasstable.cpp
 
+objects/moc_objecttreeview.o: moc/moc_objecttreeview.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_objecttreeview.o moc/moc_objecttreeview.cpp
+
 objects/moc_planedlg.o: moc/moc_planedlg.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_planedlg.o moc/moc_planedlg.cpp
 
@@ -18540,8 +18591,17 @@ objects/moc_planestldlg.o: moc/moc_planestldlg.cpp
 objects/moc_planexfldlg.o: moc/moc_planexfldlg.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_planexfldlg.o moc/moc_planexfldlg.cpp
 
+objects/moc_rotatedlg.o: moc/moc_rotatedlg.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_rotatedlg.o moc/moc_rotatedlg.cpp
+
+objects/moc_scaledlg.o: moc/moc_scaledlg.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_scaledlg.o moc/moc_scaledlg.cpp
+
 objects/moc_shapedlg.o: moc/moc_shapedlg.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_shapedlg.o moc/moc_shapedlg.cpp
+
+objects/moc_translatedlg.o: moc/moc_translatedlg.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_translatedlg.o moc/moc_translatedlg.cpp
 
 objects/moc_wingdefdlg.o: moc/moc_wingdefdlg.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_wingdefdlg.o moc/moc_wingdefdlg.cpp
@@ -18923,6 +18983,9 @@ objects/moc_targetcurvedlg.o: moc/moc_targetcurvedlg.cpp
 
 objects/moc_wingseldlg.o: moc/moc_wingseldlg.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_wingseldlg.o moc/moc_wingseldlg.cpp
+
+objects/moc_xplanewt.o: moc/moc_xplanewt.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_xplanewt.o moc/moc_xplanewt.cpp
 
 objects/moc_gl3dxplaneview.o: moc/moc_gl3dxplaneview.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_gl3dxplaneview.o moc/moc_gl3dxplaneview.cpp

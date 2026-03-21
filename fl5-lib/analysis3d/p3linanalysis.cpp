@@ -43,7 +43,7 @@
 #elif defined INTEL_MKL
     #include <mkl.h>
 #elif defined OPENBLAS
-#include <openblas/lapack.h>
+#include <lapack.h>
 #endif
 
 

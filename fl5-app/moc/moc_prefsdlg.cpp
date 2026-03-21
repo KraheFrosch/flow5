@@ -50,6 +50,8 @@ template <> constexpr inline auto PrefsDlg::qt_create_metaobjectdata<qt_meta_tag
         "pNewItem",
         "pPreviousItem",
         "onLocalization",
+        "onLanguageChanged",
+        "index",
         "onMultiThreading",
         "onOK",
         "onStyleChanged",
@@ -76,30 +78,34 @@ template <> constexpr inline auto PrefsDlg::qt_create_metaobjectdata<qt_meta_tag
         }}),
         // Slot 'onLocalization'
         QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onLanguageChanged'
+        QtMocHelpers::SlotData<void(int)>(11, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 12 },
+        }}),
         // Slot 'onMultiThreading'
-        QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(13, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'onOK'
-        QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(14, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'onStyleChanged'
-        QtMocHelpers::SlotData<void(const QString &)>(13, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::QString, 14 },
+        QtMocHelpers::SlotData<void(const QString &)>(15, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::QString, 16 },
         }}),
         // Slot 'onStyleSheet'
-        QtMocHelpers::SlotData<void(bool)>(15, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(bool)>(17, 2, QMC::AccessPrivate, QMetaType::Void, {{
             { QMetaType::Bool, 2 },
         }}),
         // Slot 'onTableFont'
-        QtMocHelpers::SlotData<void()>(16, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onTextColor'
-        QtMocHelpers::SlotData<void()>(17, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onTextFont'
         QtMocHelpers::SlotData<void()>(18, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onTheme'
+        // Slot 'onTextColor'
         QtMocHelpers::SlotData<void()>(19, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onToolTipFont'
+        // Slot 'onTextFont'
         QtMocHelpers::SlotData<void()>(20, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onTreeFont'
+        // Slot 'onTheme'
         QtMocHelpers::SlotData<void()>(21, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onToolTipFont'
+        QtMocHelpers::SlotData<void()>(22, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onTreeFont'
+        QtMocHelpers::SlotData<void()>(23, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -127,16 +133,17 @@ void PrefsDlg::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 1: _t->onButton((*reinterpret_cast< std::add_pointer_t<QAbstractButton*>>(_a[1]))); break;
         case 2: _t->onItemChanged((*reinterpret_cast< std::add_pointer_t<QTreeWidgetItem*>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QTreeWidgetItem*>>(_a[2]))); break;
         case 3: _t->onLocalization(); break;
-        case 4: _t->onMultiThreading(); break;
-        case 5: _t->onOK(); break;
-        case 6: _t->onStyleChanged((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 7: _t->onStyleSheet((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
-        case 8: _t->onTableFont(); break;
-        case 9: _t->onTextColor(); break;
-        case 10: _t->onTextFont(); break;
-        case 11: _t->onTheme(); break;
-        case 12: _t->onToolTipFont(); break;
-        case 13: _t->onTreeFont(); break;
+        case 4: _t->onLanguageChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 5: _t->onMultiThreading(); break;
+        case 6: _t->onOK(); break;
+        case 7: _t->onStyleChanged((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 8: _t->onStyleSheet((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
+        case 9: _t->onTableFont(); break;
+        case 10: _t->onTextColor(); break;
+        case 11: _t->onTextFont(); break;
+        case 12: _t->onTheme(); break;
+        case 13: _t->onToolTipFont(); break;
+        case 14: _t->onTreeFont(); break;
         default: ;
         }
     }
@@ -173,14 +180,14 @@ int PrefsDlg::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 15;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 15;
     }
     return _id;
 }

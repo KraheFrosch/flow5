@@ -51,15 +51,12 @@ void Polar3d::setDefaults()
 
     m_bViscous           = true;
     m_bViscOnTheFly      = false;
-    m_bNeuralFoilOTF     = false;
-    m_bNeuralFoilInterp  = false;
     m_bViscFromCl        = true;
 
     m_NCrit = 9.0;
     m_XTrTop = 1.0;
     m_XTrBot = 1.0;
     m_bTransAtHinge = false;
-    m_NFModelSize = 5;  // xlarge default
 
     m_BC = xfl::DIRICHLET;
 
@@ -127,15 +124,12 @@ void Polar3d::duplicateSpec(const Polar3d *pPolar3d)
 
     m_bViscous              = pPolar3d->m_bViscous;
     m_bViscOnTheFly         = pPolar3d->m_bViscOnTheFly;
-    m_bNeuralFoilOTF        = pPolar3d->m_bNeuralFoilOTF;
-    m_bNeuralFoilInterp     = pPolar3d->m_bNeuralFoilInterp;
     m_bViscFromCl           = pPolar3d->m_bViscFromCl;
 
     m_NCrit                 = pPolar3d->m_NCrit;
     m_XTrTop                = pPolar3d->m_XTrTop;
     m_XTrBot                = pPolar3d->m_XTrBot;
     m_bTransAtHinge         = pPolar3d->m_bTransAtHinge;
-    m_NFModelSize           = pPolar3d->m_NFModelSize;
 
     m_Mass = pPolar3d->m_Mass;
     m_CoG  = pPolar3d->m_CoG;
@@ -437,9 +431,8 @@ bool Polar3d::serializeFl5v750(QDataStream &ar, bool bIsStoring)
         ar << m_bTransAtHinge;
 
         // provisions for future variable saves
-        // First spare bool used for m_bNeuralFoilOTF, second for m_bNeuralFoilInterp
-        ar << m_bNeuralFoilOTF;
-        ar << m_bNeuralFoilInterp;
+        ar << boolean; // formerly m_bNeuralFoilOTF
+        ar << boolean; // formerly m_bNeuralFoilInterp
         for(int i=3; i<10; i++) ar <<boolean;
         for(int i=0; i<20; i++) ar <<integer;
         for(int i=0; i<20; i++) ar <<dble;
@@ -533,9 +526,8 @@ bool Polar3d::serializeFl5v750(QDataStream &ar, bool bIsStoring)
         ar >> m_bTransAtHinge;
 
         // provisions for future variable saves
-        // First spare bool used for m_bNeuralFoilOTF, second for m_bNeuralFoilInterp
-        ar >> m_bNeuralFoilOTF;
-        ar >> m_bNeuralFoilInterp;
+        ar >> boolean; // formerly m_bNeuralFoilOTF
+        ar >> boolean; // formerly m_bNeuralFoilInterp
         for(int i=3; i<10; i++) ar >> boolean;
         for(int i=0; i<20; i++) ar >> integer;
         for(int i=0; i<20; i++) ar >> dble;

@@ -141,7 +141,6 @@ HEADERS += \
     api/xflmesh.h \
     api/xflobject.h \
     api/xfoiltask.h \
-    api/neuralfoiltask.h \
     api/xml_globals.h \
     api/xmlpolarreader.h \
     api/xmlpolarwriter.h \
@@ -177,7 +176,6 @@ SOURCES += \
     analysis3d/p4analysis.cpp \
     analysis3d/panelanalysis.cpp \
     analysis3d/planetask.cpp \
-    analysis3d/neuralfoiltask.cpp \
     analysis3d/task3d.cpp \
     api/api.cpp \
     geom/geom2d/node2d.cpp \

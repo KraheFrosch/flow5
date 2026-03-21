@@ -1332,6 +1332,7 @@ void WingXfl::panelComputeBending(const std::vector<Panel3> &panel3list, bool bT
         Surface const &surf = m_Surface.at(j);
         for (int k=0; k<surf.NYPanels(); k++)
         {
+            if (m_FirstPanel3Index+p >= int(panel3list.size())) break; // Safety Check
             Panel3 const &p3 = panel3list.at(m_FirstPanel3Index+p);
             ypos.push_back(p3.CoG().y);
             zpos.push_back(p3.CoG().z);
@@ -1586,6 +1587,8 @@ void WingXfl::panel3ComputeInviscidForces(const std::vector<Panel3> &panel3list,
 
     for(int i3=0; i3<m_nPanel3; i3++)
     {
+        if (i3+m_FirstPanel3Index >= int(panel3list.size())) break; // Safety check for bounds
+ 
         Panel3 const & p3 = panel3list.at(i3+m_FirstPanel3Index);
 
         if(!pWPolar->bWingTipMi() && p3.isSidePanel())
@@ -1595,8 +1598,10 @@ void WingXfl::panel3ComputeInviscidForces(const std::vector<Panel3> &panel3list,
         ForcePt = p3.CoG();
         if(pWPolar->isTriUniformMethod())
         {
-            double CpAverage = (Cp3Vtx[idx]+Cp3Vtx[idx+1]+Cp3Vtx[idx+2])/3.0;
-            PanelForce = p3.normal() * (-CpAverage) * p3.area();      // Newtons/q
+            // Bug Fix: TriUniform uses per-panel CP (size N), not per-vertex (size 3N)
+            // Accessing idx*3 when size is N causes crash/garbage.
+            double Cp = Cp3Vtx[p3.index()]; 
+            PanelForce = p3.normal() * (-Cp) * p3.area();      // Newtons/q
         }
         else if(pWPolar->isTriLinearMethod())
         {
@@ -1820,10 +1825,24 @@ void WingXfl::panel3ComputeStrips(std::vector<Panel3> const &panel3list, PlanePo
                 do
                 {
                     idx =  surf.m_Panel3List.at(i3);
+                    if (idx >= int(panel3list.size())) break; // Safety Check
                     Panel3 const &p3strip = panel3list.at(idx);
 
                     ForcePt = p3strip.CoG();
-                    double CpAverage = (Cp3Vtx[3*idx]+Cp3Vtx[3*idx+1]+Cp3Vtx[3*idx+2])/3.0;
+                    
+                    // Bug Fix: Handle TriUniform (per-panel CP) vs TriLinear (per-vertex CP)
+                    double CpAverage;
+                    if(pWPolar->isTriUniformMethod())
+                    {
+                         // Access per-panel CP directly
+                         CpAverage = Cp3Vtx[idx]; 
+                    }
+                    else
+                    {
+                         // TriLinear: average of 3 vertex CPs
+                         CpAverage = (Cp3Vtx[3*idx]+Cp3Vtx[3*idx+1]+Cp3Vtx[3*idx+2])/3.0;
+                    }
+
                     PanelForce = p3strip.normal() * (-CpAverage) * p3strip.area();      // Newtons/q
 
                     StripForce += PanelForce;                                           // Newtons/q

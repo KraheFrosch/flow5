@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DFL5LIB_LIBRARY -DQT_DISABLE_DEPRECATED_BEFORE=0x060000 -DLINUX_OS -DOPENBLAS -DNEURALFOIL_ENABLED -DQT_NO_DEBUG -DQT_CORE_LIB
+DEFINES       = -DFL5LIB_LIBRARY -DQT_DISABLE_DEPRECATED_BEFORE=0x060000 -DLINUX_OS -DOPENBLAS -DQT_NO_DEBUG -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -std=gnu++1z -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I../XFoil-lib -Iapi -I/usr/local/include/opencascade/ -I/usr/include/opencascade -I/usr/include/python3.13 -I../../venv/lib/python3.13/site-packages/pybind11/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtCore -Imoc -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++
+CXXFLAGS      = -pipe -O2 -std=gnu++2a -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
+INCPATH       = -I. -I../XFoil-lib -Iapi -I/usr/local/include/opencascade/ -I/usr/include/opencascade -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtCore -Imoc -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake6
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = fl5-lib1.0.0
 DISTDIR = /home/luca/Loftimizer-V2/flow5/fl5-lib/objects/fl5-lib1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -shared -Wl,-soname,libfl5-lib.so.1
-LIBS          = $(SUBLIBS) -L../XFoil-lib -lXFoil -lopenblas -llapack -llapacke -L/usr/local/lib/ -lpython3.13 -lTKBO -lTKBRep -lTKBool -lTKCDF -lTKDESTEP -lTKFillet -lTKG2d -lTKG3d -lTKGeomAlgo -lTKGeomBase -lTKLCAF -lTKMath -lTKMesh -lTKOffset -lTKPrim -lTKShHealing -lTKTopAlgo -lTKXSBase -lTKernel /usr/lib/x86_64-linux-gnu/libQt6Core.so -lpthread   
+LIBS          = $(SUBLIBS) -L../XFoil-lib -lXFoil -lopenblas -L/usr/local/lib/ -lTKBO -lTKBRep -lTKBool -lTKCDF -lTKDESTEP -lTKFillet -lTKG2d -lTKG3d -lTKGeomAlgo -lTKGeomBase -lTKLCAF -lTKMath -lTKMesh -lTKOffset -lTKPrim -lTKShHealing -lTKTopAlgo -lTKXSBase -lTKernel /usr/lib/x86_64-linux-gnu/libQt6Core.so -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -52,8 +52,7 @@ OBJECTS_DIR   = objects/
 
 ####### Files
 
-SOURCES       = math/testmatrix.cpp \
-		objects3d/analysis3d/planepolar.cpp \
+SOURCES       = objects3d/analysis3d/planepolar.cpp \
 		objects3d/analysis3d/planepolarext.cpp \
 		utils/fl5core.cpp \
 		xml/xplane/xmlplanepolarreader.cpp \
@@ -66,7 +65,6 @@ SOURCES       = math/testmatrix.cpp \
 		analysis3d/p4analysis.cpp \
 		analysis3d/panelanalysis.cpp \
 		analysis3d/planetask.cpp \
-		analysis3d/neuralfoiltask.cpp \
 		analysis3d/task3d.cpp \
 		api/api.cpp \
 		geom/geom2d/node2d.cpp \
@@ -191,9 +189,9 @@ SOURCES       = math/testmatrix.cpp \
 		xml/xsail/xmlsailreader.cpp \
 		xml/xsail/xmlsailwriter.cpp \
 		xml/xsail/xmlxsailreader.cpp \
-		xml/xsail/xmlxsailwriter.cpp moc/moc_fileio.cpp
-OBJECTS       = objects/testmatrix.o \
-		objects/planepolar.o \
+		xml/xsail/xmlxsailwriter.cpp \
+		math/testmatrix.cpp moc/moc_fileio.cpp
+OBJECTS       = objects/planepolar.o \
 		objects/planepolarext.o \
 		objects/fl5core.o \
 		objects/xmlplanepolarreader.o \
@@ -206,7 +204,6 @@ OBJECTS       = objects/testmatrix.o \
 		objects/p4analysis.o \
 		objects/panelanalysis.o \
 		objects/planetask.o \
-		objects/neuralfoiltask.o \
 		objects/task3d.o \
 		objects/api.o \
 		objects/node2d.o \
@@ -332,6 +329,7 @@ OBJECTS       = objects/testmatrix.o \
 		objects/xmlsailwriter.o \
 		objects/xmlxsailreader.o \
 		objects/xmlxsailwriter.o \
+		objects/testmatrix.o \
 		objects/moc_fileio.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/common/unix.conf \
@@ -410,7 +408,6 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/spec_pre.prf \
 		api/planepolarext.h \
 		api/xmlplanepolarreader.h \
 		api/xmlplanepolarwriter.h \
-		math/testmatrix.h \
 		api/aeroforces.h \
 		api/analysisrange.h \
 		api/anglecontrol.h \
@@ -547,7 +544,6 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/spec_pre.prf \
 		api/xflmesh.h \
 		api/xflobject.h \
 		api/xfoiltask.h \
-		api/neuralfoiltask.h \
 		api/xml_globals.h \
 		api/xmlpolarreader.h \
 		api/xmlpolarwriter.h \
@@ -567,8 +563,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/spec_pre.prf \
 		api/xmlsailreader.h \
 		api/xmlsailwriter.h \
 		api/xmlxsailreader.h \
-		api/xmlxsailwriter.h math/testmatrix.cpp \
-		objects3d/analysis3d/planepolar.cpp \
+		api/xmlxsailwriter.h \
+		math/testmatrix.h objects3d/analysis3d/planepolar.cpp \
 		objects3d/analysis3d/planepolarext.cpp \
 		utils/fl5core.cpp \
 		xml/xplane/xmlplanepolarreader.cpp \
@@ -581,7 +577,6 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/spec_pre.prf \
 		analysis3d/p4analysis.cpp \
 		analysis3d/panelanalysis.cpp \
 		analysis3d/planetask.cpp \
-		analysis3d/neuralfoiltask.cpp \
 		analysis3d/task3d.cpp \
 		api/api.cpp \
 		geom/geom2d/node2d.cpp \
@@ -706,7 +701,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/spec_pre.prf \
 		xml/xsail/xmlsailreader.cpp \
 		xml/xsail/xmlsailwriter.cpp \
 		xml/xsail/xmlxsailreader.cpp \
-		xml/xsail/xmlxsailwriter.cpp
+		xml/xsail/xmlxsailwriter.cpp \
+		math/testmatrix.cpp
 QMAKE_TARGET  = fl5-lib
 DESTDIR       = 
 TARGET        = libfl5-lib.so.1.0.0
@@ -899,8 +895,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents api/fl5core.h api/planepolar.h api/planepolarext.h api/xmlplanepolarreader.h api/xmlplanepolarwriter.h math/testmatrix.h api/aeroforces.h api/analysisrange.h api/anglecontrol.h api/api.h api/apilog.h api/arcspline.h api/bezierspline.h api/bldata.h api/blxfoil.h api/boat.h api/boatopp.h api/boatpolar.h api/boattask.h api/boid.h api/bspline.h api/bspline3d.h api/cartesianframe.h api/cartesianframe2d.h api/constants.h api/ctrlrange.h api/cubicinterpolation.h api/cubicspline.h api/edgesplit.h api/eigenvalues.h api/enums_objects.h api/externalsail.h api/extradrag.h api/fileio.h api/fl5color.h api/fl5lib_global.h api/fl5object.h api/flow5events.h api/foil.h api/frame.h api/fuse.h api/fuseflatfaces.h api/fusenurbs.h api/fuseocc.h api/fusesections.h api/fusestl.h api/fusexfl.h api/gaussquadrature.h api/geom_enums.h api/geom_global.h api/geom_params.h api/gmshparams.h api/gqtriangle.h api/hanning.h api/hermiteinterpolation.h api/inertia.h api/linestyle.h api/llttask.h api/mathelem.h api/matrix.h api/mctriangle.h api/mesh_globals.h api/naca4spline.h api/node.h api/node2d.h api/nurbssurface.h api/objects2d.h api/objects2d_globals.h api/objects3d.h api/objects_global.h api/objects_params.h api/occ_globals.h api/occmeshparams.h api/opp3d.h api/oppoint.h api/optstructures.h api/p3analysis.h api/p3linanalysis.h api/p3unianalysis.h api/p4analysis.h api/panel.h api/panel2d.h api/panel3.h api/panel4.h api/panelanalysis.h api/panelprecision.h api/part.h api/plane.h api/planeopp.h api/planestl.h api/planetask.h api/planexfl.h api/pointmass.h api/pointspline.h api/polar.h api/polar3d.h api/pslg2d.h api/qrleastsquares.h api/quad2d.h api/quad3d.h api/quadmesh.h api/quaternion.h api/rungekutta.h api/s7spline.h api/sail.h api/sailglobals.h api/sailnurbs.h api/sailobjects.h api/sailocc.h api/sailspline.h api/sailstl.h api/sailwing.h api/segment2d.h api/segment3d.h api/sgsmooth.h api/spandistribs.h api/spline.h api/splinefoil.h api/stabderivatives.h api/stream2d.h api/surface.h api/t8opp.h api/task3d.h api/testpanels.h api/trace.h api/triangle2d.h api/triangle3d.h api/triangulation.h api/trimesh.h api/units.h api/utils.h api/vector2d.h api/vector3d.h api/vortex.h api/vorton.h api/wingopp.h api/wingsailsection.h api/wingsection.h api/wingxfl.h api/xflmesh.h api/xflobject.h api/xfoiltask.h api/neuralfoiltask.h api/xml_globals.h api/xmlpolarreader.h api/xmlpolarwriter.h api/xmlfusereader.h api/xmlfusewriter.h api/xflxmlreader.h api/xflxmlwriter.h api/xmlplanereader.h api/xmlplanewriter.h api/xmlwingreader.h api/xmlwingwriter.h api/xmlxplanereader.h api/xmlboatreader.h api/xmlboatwriter.h api/xmlbtpolarreader.h api/xmlbtpolarwriter.h api/xmlsailreader.h api/xmlsailwriter.h api/xmlxsailreader.h api/xmlxsailwriter.h $(DISTDIR)/
-	$(COPY_FILE) --parents math/testmatrix.cpp objects3d/analysis3d/planepolar.cpp objects3d/analysis3d/planepolarext.cpp utils/fl5core.cpp xml/xplane/xmlplanepolarreader.cpp xml/xplane/xmlplanepolarwriter.cpp analysis3d/boattask.cpp analysis3d/llttask.cpp analysis3d/p3analysis.cpp analysis3d/p3linanalysis.cpp analysis3d/p3unianalysis.cpp analysis3d/p4analysis.cpp analysis3d/panelanalysis.cpp analysis3d/planetask.cpp analysis3d/neuralfoiltask.cpp analysis3d/task3d.cpp api/api.cpp geom/geom2d/node2d.cpp geom/geom2d/pslg2d.cpp geom/geom2d/quad2d.cpp geom/geom2d/segment2d.cpp geom/geom2d/splines/bezierspline.cpp geom/geom2d/splines/bspline.cpp geom/geom2d/splines/cubicspline.cpp geom/geom2d/splines/pointspline.cpp geom/geom2d/splines/spline.cpp geom/geom2d/triangle2d.cpp geom/geom2d/vector2d.cpp geom/geom3d/bspline3d.cpp geom/geom3d/frame.cpp geom/geom3d/node.cpp geom/geom3d/nurbssurface.cpp geom/geom3d/quad3d.cpp geom/geom3d/quaternion.cpp geom/geom3d/segment3d.cpp geom/geom3d/triangle3d.cpp geom/geom3d/triangulation.cpp geom/geom3d/vector3d.cpp geom/geom_globals/geom_global.cpp math/cubicinterpolation.cpp math/gaussquadrature.cpp math/hanning.cpp math/hermiteinterpolation.cpp math/mathelem.cpp math/matrix.cpp math/qrleastsquares.cpp math/rungekutta.cpp math/sgsmooth.cpp objects2d/analysis2d/stream2d.cpp objects2d/analysis2d/xfoiltask.cpp objects2d/foilobjects/bldata.cpp objects2d/foilobjects/blxfoil.cpp objects2d/foilobjects/foil.cpp objects2d/foilobjects/oppoint.cpp objects2d/foilobjects/panel2d.cpp objects2d/foilobjects/polar.cpp objects2d/foilobjects/splinefoil.cpp objects2d/globals/objects2d_globals.cpp objects2d/objects2d.cpp objects3d/analysis3d/aeroforces.cpp objects3d/analysis3d/boatopp.cpp objects3d/analysis3d/boatpolar.cpp objects3d/analysis3d/opp3d.cpp objects3d/analysis3d/planeopp.cpp objects3d/analysis3d/polar3d.cpp objects3d/analysis3d/spandistribs.cpp objects3d/analysis3d/stabderivatives.cpp objects3d/analysis3d/wingopp.cpp objects3d/globals/objects_global.cpp objects3d/objects3d.cpp objects3d/planeobjects/fuse/fuse.cpp objects3d/planeobjects/fuse/fuseflatfaces.cpp objects3d/planeobjects/fuse/fusenurbs.cpp objects3d/planeobjects/fuse/fuseocc.cpp objects3d/planeobjects/fuse/fusesections.cpp objects3d/planeobjects/fuse/fusestl.cpp objects3d/planeobjects/fuse/fusexfl.cpp objects3d/planeobjects/inertia/inertia.cpp objects3d/planeobjects/part.cpp objects3d/planeobjects/plane/plane.cpp objects3d/planeobjects/plane/planestl.cpp objects3d/planeobjects/plane/planexfl.cpp objects3d/planeobjects/wing/surface.cpp objects3d/planeobjects/wing/wingsection.cpp objects3d/planeobjects/wing/wingxfl.cpp objects3d/sailobjects/boat.cpp objects3d/sailobjects/sailglobals.cpp objects3d/sailobjects/sailobjects.cpp objects3d/sailobjects/sails/externalsail.cpp objects3d/sailobjects/sails/sail.cpp objects3d/sailobjects/sails/sailnurbs.cpp objects3d/sailobjects/sails/sailocc.cpp objects3d/sailobjects/sails/sailspline.cpp objects3d/sailobjects/sails/sailstl.cpp objects3d/sailobjects/sails/sailwing.cpp objects3d/sailobjects/sails/wingsailsection.cpp objects3d/sailobjects/splines7/arcspline.cpp objects3d/sailobjects/splines7/naca4spline.cpp objects3d/sailobjects/splines7/s7spline.cpp occ/occ_globals.cpp occ/occmeshparams.cpp panels/mesh/mesh_globals.cpp panels/mesh/quadmesh.cpp panels/mesh/trimesh.cpp panels/mesh/xflmesh.cpp panels/panels/gqtriangle.cpp panels/panels/mctriangle.cpp panels/panels/panel.cpp panels/panels/panel3.cpp panels/panels/panel4.cpp panels/panels/testpanels.cpp panels/panels/vortex.cpp panels/panels/vorton.cpp panels/shell/edgesplit.cpp utils/apilog.cpp utils/fileio.cpp utils/fl5color.cpp utils/trace.cpp utils/units.cpp utils/utils.cpp xml/foil/xmlpolarreader.cpp xml/foil/xmlpolarwriter.cpp xml/fuse/xmlfusereader.cpp xml/fuse/xmlfusewriter.cpp xml/xml_globals.cpp xml/xflxmlreader.cpp xml/xflxmlwriter.cpp xml/xplane/xmlplanereader.cpp xml/xplane/xmlplanewriter.cpp xml/xplane/xmlwingreader.cpp xml/xplane/xmlwingwriter.cpp xml/xplane/xmlxplanereader.cpp xml/xsail/xmlboatreader.cpp xml/xsail/xmlboatwriter.cpp xml/xsail/xmlbtpolarreader.cpp xml/xsail/xmlbtpolarwriter.cpp xml/xsail/xmlsailreader.cpp xml/xsail/xmlsailwriter.cpp xml/xsail/xmlxsailreader.cpp xml/xsail/xmlxsailwriter.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents api/fl5core.h api/planepolar.h api/planepolarext.h api/xmlplanepolarreader.h api/xmlplanepolarwriter.h api/aeroforces.h api/analysisrange.h api/anglecontrol.h api/api.h api/apilog.h api/arcspline.h api/bezierspline.h api/bldata.h api/blxfoil.h api/boat.h api/boatopp.h api/boatpolar.h api/boattask.h api/boid.h api/bspline.h api/bspline3d.h api/cartesianframe.h api/cartesianframe2d.h api/constants.h api/ctrlrange.h api/cubicinterpolation.h api/cubicspline.h api/edgesplit.h api/eigenvalues.h api/enums_objects.h api/externalsail.h api/extradrag.h api/fileio.h api/fl5color.h api/fl5lib_global.h api/fl5object.h api/flow5events.h api/foil.h api/frame.h api/fuse.h api/fuseflatfaces.h api/fusenurbs.h api/fuseocc.h api/fusesections.h api/fusestl.h api/fusexfl.h api/gaussquadrature.h api/geom_enums.h api/geom_global.h api/geom_params.h api/gmshparams.h api/gqtriangle.h api/hanning.h api/hermiteinterpolation.h api/inertia.h api/linestyle.h api/llttask.h api/mathelem.h api/matrix.h api/mctriangle.h api/mesh_globals.h api/naca4spline.h api/node.h api/node2d.h api/nurbssurface.h api/objects2d.h api/objects2d_globals.h api/objects3d.h api/objects_global.h api/objects_params.h api/occ_globals.h api/occmeshparams.h api/opp3d.h api/oppoint.h api/optstructures.h api/p3analysis.h api/p3linanalysis.h api/p3unianalysis.h api/p4analysis.h api/panel.h api/panel2d.h api/panel3.h api/panel4.h api/panelanalysis.h api/panelprecision.h api/part.h api/plane.h api/planeopp.h api/planestl.h api/planetask.h api/planexfl.h api/pointmass.h api/pointspline.h api/polar.h api/polar3d.h api/pslg2d.h api/qrleastsquares.h api/quad2d.h api/quad3d.h api/quadmesh.h api/quaternion.h api/rungekutta.h api/s7spline.h api/sail.h api/sailglobals.h api/sailnurbs.h api/sailobjects.h api/sailocc.h api/sailspline.h api/sailstl.h api/sailwing.h api/segment2d.h api/segment3d.h api/sgsmooth.h api/spandistribs.h api/spline.h api/splinefoil.h api/stabderivatives.h api/stream2d.h api/surface.h api/t8opp.h api/task3d.h api/testpanels.h api/trace.h api/triangle2d.h api/triangle3d.h api/triangulation.h api/trimesh.h api/units.h api/utils.h api/vector2d.h api/vector3d.h api/vortex.h api/vorton.h api/wingopp.h api/wingsailsection.h api/wingsection.h api/wingxfl.h api/xflmesh.h api/xflobject.h api/xfoiltask.h api/xml_globals.h api/xmlpolarreader.h api/xmlpolarwriter.h api/xmlfusereader.h api/xmlfusewriter.h api/xflxmlreader.h api/xflxmlwriter.h api/xmlplanereader.h api/xmlplanewriter.h api/xmlwingreader.h api/xmlwingwriter.h api/xmlxplanereader.h api/xmlboatreader.h api/xmlboatwriter.h api/xmlbtpolarreader.h api/xmlbtpolarwriter.h api/xmlsailreader.h api/xmlsailwriter.h api/xmlxsailreader.h api/xmlxsailwriter.h math/testmatrix.h $(DISTDIR)/
+	$(COPY_FILE) --parents objects3d/analysis3d/planepolar.cpp objects3d/analysis3d/planepolarext.cpp utils/fl5core.cpp xml/xplane/xmlplanepolarreader.cpp xml/xplane/xmlplanepolarwriter.cpp analysis3d/boattask.cpp analysis3d/llttask.cpp analysis3d/p3analysis.cpp analysis3d/p3linanalysis.cpp analysis3d/p3unianalysis.cpp analysis3d/p4analysis.cpp analysis3d/panelanalysis.cpp analysis3d/planetask.cpp analysis3d/task3d.cpp api/api.cpp geom/geom2d/node2d.cpp geom/geom2d/pslg2d.cpp geom/geom2d/quad2d.cpp geom/geom2d/segment2d.cpp geom/geom2d/splines/bezierspline.cpp geom/geom2d/splines/bspline.cpp geom/geom2d/splines/cubicspline.cpp geom/geom2d/splines/pointspline.cpp geom/geom2d/splines/spline.cpp geom/geom2d/triangle2d.cpp geom/geom2d/vector2d.cpp geom/geom3d/bspline3d.cpp geom/geom3d/frame.cpp geom/geom3d/node.cpp geom/geom3d/nurbssurface.cpp geom/geom3d/quad3d.cpp geom/geom3d/quaternion.cpp geom/geom3d/segment3d.cpp geom/geom3d/triangle3d.cpp geom/geom3d/triangulation.cpp geom/geom3d/vector3d.cpp geom/geom_globals/geom_global.cpp math/cubicinterpolation.cpp math/gaussquadrature.cpp math/hanning.cpp math/hermiteinterpolation.cpp math/mathelem.cpp math/matrix.cpp math/qrleastsquares.cpp math/rungekutta.cpp math/sgsmooth.cpp objects2d/analysis2d/stream2d.cpp objects2d/analysis2d/xfoiltask.cpp objects2d/foilobjects/bldata.cpp objects2d/foilobjects/blxfoil.cpp objects2d/foilobjects/foil.cpp objects2d/foilobjects/oppoint.cpp objects2d/foilobjects/panel2d.cpp objects2d/foilobjects/polar.cpp objects2d/foilobjects/splinefoil.cpp objects2d/globals/objects2d_globals.cpp objects2d/objects2d.cpp objects3d/analysis3d/aeroforces.cpp objects3d/analysis3d/boatopp.cpp objects3d/analysis3d/boatpolar.cpp objects3d/analysis3d/opp3d.cpp objects3d/analysis3d/planeopp.cpp objects3d/analysis3d/polar3d.cpp objects3d/analysis3d/spandistribs.cpp objects3d/analysis3d/stabderivatives.cpp objects3d/analysis3d/wingopp.cpp objects3d/globals/objects_global.cpp objects3d/objects3d.cpp objects3d/planeobjects/fuse/fuse.cpp objects3d/planeobjects/fuse/fuseflatfaces.cpp objects3d/planeobjects/fuse/fusenurbs.cpp objects3d/planeobjects/fuse/fuseocc.cpp objects3d/planeobjects/fuse/fusesections.cpp objects3d/planeobjects/fuse/fusestl.cpp objects3d/planeobjects/fuse/fusexfl.cpp objects3d/planeobjects/inertia/inertia.cpp objects3d/planeobjects/part.cpp objects3d/planeobjects/plane/plane.cpp objects3d/planeobjects/plane/planestl.cpp objects3d/planeobjects/plane/planexfl.cpp objects3d/planeobjects/wing/surface.cpp objects3d/planeobjects/wing/wingsection.cpp objects3d/planeobjects/wing/wingxfl.cpp objects3d/sailobjects/boat.cpp objects3d/sailobjects/sailglobals.cpp objects3d/sailobjects/sailobjects.cpp objects3d/sailobjects/sails/externalsail.cpp objects3d/sailobjects/sails/sail.cpp objects3d/sailobjects/sails/sailnurbs.cpp objects3d/sailobjects/sails/sailocc.cpp objects3d/sailobjects/sails/sailspline.cpp objects3d/sailobjects/sails/sailstl.cpp objects3d/sailobjects/sails/sailwing.cpp objects3d/sailobjects/sails/wingsailsection.cpp objects3d/sailobjects/splines7/arcspline.cpp objects3d/sailobjects/splines7/naca4spline.cpp objects3d/sailobjects/splines7/s7spline.cpp occ/occ_globals.cpp occ/occmeshparams.cpp panels/mesh/mesh_globals.cpp panels/mesh/quadmesh.cpp panels/mesh/trimesh.cpp panels/mesh/xflmesh.cpp panels/panels/gqtriangle.cpp panels/panels/mctriangle.cpp panels/panels/panel.cpp panels/panels/panel3.cpp panels/panels/panel4.cpp panels/panels/testpanels.cpp panels/panels/vortex.cpp panels/panels/vorton.cpp panels/shell/edgesplit.cpp utils/apilog.cpp utils/fileio.cpp utils/fl5color.cpp utils/trace.cpp utils/units.cpp utils/utils.cpp xml/foil/xmlpolarreader.cpp xml/foil/xmlpolarwriter.cpp xml/fuse/xmlfusereader.cpp xml/fuse/xmlfusewriter.cpp xml/xml_globals.cpp xml/xflxmlreader.cpp xml/xflxmlwriter.cpp xml/xplane/xmlplanereader.cpp xml/xplane/xmlplanewriter.cpp xml/xplane/xmlwingreader.cpp xml/xplane/xmlwingwriter.cpp xml/xplane/xmlxplanereader.cpp xml/xsail/xmlboatreader.cpp xml/xsail/xmlboatwriter.cpp xml/xsail/xmlbtpolarreader.cpp xml/xsail/xmlbtpolarwriter.cpp xml/xsail/xmlsailreader.cpp xml/xsail/xmlsailwriter.cpp xml/xsail/xmlxsailreader.cpp xml/xsail/xmlxsailwriter.cpp math/testmatrix.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -930,7 +926,7 @@ compiler_moc_predefs_make_all: moc/moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc/moc_predefs.h
 moc/moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O2 -std=gnu++1z -Wall -Wextra -dM -E -o moc/moc_predefs.h /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
+	g++ -pipe -O2 -std=gnu++2a -Wall -Wextra -dM -E -o moc/moc_predefs.h /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: moc/moc_fileio.cpp
 compiler_moc_header_clean:
@@ -939,7 +935,7 @@ moc/moc_fileio.cpp: api/fileio.h \
 		api/fl5lib_global.h \
 		moc/moc_predefs.h \
 		/usr/lib/qt6/libexec/moc
-	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-lib/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/include/python3.13 -I/home/luca/Loftimizer-V2/venv/lib/python3.13/site-packages/pybind11/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include api/fileio.h -o moc/moc_fileio.cpp
+	/usr/lib/qt6/libexec/moc $(DEFINES) --include /home/luca/Loftimizer-V2/flow5/fl5-lib/moc/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/home/luca/Loftimizer-V2/flow5/fl5-lib -I/home/luca/Loftimizer-V2/flow5/XFoil-lib -I/home/luca/Loftimizer-V2/flow5/fl5-lib/api -I/usr/local/include/opencascade -I/usr/include/opencascade -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include api/fileio.h -o moc/moc_fileio.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -954,12 +950,6 @@ compiler_lex_clean:
 compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean 
 
 ####### Compile
-
-objects/testmatrix.o: math/testmatrix.cpp math/testmatrix.h \
-		api/matrix.h \
-		api/fl5lib_global.h \
-		api/constants.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/testmatrix.o math/testmatrix.cpp
 
 objects/planepolar.o: objects3d/analysis3d/planepolar.cpp api/planepolar.h \
 		api/aeroforces.h \
@@ -1596,62 +1586,8 @@ objects/planetask.o: analysis3d/planetask.cpp api/planetask.h \
 		../XFoil-lib/xfoil.h \
 		../XFoil-lib/xfoil-lib_global.h \
 		../XFoil-lib/xfoil_params.h \
-		api/analysisrange.h \
-		api/neuralfoiltask.h
+		api/analysisrange.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/planetask.o analysis3d/planetask.cpp
-
-objects/neuralfoiltask.o: analysis3d/neuralfoiltask.cpp ../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/embed.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/pybind11.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/class.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/attr.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/common.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/conduit/wrap_include_python_h.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/pybind11_namespace_macros.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/cast.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/descr.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/native_enum_data.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/pytypes.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/buffer_info.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/internals.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/conduit/pybind11_platform_abi_id.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/gil_simple.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/trampoline_self_life_support.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/using_smart_holder.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/struct_smart_holder.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/value_and_holder.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/type_caster_base.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/gil.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/cpp_conduit.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/dynamic_raw_ptr_cast_if_possible.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/typeid.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/options.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/exception_translation.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/function_record_pyobject.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/detail/init.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/gil_safe_call_once.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/typing.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/eval.h \
-		../../venv/lib/python3.13/site-packages/pybind11/include/pybind11/stl.h \
-		api/neuralfoiltask.h \
-		api/objects_global.h \
-		api/enums_objects.h \
-		api/geom_enums.h \
-		api/vector2d.h \
-		api/fl5lib_global.h \
-		api/vector3d.h \
-		api/geom_params.h \
-		api/constants.h \
-		api/mathelem.h \
-		api/foil.h \
-		api/cubicspline.h \
-		api/spline.h \
-		api/node2d.h \
-		api/linestyle.h \
-		api/fl5color.h \
-		api/xflobject.h \
-		api/polar.h \
-		api/bldata.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/neuralfoiltask.o analysis3d/neuralfoiltask.cpp
 
 objects/task3d.o: analysis3d/task3d.cpp api/task3d.h \
 		api/fl5lib_global.h \
@@ -5420,6 +5356,12 @@ objects/xmlxsailwriter.o: xml/xsail/xmlxsailwriter.cpp api/xmlxsailwriter.h \
 		api/units.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/xmlxsailwriter.o xml/xsail/xmlxsailwriter.cpp
 
+objects/testmatrix.o: math/testmatrix.cpp math/testmatrix.h \
+		api/matrix.h \
+		api/fl5lib_global.h \
+		api/constants.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/testmatrix.o math/testmatrix.cpp
+
 objects/moc_fileio.o: moc/moc_fileio.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/moc_fileio.o moc/moc_fileio.cpp
 
@@ -5501,7 +5443,6 @@ install_inc: first FORCE
 	$(QINSTALL) /home/luca/Loftimizer-V2/flow5/fl5-lib/api/mctriangle.h $(INSTALL_ROOT)/usr/local/include/fl5-lib/mctriangle.h
 	$(QINSTALL) /home/luca/Loftimizer-V2/flow5/fl5-lib/api/mesh_globals.h $(INSTALL_ROOT)/usr/local/include/fl5-lib/mesh_globals.h
 	$(QINSTALL) /home/luca/Loftimizer-V2/flow5/fl5-lib/api/naca4spline.h $(INSTALL_ROOT)/usr/local/include/fl5-lib/naca4spline.h
-	$(QINSTALL) /home/luca/Loftimizer-V2/flow5/fl5-lib/api/neuralfoiltask.h $(INSTALL_ROOT)/usr/local/include/fl5-lib/neuralfoiltask.h
 	$(QINSTALL) /home/luca/Loftimizer-V2/flow5/fl5-lib/api/node.h $(INSTALL_ROOT)/usr/local/include/fl5-lib/node.h
 	$(QINSTALL) /home/luca/Loftimizer-V2/flow5/fl5-lib/api/node2d.h $(INSTALL_ROOT)/usr/local/include/fl5-lib/node2d.h
 	$(QINSTALL) /home/luca/Loftimizer-V2/flow5/fl5-lib/api/nurbssurface.h $(INSTALL_ROOT)/usr/local/include/fl5-lib/nurbssurface.h
@@ -5712,7 +5653,6 @@ uninstall_inc: FORCE
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/local/include/fl5-lib/nurbssurface.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/local/include/fl5-lib/node2d.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/local/include/fl5-lib/node.h
-	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/local/include/fl5-lib/neuralfoiltask.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/local/include/fl5-lib/naca4spline.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/local/include/fl5-lib/mesh_globals.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/local/include/fl5-lib/mctriangle.h
