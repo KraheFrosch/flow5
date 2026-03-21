@@ -15,8 +15,8 @@ EQ            = =
 CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x060000 -DOPENBLAS -DQT_NO_DEBUG -DQT_OPENGLWIDGETS_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB
-CFLAGS        = -pipe -O3 -D_REENTRANT -Wall -Wextra $(DEFINES)
-CXXFLAGS      = -pipe -O3 -std=gnu++2a -D_REENTRANT -Wall -Wextra $(DEFINES)
+CFLAGS        = -pipe -O3 -Wall -Wextra -D_REENTRANT $(DEFINES)
+CXXFLAGS      = -pipe -O3 -std=gnu++2a -Wall -Wextra -D_REENTRANT $(DEFINES)
 INCPATH       = -I. -I../XFoil-lib -I../fl5-lib -I../fl5-lib/api -I/usr/local/include/opencascade/ -I/usr/include/opencascade -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/x86_64-linux-gnu/qt6/QtCore -Imoc -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake6
 DEL_FILE      = rm -f
@@ -36,11 +36,11 @@ DEL_DIR       = rmdir
 MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
-DISTNAME      = flow57.54
-DISTDIR = /home/luca/Loftimizer-V2/flow5/fl5-app/objects/flow57.54
+DISTNAME      = flow57.55
+DISTDIR = /home/luca/Loftimizer-V2/flow5/fl5-app/objects/flow57.55
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath-link,/usr/lib/x86_64-linux-gnu
-LIBS          = $(SUBLIBS) -llapack -llapacke -lopenblas -L/usr/local/lib/ -L/usr/local/lib64 -lgmsh -L../XFoil-lib -lXFoil -L../fl5-lib -lfl5-lib -lTKBRep -lTKBO -lTKG3d -lTKGeomAlgo -lTKGeomBase -lTKLCAF -lTKMath -lTKMesh -lTKOffset -lTKPrim -lTKDESTEP -lTKShHealing -lTKTopAlgo -lTKXSBase -lTKernel -lTKBool -lTKG2d -lTKCDF -lTKFillet -lpthread /usr/lib/x86_64-linux-gnu/libQt6OpenGLWidgets.so /usr/lib/x86_64-linux-gnu/libQt6OpenGL.so /usr/lib/x86_64-linux-gnu/libQt6Widgets.so /usr/lib/x86_64-linux-gnu/libQt6Gui.so /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libQt6Xml.so /usr/lib/x86_64-linux-gnu/libQt6Core.so -lGLX -lOpenGL   
+LIBS          = $(SUBLIBS) -lopenblas -L/usr/local/lib/ -L/usr/local/lib64 -lgmsh -L../XFoil-lib -lXFoil -L../fl5-lib -lfl5-lib -lTKBRep -lTKBO -lTKG3d -lTKGeomAlgo -lTKGeomBase -lTKLCAF -lTKMath -lTKMesh -lTKOffset -lTKPrim -lTKDESTEP -lTKShHealing -lTKTopAlgo -lTKXSBase -lTKernel -lTKBool -lTKG2d -lTKCDF -lTKFillet /usr/lib/x86_64-linux-gnu/libQt6OpenGLWidgets.so /usr/lib/x86_64-linux-gnu/libQt6OpenGL.so /usr/lib/x86_64-linux-gnu/libQt6Widgets.so /usr/lib/x86_64-linux-gnu/libQt6Gui.so /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libQt6Xml.so /usr/lib/x86_64-linux-gnu/libQt6Core.so -lpthread -lGLX -lOpenGL   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -1286,7 +1286,6 @@ DIST          = ../meta/doc/images/flow5.png \
 		fl5-app.pri \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/resolve_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/default_post.prf \
-		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/thread.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/warn_on.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/permissions.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/qt.prf \
@@ -1295,6 +1294,7 @@ DIST          = ../meta/doc/images/flow5.png \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/moc.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/opengl.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/uic.prf \
+		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/thread.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/qmake_use.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/file_copies.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/testcase_targets.prf \
@@ -2031,7 +2031,6 @@ Makefile: fl5-app.pro /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++/qmake.conf
 		fl5-app.pri \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/resolve_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/default_post.prf \
-		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/thread.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/warn_on.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/permissions.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/qt.prf \
@@ -2040,6 +2039,7 @@ Makefile: fl5-app.pro /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++/qmake.conf
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/moc.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/opengl.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/uic.prf \
+		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/thread.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/qmake_use.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/file_copies.prf \
 		/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/testcase_targets.prf \
@@ -2160,7 +2160,6 @@ test/test.pri:
 fl5-app.pri:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/resolve_config.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/default_post.prf:
-/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/thread.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/warn_on.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/permissions.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/qt.prf:
@@ -2169,6 +2168,7 @@ fl5-app.pri:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/moc.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/opengl.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/uic.prf:
+/usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/unix/thread.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/qmake_use.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/file_copies.prf:
 /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/testcase_targets.prf:
@@ -2393,7 +2393,7 @@ compiler_moc_predefs_make_all: moc/moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc/moc_predefs.h
 moc/moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O3 -std=gnu++2a -D_REENTRANT -Wall -Wextra -dM -E -o moc/moc_predefs.h /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
+	g++ -pipe -O3 -std=gnu++2a -Wall -Wextra -dM -E -o moc/moc_predefs.h /usr/lib/x86_64-linux-gnu/qt6/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: moc/moc_stlreaderdlg.cpp moc/moc_aboutf5.cpp moc/moc_creditsdlg.cpp moc/moc_mainframe.cpp moc/moc_analysisrangetable.cpp moc/moc_t8rangetable.cpp moc/moc_w3dprefs.cpp moc/moc_splineapproxdlg.cpp moc/moc_splinectrl.cpp moc/moc_splinefoilctrls.cpp moc/moc_crossflowctrls.cpp moc/moc_flowctrls.cpp moc/moc_opp3dscalesctrls.cpp moc/moc_streamlinesctrls.cpp moc/moc_t1234578polardlg.cpp moc/moc_sailnurbsdlg.cpp moc/moc_sailoccdlg.cpp moc/moc_sailsplinedlg.cpp moc/moc_sailstldlg.cpp moc/moc_sailwingdlg.cpp moc/moc_analysisseldlg.cpp moc/moc_foilpolardlg.cpp moc/moc_polarautonamedlg.cpp moc/moc_aerodatadlg.cpp moc/moc_btpolarautonamedlg.cpp moc/moc_btpolardlg.cpp moc/moc_extradragdlg.cpp moc/moc_extradragwt.cpp moc/moc_planepolardlg.cpp moc/moc_polar3ddlg.cpp moc/moc_t6polardlg.cpp moc/moc_wpolarautonamedlg.cpp moc/moc_boatdlg.cpp moc/moc_externalsaildlg.cpp moc/moc_thinsaildlg.cpp moc/moc_sailcadreaderdlg.cpp moc/moc_saildlg.cpp moc/moc_sailscaledlg.cpp moc/moc_sailsectionview.cpp moc/moc_wingsailsectionmodel.cpp moc/moc_editplrdlg.cpp moc/moc_foil1splinedlg.cpp moc/moc_foil2splinedlg.cpp moc/moc_foilcamberdlg.cpp moc/moc_foilcoorddlg.cpp moc/moc_foildlg.cpp moc/moc_foilflapdlg.cpp moc/moc_foilledlg.cpp moc/moc_foilnacadlg.cpp moc/moc_foilnormalizedlg.cpp moc/moc_foilrepaneldlg.cpp moc/moc_foilscaledlg.cpp moc/moc_foiltegapdlg.cpp moc/moc_foilwt.cpp moc/moc_interpolatefoilsdlg.cpp moc/moc_bodyscaledlg.cpp moc/moc_bodytransdlg.cpp moc/moc_flatfaceconverterdlg.cpp moc/moc_fusedlg.cpp moc/moc_fusemesherdlg.cpp moc/moc_fuseoccdlg.cpp moc/moc_fusestldlg.cpp moc/moc_shapefixerdlg.cpp moc/moc_fuseframewt.cpp moc/moc_fuselinewt.cpp moc/moc_fusexfldefdlg.cpp moc/moc_fusexfldlg.cpp moc/moc_fusexflobjectdlg.cpp moc/moc_importobjectdlg.cpp moc/moc_partinertiadelegate.cpp moc/moc_partinertiadlg.cpp moc/moc_partinertiamodel.cpp moc/moc_planeinertiadlg.cpp moc/moc_planeinertiamodel.cpp moc/moc_planestlinertiadlg.cpp moc/moc_planexflinertiadlg.cpp moc/moc_pointmasstable.cpp moc/moc_objecttreeview.cpp moc/moc_planedlg.cpp moc/moc_planepartdelegate.cpp moc/moc_planepartmodel.cpp moc/moc_planestldlg.cpp moc/moc_planexfldlg.cpp moc/moc_rotatedlg.cpp moc/moc_scaledlg.cpp moc/moc_shapedlg.cpp moc/moc_translatedlg.cpp moc/moc_wingdefdlg.cpp moc/moc_wingdlg.cpp moc/moc_wingobjectdlg.cpp moc/moc_wingscaledlg.cpp moc/moc_cadexportdlg.cpp moc/moc_stlwriterdlg.cpp moc/moc_wingexportdlg.cpp moc/moc_fastgraphwt.cpp moc/moc_graphwt.cpp moc/moc_legendwt.cpp moc/moc_splinedgraphwt.cpp moc/moc_graphdlg.cpp moc/moc_graphoptions.cpp moc/moc_graphtilectrls.cpp moc/moc_graphtiles.cpp moc/moc_afmesher.cpp moc/moc_gmesher.cpp moc/moc_gmesherwt.cpp moc/moc_gmshctrlswt.cpp moc/moc_mesherwt.cpp moc/moc_occtessctrlswt.cpp moc/moc_panelcheckdlg.cpp moc/moc_tesscontrolsdlg.cpp moc/moc_gl3dgeomcontrols.cpp moc/moc_fine3dcontrols.cpp moc/moc_gl3dcontrols.cpp moc/moc_gllightdlg.cpp moc/moc_gl3dboatview.cpp moc/moc_gl3doptimxflview.cpp moc/moc_gl3dplanestlview.cpp moc/moc_gl3dplanexflview.cpp moc/moc_gl3dsailview.cpp moc/moc_gl3dxflview.cpp moc/moc_opengldlg.cpp moc/moc_gl2dcomplex.cpp moc/moc_gl2dfractal.cpp moc/moc_gl2dnewton.cpp moc/moc_gl2dquat.cpp moc/moc_gl3dattractors.cpp moc/moc_gl3dboids.cpp moc/moc_gl3dboids2.cpp moc/moc_gl3dflowvtx.cpp moc/moc_gl3dhydrogen.cpp moc/moc_gl3dlorenz.cpp moc/moc_gl3dlorenz2.cpp moc/moc_gl3dquat.cpp moc/moc_gl3dsagittarius.cpp moc/moc_gl3dshadow.cpp moc/moc_gl3dsolarsys.cpp moc/moc_gl3dspace.cpp moc/moc_gl3dtestglview.cpp moc/moc_gl3dtexture.cpp moc/moc_gl2dview.cpp moc/moc_gl3dview.cpp moc/moc_optimplanedlg.cpp moc/moc_psotask.cpp moc/moc_xflexecutor.cpp moc/moc_colorbtn.cpp moc/moc_colorgraddlg.cpp moc/moc_textclrbtn.cpp moc/moc_gridsettingsdlg.cpp moc/moc_helpimgdlg.cpp moc/moc_imagedlg.cpp moc/moc_intvaluesdlg.cpp moc/moc_logmessagedlg.cpp moc/moc_moddlg.cpp moc/moc_newnamedlg.cpp moc/moc_objectpropsdlg.cpp moc/moc_renamedlg.cpp moc/moc_selectiondlg.cpp moc/moc_separatorsdlg.cpp moc/moc_stringvaluedlg.cpp moc/moc_textdlg.cpp moc/moc_xfldialog.cpp moc/moc_actionitemmodel.cpp moc/moc_cptableview.cpp moc/moc_crosscheckbox.cpp moc/moc_ctrltabledelegate.cpp moc/moc_floatedit.cpp moc/moc_formattextoutput.cpp moc/moc_gridcontrol.cpp moc/moc_intedit.cpp moc/moc_logwt.cpp moc/moc_numedit.cpp moc/moc_plaintextoutput.cpp moc/moc_popup.cpp moc/moc_xfldelegate.cpp moc/moc_legendbtn.cpp moc/moc_lineaction.cpp moc/moc_linebtn.cpp moc/moc_linecbbox.cpp moc/moc_linemenu.cpp moc/moc_linepicker.cpp moc/moc_expandabletreeview.cpp moc/moc_objecttreemodel.cpp moc/moc_section2doptions.cpp moc/moc_section2dwt.cpp moc/moc_analysis2dsettings.cpp moc/moc_batchaltdlg.cpp moc/moc_batchdlg.cpp moc/moc_batchxfoildlg.cpp moc/moc_xfoilanalysisdlg.cpp moc/moc_analysis2dctrls.cpp moc/moc_foilexplorer.cpp moc/moc_foiltable.cpp moc/moc_lecircledlg.cpp moc/moc_oppointctrls.cpp moc/moc_blgraphctrls.cpp moc/moc_xdirectlegendwt.cpp moc/moc_xdirectactions.cpp moc/moc_foilplrlistdlg.cpp moc/moc_dfoillegendwt.cpp moc/moc_dfoilwt.cpp moc/moc_oppointwt.cpp moc/moc_xdirect.cpp moc/moc_analysis3dsettings.cpp moc/moc_batchplanedlg.cpp moc/moc_batchxmldlg.cpp moc/moc_lltanalysisdlg.cpp moc/moc_planeanalysisdlg.cpp moc/moc_analysis3dctrls.cpp moc/moc_planeexplorer.cpp moc/moc_popp3dctrls.cpp moc/moc_stab3dctrls.cpp moc/moc_stabtimectrls.cpp moc/moc_targetcurvedlg.cpp moc/moc_wingseldlg.cpp moc/moc_xplanewt.cpp moc/moc_gl3dxplaneview.cpp moc/moc_cpgraphctrls.cpp moc/moc_cpviewwt.cpp moc/moc_poppgraphctrls.cpp moc/moc_xplanelegendwt.cpp moc/moc_xplaneactions.cpp moc/moc_xplane.cpp moc/moc_boatanalysisdlg.cpp moc/moc_boatexplorer.cpp moc/moc_xsailanalysisctrls.cpp moc/moc_xsaildisplayctrls.cpp moc/moc_xsailactions.cpp moc/moc_gl3dxsailview.cpp moc/moc_xsaillegendwt.cpp moc/moc_xsail.cpp moc/moc_prefsdlg.cpp moc/moc_saveoptionswt.cpp moc/moc_unitswt.cpp moc/moc_gl3daxesview.cpp moc/moc_gl3dcontourview.cpp moc/moc_gl3dflightview.cpp moc/moc_gl3doptim2d.cpp moc/moc_gl3dpanelfield.cpp moc/moc_gl3dquadfield.cpp moc/moc_gl3dsingularity.cpp moc/moc_gl3dsurfaceplot.cpp moc/moc_gl3dvortonfield.cpp moc/moc_threadtestdlg.cpp moc/moc_attractor2d.cpp moc/moc_onevortontestdlg.cpp moc/moc_panel3testdlg.cpp moc/moc_panelanalysistest.cpp moc/moc_textoutputtestdlg.cpp moc/moc_vortontestdlg.cpp moc/moc_streamtestdlg.cpp
 compiler_moc_header_clean:
@@ -5863,25 +5863,25 @@ objects/main.o: globals/main.cpp globals/flow5.h \
 		interfaces/opengl/views/shadloc.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/main.o globals/main.cpp
 
-objects/mainframe.o: globals/mainframe.cpp core/displayoptions.h \
-		core/fontstruct.h \
-		core/saveoptions.h \
-		core/enums_core.h \
+objects/mainframe.o: globals/mainframe.cpp globals/mainframe.h \
 		../fl5-lib/api/utils.h \
 		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/fl5color.h \
-		../fl5-lib/api/trace.h \
-		core/xflcore.h \
-		globals/aboutf5.h \
-		globals/creditsdlg.h \
-		globals/gui_params.h \
-		globals/mainframe.h \
+		core/enums_core.h \
 		interfaces/graphs/graph/graph.h \
 		interfaces/graphs/graph/curvemodel.h \
 		interfaces/graphs/graph/curve.h \
 		../fl5-lib/api/linestyle.h \
 		interfaces/graphs/graph/axis.h \
 		interfaces/widgets/view/grid.h \
+		core/displayoptions.h \
+		core/fontstruct.h \
+		core/saveoptions.h \
+		../fl5-lib/api/trace.h \
+		core/xflcore.h \
+		globals/aboutf5.h \
+		globals/creditsdlg.h \
+		globals/gui_params.h \
 		interfaces/controls/poppctrls/crossflowctrls.h \
 		../fl5-lib/api/vector3d.h \
 		../fl5-lib/api/geom_params.h \
@@ -6170,8 +6170,11 @@ objects/t8rangetable.o: interfaces/controls/t8rangetable.cpp interfaces/controls
 		../fl5-lib/api/fl5color.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/t8rangetable.o interfaces/controls/t8rangetable.cpp
 
-objects/w3dprefs.o: interfaces/controls/w3dprefs.cpp ../fl5-lib/api/fl5color.h \
+objects/w3dprefs.o: interfaces/controls/w3dprefs.cpp interfaces/controls/w3dprefs.h \
+		../fl5-lib/api/linestyle.h \
+		../fl5-lib/api/fl5color.h \
 		../fl5-lib/api/fl5lib_global.h \
+		core/fontstruct.h \
 		../fl5-lib/api/sail.h \
 		../fl5-lib/api/triangulation.h \
 		../fl5-lib/api/triangle3d.h \
@@ -6196,7 +6199,6 @@ objects/w3dprefs.o: interfaces/controls/w3dprefs.cpp ../fl5-lib/api/fl5color.h \
 		../fl5-lib/api/gmshparams.h \
 		../fl5-lib/api/inertia.h \
 		../fl5-lib/api/pointmass.h \
-		../fl5-lib/api/linestyle.h \
 		../fl5-lib/api/trimesh.h \
 		../fl5-lib/api/xflmesh.h \
 		../fl5-lib/api/panel3.h \
@@ -6210,9 +6212,8 @@ objects/w3dprefs.o: interfaces/controls/w3dprefs.cpp ../fl5-lib/api/fl5color.h \
 		../fl5-lib/api/edgesplit.h \
 		../fl5-lib/api/units.h \
 		core/displayoptions.h \
-		core/fontstruct.h \
 		core/xflcore.h \
-		interfaces/controls/w3dprefs.h \
+		interfaces/mesh/gmshctrlswt.h \
 		interfaces/opengl/controls/arcball.h \
 		interfaces/opengl/controls/colourlegend.h \
 		interfaces/opengl/views/gl3dview.h \
@@ -6560,12 +6561,15 @@ objects/streamlinesctrls.o: interfaces/controls/poppctrls/streamlinesctrls.cpp i
 		../fl5-lib/api/units.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/streamlinesctrls.o interfaces/controls/poppctrls/streamlinesctrls.cpp
 
-objects/t1234578polardlg.o: interfaces/editors/analysis3ddef/t1234578polardlg.cpp ../fl5-lib/api/objects3d.h \
+objects/t1234578polardlg.o: interfaces/editors/analysis3ddef/t1234578polardlg.cpp interfaces/editors/analysis3ddef/t1234578polardlg.h \
+		interfaces/editors/analysis3ddef/planepolardlg.h \
+		../fl5-lib/api/enums_objects.h \
+		interfaces/editors/analysis3ddef/polar3ddlg.h \
+		../fl5-lib/api/objects3d.h \
 		../fl5-lib/api/linestyle.h \
 		../fl5-lib/api/fl5color.h \
 		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/planexfl.h \
-		../fl5-lib/api/enums_objects.h \
 		../fl5-lib/api/fuse.h \
 		../fl5-lib/api/occmeshparams.h \
 		../fl5-lib/api/part.h \
@@ -6625,9 +6629,6 @@ objects/t1234578polardlg.o: interfaces/editors/analysis3ddef/t1234578polardlg.cp
 		core/xflcore.h \
 		interfaces/editors/analysis3ddef/ctrltablemodel.h \
 		interfaces/editors/analysis3ddef/extradragwt.h \
-		interfaces/editors/analysis3ddef/t1234578polardlg.h \
-		interfaces/editors/analysis3ddef/planepolardlg.h \
-		interfaces/editors/analysis3ddef/polar3ddlg.h \
 		interfaces/widgets/customwts/actionitemmodel.h \
 		interfaces/widgets/customwts/cptableview.h \
 		interfaces/widgets/customwts/ctrltabledelegate.h \
@@ -7635,10 +7636,16 @@ objects/analysisseldlg.o: interfaces/editors/analysisseldlg.cpp interfaces/edito
 		interfaces/widgets/mvc/objecttreemodel.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/analysisseldlg.o interfaces/editors/analysisseldlg.cpp
 
-objects/boatdlg.o: interfaces/editors/boatedit/boatdlg.cpp ../fl5-lib/api/boat.h \
+objects/boatdlg.o: interfaces/editors/boatedit/boatdlg.cpp interfaces/editors/boatedit/boatdlg.h \
+		../fl5-lib/api/quaternion.h \
+		../fl5-lib/api/vector3d.h \
+		../fl5-lib/api/fl5lib_global.h \
+		../fl5-lib/api/geom_params.h \
+		../fl5-lib/api/constants.h \
+		interfaces/widgets/customdlg/xfldialog.h \
+		../fl5-lib/api/boat.h \
 		../fl5-lib/api/fl5object.h \
 		../fl5-lib/api/xflobject.h \
-		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/linestyle.h \
 		../fl5-lib/api/fl5color.h \
 		../fl5-lib/api/enums_objects.h \
@@ -7649,14 +7656,10 @@ objects/boatdlg.o: interfaces/editors/boatedit/boatdlg.cpp ../fl5-lib/api/boat.h
 		../fl5-lib/api/vector2d.h \
 		../fl5-lib/api/node.h \
 		../fl5-lib/api/geom_enums.h \
-		../fl5-lib/api/vector3d.h \
-		../fl5-lib/api/geom_params.h \
-		../fl5-lib/api/constants.h \
 		../fl5-lib/api/panel.h \
 		../fl5-lib/api/cartesianframe.h \
 		../fl5-lib/api/matrix.h \
 		../fl5-lib/api/panelprecision.h \
-		../fl5-lib/api/quaternion.h \
 		../fl5-lib/api/segment3d.h \
 		../fl5-lib/api/triangle3d.h \
 		../fl5-lib/api/triangle2d.h \
@@ -7707,12 +7710,15 @@ objects/boatdlg.o: interfaces/editors/boatedit/boatdlg.cpp ../fl5-lib/api/boat.h
 		../fl5-lib/api/sailwing.h \
 		../fl5-lib/api/wingsailsection.h \
 		../fl5-lib/api/units.h \
+		../fl5-lib/api/xmlboatreader.h \
+		../fl5-lib/api/xmlxsailreader.h \
+		../fl5-lib/api/xflxmlreader.h \
+		../fl5-lib/api/xmlfusereader.h \
+		../fl5-lib/api/xmlsailreader.h \
 		core/saveoptions.h \
 		core/enums_core.h \
 		core/stlreaderdlg.h \
 		core/xflcore.h \
-		interfaces/editors/boatedit/boatdlg.h \
-		interfaces/widgets/customdlg/xfldialog.h \
 		interfaces/editors/boatedit/sailcadreaderdlg.h \
 		interfaces/editors/boatedit/sailnurbsdlg.h \
 		interfaces/editors/boatedit/thinsaildlg.h \
@@ -7748,11 +7754,6 @@ objects/boatdlg.o: interfaces/editors/boatedit/boatdlg.cpp ../fl5-lib/api/boat.h
 		interfaces/widgets/customwts/plaintextoutput.h \
 		interfaces/widgets/customwts/xfldelegate.h \
 		interfaces/widgets/globals/wt_globals.h \
-		../fl5-lib/api/xmlfusereader.h \
-		../fl5-lib/api/xflxmlreader.h \
-		../fl5-lib/api/xmlboatreader.h \
-		../fl5-lib/api/xmlxsailreader.h \
-		../fl5-lib/api/xmlsailreader.h \
 		modules/xobjects.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/boatdlg.o interfaces/editors/boatedit/boatdlg.cpp
 
@@ -7922,28 +7923,33 @@ objects/sailcadreaderdlg.o: interfaces/editors/boatedit/sailcadreaderdlg.cpp int
 		../fl5-lib/api/flow5events.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/sailcadreaderdlg.o interfaces/editors/boatedit/sailcadreaderdlg.cpp
 
-objects/saildlg.o: interfaces/editors/boatedit/saildlg.cpp ../fl5-lib/api/constants.h \
-		../fl5-lib/api/objects_global.h \
-		../fl5-lib/api/enums_objects.h \
-		../fl5-lib/api/geom_enums.h \
-		../fl5-lib/api/vector2d.h \
-		../fl5-lib/api/fl5lib_global.h \
+objects/saildlg.o: interfaces/editors/boatedit/saildlg.cpp interfaces/editors/boatedit/saildlg.h \
+		../fl5-lib/api/quaternion.h \
 		../fl5-lib/api/vector3d.h \
+		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/geom_params.h \
-		../fl5-lib/api/mathelem.h \
-		../fl5-lib/api/occ_globals.h \
+		../fl5-lib/api/constants.h \
+		../fl5-lib/api/segment3d.h \
+		../fl5-lib/api/node.h \
+		../fl5-lib/api/geom_enums.h \
 		../fl5-lib/api/triangle3d.h \
 		../fl5-lib/api/cartesianframe.h \
 		../fl5-lib/api/matrix.h \
-		../fl5-lib/api/segment3d.h \
-		../fl5-lib/api/node.h \
 		../fl5-lib/api/triangle2d.h \
+		../fl5-lib/api/vector2d.h \
 		../fl5-lib/api/segment2d.h \
 		../fl5-lib/api/node2d.h \
 		../fl5-lib/api/cartesianframe2d.h \
-		../fl5-lib/api/bspline3d.h \
+		interfaces/widgets/color/colorbtn.h \
+		interfaces/widgets/view/grid.h \
 		../fl5-lib/api/linestyle.h \
 		../fl5-lib/api/fl5color.h \
+		interfaces/widgets/customdlg/xfldialog.h \
+		../fl5-lib/api/objects_global.h \
+		../fl5-lib/api/enums_objects.h \
+		../fl5-lib/api/mathelem.h \
+		../fl5-lib/api/occ_globals.h \
+		../fl5-lib/api/bspline3d.h \
 		../fl5-lib/api/sail.h \
 		../fl5-lib/api/triangulation.h \
 		../fl5-lib/api/aeroforces.h \
@@ -7958,7 +7964,6 @@ objects/saildlg.o: interfaces/editors/boatedit/saildlg.cpp ../fl5-lib/api/consta
 		../fl5-lib/api/panel3.h \
 		../fl5-lib/api/gqtriangle.h \
 		../fl5-lib/api/panel.h \
-		../fl5-lib/api/quaternion.h \
 		../fl5-lib/api/vortex.h \
 		../fl5-lib/api/quadmesh.h \
 		../fl5-lib/api/panel4.h \
@@ -7968,15 +7973,14 @@ objects/saildlg.o: interfaces/editors/boatedit/saildlg.cpp ../fl5-lib/api/consta
 		../fl5-lib/api/utils.h \
 		../fl5-lib/api/frame.h \
 		../fl5-lib/api/units.h \
+		../fl5-lib/api/xmlsailwriter.h \
+		../fl5-lib/api/xmlxsailwriter.h \
+		../fl5-lib/api/xflxmlwriter.h \
 		core/saveoptions.h \
 		core/enums_core.h \
 		core/xflcore.h \
 		interfaces/controls/w3dprefs.h \
 		core/fontstruct.h \
-		interfaces/editors/boatedit/saildlg.h \
-		interfaces/widgets/color/colorbtn.h \
-		interfaces/widgets/view/grid.h \
-		interfaces/widgets/customdlg/xfldialog.h \
 		interfaces/editors/boatedit/sailscaledlg.h \
 		interfaces/editors/boatedit/sailsectionview.h \
 		interfaces/widgets/view/section2dwt.h \
@@ -8019,9 +8023,6 @@ objects/saildlg.o: interfaces/editors/boatedit/saildlg.cpp ../fl5-lib/api/consta
 		interfaces/widgets/line/linebtn.h \
 		interfaces/widgets/line/linemenu.h \
 		interfaces/widgets/line/lineaction.h \
-		../fl5-lib/api/xmlsailwriter.h \
-		../fl5-lib/api/xmlxsailwriter.h \
-		../fl5-lib/api/xflxmlwriter.h \
 		modules/xobjects.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/saildlg.o interfaces/editors/boatedit/saildlg.cpp
 
@@ -9201,34 +9202,40 @@ objects/fuselinewt.o: interfaces/editors/fuseedit/xflfuseedit/fuselinewt.cpp int
 		interfaces/view2d/paint2d.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/fuselinewt.o interfaces/editors/fuseedit/xflfuseedit/fuselinewt.cpp
 
-objects/fusexfldefdlg.o: interfaces/editors/fuseedit/xflfuseedit/fusexfldefdlg.cpp ../fl5-lib/api/frame.h \
+objects/fusexfldefdlg.o: interfaces/editors/fuseedit/xflfuseedit/fusexfldefdlg.cpp interfaces/editors/fuseedit/xflfuseedit/fusexfldefdlg.h \
+		interfaces/editors/fuseedit/xflfuseedit/fusexfldlg.h \
+		interfaces/editors/fuseedit/fusedlg.h \
+		interfaces/opengl/fl5views/gl3dfuseview.h \
+		interfaces/opengl/fl5views/gl3dxflview.h \
+		../fl5-lib/api/enums_objects.h \
+		interfaces/opengl/controls/arcball.h \
 		../fl5-lib/api/vector3d.h \
 		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/geom_params.h \
 		../fl5-lib/api/constants.h \
-		../fl5-lib/api/fusesections.h \
-		../fl5-lib/api/fusexfl.h \
-		../fl5-lib/api/nurbssurface.h \
-		../fl5-lib/api/utils.h \
+		../fl5-lib/api/quaternion.h \
+		interfaces/opengl/views/gl3dview.h \
+		../fl5-lib/api/linestyle.h \
 		../fl5-lib/api/fl5color.h \
-		../fl5-lib/api/enums_objects.h \
+		../fl5-lib/api/vector2d.h \
+		../fl5-lib/api/node.h \
+		../fl5-lib/api/geom_enums.h \
+		core/fontstruct.h \
+		interfaces/opengl/views/light.h \
+		interfaces/opengl/views/shadloc.h \
+		../fl5-lib/api/segment3d.h \
 		../fl5-lib/api/fuse.h \
 		../fl5-lib/api/occmeshparams.h \
 		../fl5-lib/api/part.h \
 		../fl5-lib/api/gmshparams.h \
 		../fl5-lib/api/inertia.h \
 		../fl5-lib/api/pointmass.h \
-		../fl5-lib/api/linestyle.h \
 		../fl5-lib/api/mathelem.h \
 		../fl5-lib/api/triangulation.h \
 		../fl5-lib/api/triangle3d.h \
 		../fl5-lib/api/cartesianframe.h \
 		../fl5-lib/api/matrix.h \
-		../fl5-lib/api/segment3d.h \
-		../fl5-lib/api/node.h \
-		../fl5-lib/api/geom_enums.h \
 		../fl5-lib/api/triangle2d.h \
-		../fl5-lib/api/vector2d.h \
 		../fl5-lib/api/segment2d.h \
 		../fl5-lib/api/node2d.h \
 		../fl5-lib/api/cartesianframe2d.h \
@@ -9238,8 +9245,14 @@ objects/fusexfldefdlg.o: interfaces/editors/fuseedit/xflfuseedit/fusexfldefdlg.c
 		../fl5-lib/api/gqtriangle.h \
 		../fl5-lib/api/panel.h \
 		../fl5-lib/api/panelprecision.h \
-		../fl5-lib/api/quaternion.h \
 		../fl5-lib/api/vortex.h \
+		interfaces/widgets/customdlg/xfldialog.h \
+		interfaces/widgets/view/grid.h \
+		../fl5-lib/api/frame.h \
+		../fl5-lib/api/fusesections.h \
+		../fl5-lib/api/fusexfl.h \
+		../fl5-lib/api/nurbssurface.h \
+		../fl5-lib/api/utils.h \
 		../fl5-lib/api/quadmesh.h \
 		../fl5-lib/api/panel4.h \
 		../fl5-lib/api/quad3d.h \
@@ -9247,19 +9260,7 @@ objects/fusexfldefdlg.o: interfaces/editors/fuseedit/xflfuseedit/fusexfldefdlg.c
 		../fl5-lib/api/units.h \
 		interfaces/editors/fuseedit/xflfuseedit/fuseframewt.h \
 		interfaces/widgets/view/section2dwt.h \
-		interfaces/widgets/view/grid.h \
 		interfaces/editors/fuseedit/xflfuseedit/fuselinewt.h \
-		interfaces/editors/fuseedit/xflfuseedit/fusexfldefdlg.h \
-		interfaces/editors/fuseedit/xflfuseedit/fusexfldlg.h \
-		interfaces/editors/fuseedit/fusedlg.h \
-		interfaces/opengl/fl5views/gl3dfuseview.h \
-		interfaces/opengl/fl5views/gl3dxflview.h \
-		interfaces/opengl/controls/arcball.h \
-		interfaces/opengl/views/gl3dview.h \
-		core/fontstruct.h \
-		interfaces/opengl/views/light.h \
-		interfaces/opengl/views/shadloc.h \
-		interfaces/widgets/customdlg/xfldialog.h \
 		interfaces/opengl/controls/gl3dgeomcontrols.h \
 		interfaces/opengl/controls/gl3dcontrols.h \
 		interfaces/widgets/customwts/actionitemmodel.h \
@@ -9411,12 +9412,12 @@ objects/fusexflobjectdlg.o: interfaces/editors/fuseedit/xflfuseedit/fusexflobjec
 		../fl5-lib/api/spandistribs.h \
 		../fl5-lib/api/surface.h \
 		../fl5-lib/api/wingsection.h \
+		../fl5-lib/api/units.h \
 		../fl5-lib/api/xmlfusereader.h \
 		../fl5-lib/api/xflxmlreader.h \
 		../fl5-lib/api/xmlfusewriter.h \
 		../fl5-lib/api/xflxmlwriter.h \
 		core/enums_core.h \
-		../fl5-lib/api/units.h \
 		core/saveoptions.h \
 		interfaces/editors/editobjectdelegate.h \
 		interfaces/editors/fuseedit/bodyscaledlg.h \
@@ -10488,44 +10489,47 @@ objects/wingdefdlg.o: interfaces/editors/wingedit/wingdefdlg.cpp interfaces/edit
 		../fl5-lib/api/xflxmlwriter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/wingdefdlg.o interfaces/editors/wingedit/wingdefdlg.cpp
 
-objects/wingdlg.o: interfaces/editors/wingedit/wingdlg.cpp interfaces/opengl/controls/gl3dgeomcontrols.h \
-		interfaces/opengl/controls/gl3dcontrols.h \
-		interfaces/opengl/fl5views/gl3dwingview.h \
-		interfaces/opengl/fl5views/gl3dxflview.h \
-		../fl5-lib/api/enums_objects.h \
-		interfaces/opengl/controls/arcball.h \
+objects/wingdlg.o: interfaces/editors/wingedit/wingdlg.cpp interfaces/editors/wingedit/wingdlg.h \
 		../fl5-lib/api/vector3d.h \
 		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/geom_params.h \
 		../fl5-lib/api/constants.h \
 		../fl5-lib/api/quaternion.h \
-		interfaces/opengl/views/gl3dview.h \
+		interfaces/editors/wingedit/wingsectionmodel.h \
+		interfaces/widgets/customdlg/xfldialog.h \
+		../fl5-lib/api/foil.h \
+		../fl5-lib/api/cubicspline.h \
+		../fl5-lib/api/spline.h \
+		../fl5-lib/api/node2d.h \
+		../fl5-lib/api/vector2d.h \
+		../fl5-lib/api/mathelem.h \
 		../fl5-lib/api/linestyle.h \
 		../fl5-lib/api/fl5color.h \
-		../fl5-lib/api/vector2d.h \
-		../fl5-lib/api/node.h \
-		../fl5-lib/api/geom_enums.h \
-		core/fontstruct.h \
-		interfaces/opengl/views/light.h \
-		interfaces/opengl/views/shadloc.h \
-		../fl5-lib/api/segment3d.h \
-		core/saveoptions.h \
-		core/enums_core.h \
-		../fl5-lib/api/utils.h \
-		../fl5-lib/api/units.h \
-		core/xflcore.h \
-		interfaces/editors/inertia/partinertiadlg.h \
-		../fl5-lib/api/pointmass.h \
-		interfaces/editors/planeedit/planexfldlg.h \
-		interfaces/editors/planeedit/planedlg.h \
+		../fl5-lib/api/xflobject.h \
+		../fl5-lib/api/objects2d.h \
+		../fl5-lib/api/bldata.h \
+		../fl5-lib/api/enums_objects.h \
+		../fl5-lib/api/polar.h \
+		../fl5-lib/api/objects3d.h \
+		../fl5-lib/api/occ_globals.h \
 		../fl5-lib/api/triangle3d.h \
 		../fl5-lib/api/cartesianframe.h \
 		../fl5-lib/api/matrix.h \
+		../fl5-lib/api/segment3d.h \
+		../fl5-lib/api/node.h \
+		../fl5-lib/api/geom_enums.h \
 		../fl5-lib/api/triangle2d.h \
 		../fl5-lib/api/segment2d.h \
-		../fl5-lib/api/node2d.h \
 		../fl5-lib/api/cartesianframe2d.h \
-		interfaces/widgets/customdlg/xfldialog.h \
+		../fl5-lib/api/bspline3d.h \
+		../fl5-lib/api/planexfl.h \
+		../fl5-lib/api/fuse.h \
+		../fl5-lib/api/occmeshparams.h \
+		../fl5-lib/api/part.h \
+		../fl5-lib/api/gmshparams.h \
+		../fl5-lib/api/inertia.h \
+		../fl5-lib/api/pointmass.h \
+		../fl5-lib/api/triangulation.h \
 		../fl5-lib/api/trimesh.h \
 		../fl5-lib/api/xflmesh.h \
 		../fl5-lib/api/panel3.h \
@@ -10533,30 +10537,6 @@ objects/wingdlg.o: interfaces/editors/wingedit/wingdlg.cpp interfaces/opengl/con
 		../fl5-lib/api/panel.h \
 		../fl5-lib/api/panelprecision.h \
 		../fl5-lib/api/vortex.h \
-		../fl5-lib/api/triangulation.h \
-		interfaces/editors/translatedlg.h \
-		interfaces/editors/wingedit/wingdlg.h \
-		interfaces/editors/wingedit/wingsectionmodel.h \
-		interfaces/editors/wingedit/wingscaledlg.h \
-		interfaces/editors/wingedit/wingsectiondelegate.h \
-		interfaces/exchange/stlwriterdlg.h \
-		interfaces/exchange/wingexportdlg.h \
-		interfaces/exchange/cadexportdlg.h \
-		../fl5-lib/api/foil.h \
-		../fl5-lib/api/cubicspline.h \
-		../fl5-lib/api/spline.h \
-		../fl5-lib/api/mathelem.h \
-		../fl5-lib/api/xflobject.h \
-		../fl5-lib/api/objects2d.h \
-		../fl5-lib/api/bldata.h \
-		../fl5-lib/api/polar.h \
-		../fl5-lib/api/objects3d.h \
-		../fl5-lib/api/planexfl.h \
-		../fl5-lib/api/fuse.h \
-		../fl5-lib/api/occmeshparams.h \
-		../fl5-lib/api/part.h \
-		../fl5-lib/api/gmshparams.h \
-		../fl5-lib/api/inertia.h \
 		../fl5-lib/api/optstructures.h \
 		../fl5-lib/api/plane.h \
 		../fl5-lib/api/fl5object.h \
@@ -10567,10 +10547,31 @@ objects/wingdlg.o: interfaces/editors/wingedit/wingdlg.cpp interfaces/opengl/con
 		../fl5-lib/api/spandistribs.h \
 		../fl5-lib/api/surface.h \
 		../fl5-lib/api/wingsection.h \
-		../fl5-lib/api/occ_globals.h \
-		../fl5-lib/api/bspline3d.h \
+		../fl5-lib/api/units.h \
 		../fl5-lib/api/xmlwingwriter.h \
 		../fl5-lib/api/xflxmlwriter.h \
+		core/saveoptions.h \
+		core/enums_core.h \
+		../fl5-lib/api/utils.h \
+		core/xflcore.h \
+		interfaces/editors/inertia/partinertiadlg.h \
+		interfaces/editors/planeedit/planexfldlg.h \
+		interfaces/editors/planeedit/planedlg.h \
+		interfaces/editors/translatedlg.h \
+		interfaces/editors/wingedit/wingscaledlg.h \
+		interfaces/editors/wingedit/wingsectiondelegate.h \
+		interfaces/exchange/stlwriterdlg.h \
+		interfaces/exchange/wingexportdlg.h \
+		interfaces/exchange/cadexportdlg.h \
+		interfaces/opengl/controls/gl3dgeomcontrols.h \
+		interfaces/opengl/controls/gl3dcontrols.h \
+		interfaces/opengl/fl5views/gl3dwingview.h \
+		interfaces/opengl/fl5views/gl3dxflview.h \
+		interfaces/opengl/controls/arcball.h \
+		interfaces/opengl/views/gl3dview.h \
+		core/fontstruct.h \
+		interfaces/opengl/views/light.h \
+		interfaces/opengl/views/shadloc.h \
 		interfaces/widgets/color/colorbtn.h \
 		interfaces/widgets/customdlg/intvaluedlg.h \
 		interfaces/widgets/customwts/floatedit.h \
@@ -10906,10 +10907,8 @@ objects/fastgraphwt.o: interfaces/graphs/containers/fastgraphwt.cpp interfaces/g
 		interfaces/widgets/customwts/cptableview.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/fastgraphwt.o interfaces/graphs/containers/fastgraphwt.cpp
 
-objects/graphwt.o: interfaces/graphs/containers/graphwt.cpp core/xflcore.h \
-		core/displayoptions.h \
+objects/graphwt.o: interfaces/graphs/containers/graphwt.cpp interfaces/graphs/containers/graphwt.h \
 		core/fontstruct.h \
-		interfaces/graphs/containers/graphwt.h \
 		interfaces/graphs/graph/graph.h \
 		interfaces/graphs/graph/curvemodel.h \
 		interfaces/graphs/graph/curve.h \
@@ -10918,6 +10917,8 @@ objects/graphwt.o: interfaces/graphs/containers/graphwt.cpp core/xflcore.h \
 		../fl5-lib/api/fl5lib_global.h \
 		interfaces/graphs/graph/axis.h \
 		interfaces/widgets/view/grid.h \
+		core/xflcore.h \
+		core/displayoptions.h \
 		interfaces/graphs/controls/graphdlg.h \
 		interfaces/graphs/globals/graph_globals.h \
 		interfaces/graphs/controls/graphoptions.h
@@ -13462,7 +13463,8 @@ objects/psotaskplane.o: interfaces/optim/psotaskplane.cpp interfaces/optim/psota
 		../fl5-lib/api/occmeshparams.h \
 		../fl5-lib/api/plane.h \
 		../fl5-lib/api/fl5object.h \
-		../fl5-lib/api/quadmesh.h
+		../fl5-lib/api/quadmesh.h \
+		../fl5-lib/api/objects3d.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/psotaskplane.o interfaces/optim/psotaskplane.cpp
 
 objects/xflexecutor.o: interfaces/script/xflexecutor.cpp core/xflcore.h \
@@ -13979,14 +13981,14 @@ objects/linemenu.o: interfaces/widgets/line/linemenu.cpp interfaces/widgets/line
 		interfaces/widgets/line/linepicker.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/linemenu.o interfaces/widgets/line/linemenu.cpp
 
-objects/linepicker.o: interfaces/widgets/line/linepicker.cpp core/xflcore.h \
-		core/displayoptions.h \
-		core/fontstruct.h \
-		interfaces/widgets/line/linepicker.h \
+objects/linepicker.o: interfaces/widgets/line/linepicker.cpp interfaces/widgets/line/linepicker.h \
 		interfaces/widgets/line/linebtn.h \
 		../fl5-lib/api/linestyle.h \
 		../fl5-lib/api/fl5color.h \
 		../fl5-lib/api/fl5lib_global.h \
+		core/xflcore.h \
+		core/displayoptions.h \
+		core/fontstruct.h \
 		interfaces/widgets/color/textclrbtn.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/linepicker.o interfaces/widgets/line/linepicker.cpp
 
@@ -14691,19 +14693,20 @@ objects/oppointwt.o: modules/xdirect/view2d/oppointwt.cpp modules/xdirect/view2d
 		../fl5-lib/api/constants.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/oppointwt.o modules/xdirect/view2d/oppointwt.cpp
 
-objects/xdirect.o: modules/xdirect/xdirect.cpp core/displayoptions.h \
+objects/xdirect.o: modules/xdirect/xdirect.cpp modules/xdirect/xdirect.h \
+		core/enums_core.h \
+		../fl5-lib/api/linestyle.h \
+		../fl5-lib/api/fl5color.h \
+		../fl5-lib/api/fl5lib_global.h \
+		core/displayoptions.h \
 		core/fontstruct.h \
 		core/saveoptions.h \
-		core/enums_core.h \
 		../fl5-lib/api/utils.h \
-		../fl5-lib/api/fl5lib_global.h \
-		../fl5-lib/api/fl5color.h \
 		core/xflcore.h \
 		globals/mainframe.h \
 		interfaces/graphs/graph/graph.h \
 		interfaces/graphs/graph/curvemodel.h \
 		interfaces/graphs/graph/curve.h \
-		../fl5-lib/api/linestyle.h \
 		interfaces/graphs/graph/axis.h \
 		interfaces/widgets/view/grid.h \
 		interfaces/editors/analysis2ddef/foilpolardlg.h \
@@ -14772,7 +14775,6 @@ objects/xdirect.o: modules/xdirect/xdirect.cpp core/displayoptions.h \
 		modules/xdirect/view2d/dfoilwt.h \
 		interfaces/widgets/view/section2dwt.h \
 		modules/xdirect/view2d/oppointwt.h \
-		modules/xdirect/xdirect.h \
 		modules/xobjects.h \
 		../fl5-lib/api/sail.h \
 		../fl5-lib/api/triangulation.h \
@@ -15002,7 +15004,9 @@ objects/batchplanedlg.o: modules/xplane/analysis/batchplanedlg.cpp modules/xplan
 		modules/xplane/controls/planeexplorer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/batchplanedlg.o modules/xplane/analysis/batchplanedlg.cpp
 
-objects/batchxmldlg.o: modules/xplane/analysis/batchxmldlg.cpp ../fl5-lib/api/fl5core.h \
+objects/batchxmldlg.o: modules/xplane/analysis/batchxmldlg.cpp modules/xplane/analysis/batchxmldlg.h \
+		../fl5-lib/api/analysisrange.h \
+		../fl5-lib/api/fl5core.h \
 		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/flow5events.h \
 		../fl5-lib/api/llttask.h \
@@ -15069,19 +15073,18 @@ objects/batchxmldlg.o: modules/xplane/analysis/batchxmldlg.cpp ../fl5-lib/api/fl
 		../fl5-lib/api/cubicspline.h \
 		../fl5-lib/api/surface.h \
 		../fl5-lib/api/wingsection.h \
+		../fl5-lib/api/units.h \
 		../fl5-lib/api/xmlplanepolarreader.h \
 		../fl5-lib/api/xflxmlreader.h \
 		../fl5-lib/api/xmlplanepolarwriter.h \
 		../fl5-lib/api/xflxmlwriter.h \
 		core/displayoptions.h \
 		core/fontstruct.h \
-		../fl5-lib/api/units.h \
 		core/saveoptions.h \
 		core/enums_core.h \
 		core/xflcore.h \
 		interfaces/controls/analysisrangetable.h \
 		interfaces/widgets/customwts/cptableview.h \
-		../fl5-lib/api/analysisrange.h \
 		interfaces/controls/t8rangetable.h \
 		interfaces/editors/analysis3ddef/t1234578polardlg.h \
 		interfaces/editors/analysis3ddef/planepolardlg.h \
@@ -15098,7 +15101,6 @@ objects/batchxmldlg.o: modules/xplane/analysis/batchxmldlg.cpp ../fl5-lib/api/fl
 		interfaces/widgets/customwts/xfldelegate.h \
 		interfaces/widgets/globals/wt_globals.h \
 		modules/xplane/analysis/analysis3dsettings.h \
-		modules/xplane/analysis/batchxmldlg.h \
 		modules/xplane/xplane.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/batchxmldlg.o modules/xplane/analysis/batchxmldlg.cpp
 
@@ -16344,7 +16346,8 @@ objects/xplanelegendwt.o: modules/xplane/graphs/xplanelegendwt.cpp modules/xplan
 		interfaces/widgets/globals/wt_globals.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o objects/xplanelegendwt.o modules/xplane/graphs/xplanelegendwt.cpp
 
-objects/xplaneactions.o: modules/xplane/menus/xplaneactions.cpp globals/mainframe.h \
+objects/xplaneactions.o: modules/xplane/menus/xplaneactions.cpp modules/xplane/menus/xplaneactions.h \
+		globals/mainframe.h \
 		../fl5-lib/api/utils.h \
 		../fl5-lib/api/fl5lib_global.h \
 		../fl5-lib/api/fl5color.h \
@@ -16415,7 +16418,6 @@ objects/xplaneactions.o: modules/xplane/menus/xplaneactions.cpp globals/mainfram
 		interfaces/opengl/views/shadloc.h \
 		interfaces/opengl/controls/colourlegend.h \
 		../fl5-lib/api/boid.h \
-		modules/xplane/menus/xplaneactions.h \
 		modules/xplane/xplane.h \
 		../fl5-lib/api/optstructures.h \
 		../fl5-lib/api/planepolar.h \

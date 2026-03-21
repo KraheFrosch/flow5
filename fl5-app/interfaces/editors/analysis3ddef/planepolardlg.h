@@ -108,15 +108,14 @@ class PlanePolarDlg : public Polar3dDlg
 
         QFrame *m_pfrViscosity;
         QCheckBox *m_pchViscAnalysis;
-        QRadioButton *m_prbViscInterpolated, *m_prbViscOnTheFly, *m_prbNeuralFoilOTF;
+        QRadioButton *m_prbViscInterpolated, *m_prbViscOnTheFly;
         QRadioButton *m_prbViscFromCl, *m_prbViscFromAlpha;
         FloatEdit *m_pfeNCrit;
         FloatEdit *m_pfeXTopTr, *m_pfeXBotTr;
         QCheckBox *m_pchTransAtHinge;
         QFrame *m_pfrInterpolated, *m_pfrOntheFly;
         QCheckBox *m_pchViscousLoop;
-        QComboBox *m_pcbNFModelSize;
-        QComboBox *m_pcbNFMode;
+
 
         static PlanePolar s_WPolar;
 };
