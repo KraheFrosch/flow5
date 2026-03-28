@@ -26,3 +26,6 @@ fl5-lib/libfl5-lib.so*
 # Build directories
 build/
 objects/
+
+# Qt generated resource files
+rcc/
