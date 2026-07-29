@@ -26,6 +26,7 @@
 
 #include <QString>
 
+#include <cstdlib>
 #include <thread>
 
 
@@ -40,6 +41,30 @@
 #include <vortex.h>
 #include <vorton.h>
 
+double P3Analysis::s_trefftzCoreRadius = 0.0001;
+
+/**
+ * FL5_WAKE_LR_FIX=1: BOT trailing panels store their geometric LEFT trailing node in
+ * m_S[2] and RIGHT in m_S[1] (Panel3::leftTrailingNode), inverted vs TOP/MID panels.
+ * The legacy gLeft/gRight extraction pairs top DOF+1 (top-left) with bot DOF+1
+ * (bot-RIGHT). Harmless while only gMid is used (swap cancels in the sum), load-bearing
+ * for any per-edge use of gLeft/gRight (multi-point Trefftz quadrature).
+ * FL5_TREFFTZ_NPT=N (default 1): N-point Gauss-Legendre sampling of the Trefftz strip
+ * drag integral. N=1 is the legacy midpoint scheme, bit-identical.
+ */
+static bool fl5WakeLRFix()
+{
+    char const *v = getenv("FL5_WAKE_LR_FIX");
+    return v && v[0]=='1';
+}
+
+static int fl5TrefftzNpt()
+{
+    char const *v = getenv("FL5_TREFFTZ_NPT");
+    if(!v) return 1;
+    int n = atoi(v);
+    return (n>=1 && n<=16) ? n : 1;
+}
 
 
 P3Analysis::P3Analysis() : PanelAnalysis()
@@ -730,6 +755,7 @@ void P3Analysis::inducedForce(int nPanel3, double QInf, double alpha, double bet
     Vector3d StripForce; // body axes
 
     double const *mu3    = m_Mu.data();
+    bool bLRFix = fl5WakeLRFix();
     int m=0;
     for(int i3=0; i3<nPanel3; i3++)
     {
@@ -751,9 +777,18 @@ void P3Analysis::inducedForce(int nPanel3, double QInf, double alpha, double bet
                 int idxU = nextTopTrailingPanelIndex(p3);
                 assert(idxU>=0);
 
-                // the trailing nodes have indexes 1 & 2
-                gLeft  = (-mu3[3*idxU+1] + mu3[3*idxB+1])*4.0*PI;
-                gRight = (-mu3[3*idxU+2] + mu3[3*idxB+2])*4.0*PI;
+                if(bLRFix)
+                {
+                    // top panel: left node = m_S[1]; bot panel: left node = m_S[2]
+                    gLeft  = (-mu3[3*idxU+1] + mu3[3*idxB+2])*4.0*PI;
+                    gRight = (-mu3[3*idxU+2] + mu3[3*idxB+1])*4.0*PI;
+                }
+                else
+                {
+                    // the trailing nodes have indexes 1 & 2
+                    gLeft  = (-mu3[3*idxU+1] + mu3[3*idxB+1])*4.0*PI;
+                    gRight = (-mu3[3*idxU+2] + mu3[3*idxB+2])*4.0*PI;
+                }
             }
 
             gMid = (gLeft+gRight)/2.0;
@@ -802,6 +837,10 @@ void P3Analysis::trefftzDrag(int nPanel3, double QInf, double alpha, double beta
 
 //    clearDebugPts();
 
+    bool bLRFix = fl5WakeLRFix();
+    int nTrefftzPt = fl5TrefftzNpt();
+    GaussQuadrature gqStrip(nTrefftzPt);
+
     // Note: parallelization fails, incompatibility with std::vectors of SpanDistribs
     int m=0;
     for(int i3=0; i3<nPanel3; i3++)
@@ -823,18 +862,6 @@ void P3Analysis::trefftzDrag(int nPanel3, double QInf, double alpha, double beta
             midWakePoint(p3W, left, right);
             mid.set((left + right)/2.0);
 
-//            getVelocityVector(left,  mu3, sigma3, Wg_l, 0.0001, true, s_bMultiThread);
-            getVelocityVector(mid,   mu3, sigma3, Wg_m, 0.0001, true, s_bMultiThread);
-//            getVelocityVector(right, mu3, sigma3, Wg_r, 0.0001, true, s_bMultiThread);
-
-//            Wg_l *= 0.5;
-            Wg_m *= 0.5;
-//            Wg_r *= 0.5;
-
-//s_DebugPts.push_back(mid);
-//s_DebugVecs.push_back(Wg_m);
-
-
             if(p3.isMidPanel())
             {
                 int idxM = p3.index();
@@ -848,14 +875,36 @@ void P3Analysis::trefftzDrag(int nPanel3, double QInf, double alpha, double beta
                 int idxU = nextTopTrailingPanelIndex(p3);
                 assert(idxU>=0);
 
-                // the trailing nodes have indexes 1 & 2
-                gLeft  = (-mu3[3*idxU+1] + mu3[3*idxB+1])*4.0*PI;
-                gRight = (-mu3[3*idxU+2] + mu3[3*idxB+2])*4.0*PI;
+                if(bLRFix)
+                {
+                    // top panel: left node = m_S[1]; bot panel: left node = m_S[2]
+                    gLeft  = (-mu3[3*idxU+1] + mu3[3*idxB+2])*4.0*PI;
+                    gRight = (-mu3[3*idxU+2] + mu3[3*idxB+1])*4.0*PI;
+                }
+                else
+                {
+                    // the trailing nodes have indexes 1 & 2
+                    gLeft  = (-mu3[3*idxU+1] + mu3[3*idxB+1])*4.0*PI;
+                    gRight = (-mu3[3*idxU+2] + mu3[3*idxB+2])*4.0*PI;
+                }
                 gMid = (gLeft+gRight)/2.0;
             }
 
             u.set(p3.trailingVortex());
             u.normalize();
+
+            if(nTrefftzPt<=1)
+            {
+//            getVelocityVector(left,  mu3, sigma3, Wg_l, 0.0001, true, s_bMultiThread);
+            getVelocityVector(mid,   mu3, sigma3, Wg_m, s_trefftzCoreRadius, true, s_bMultiThread);
+//            getVelocityVector(right, mu3, sigma3, Wg_r, 0.0001, true, s_bMultiThread);
+
+//            Wg_l *= 0.5;
+            Wg_m *= 0.5;
+//            Wg_r *= 0.5;
+
+//s_DebugPts.push_back(mid);
+//s_DebugVecs.push_back(Wg_m);
 
 //            theforce_l = Wg_l * u * gLeft;
             theforce_m = Wg_m * u * gMid;
@@ -867,6 +916,27 @@ void P3Analysis::trefftzDrag(int nPanel3, double QInf, double alpha, double beta
              StripForce += theforce_m*2.0;
 
             StripForce *= p3.trailingVortex().norm()/2.0; // two half segments
+            }
+            else
+            {
+                // FL5_TREFFTZ_NPT>1: Gauss-Legendre sampling of the strip drag integral.
+                // Interior nodes keep the samples off the trailing filaments; the doublet
+                // drop is linear across the strip, so Gamma interpolates gLeft->gRight.
+                Wg_m.set(0,0,0);
+                for(int k=0; k<nTrefftzPt; k++)
+                {
+                    double t = gqStrip.xrel(k, -0.5, 0.5);
+                    double wt = gqStrip.weight(k, -0.5, 0.5);
+                    Vector3d pt = mid + (right-left)*t;
+                    double g = gMid + (gRight-gLeft)*t;
+                    Vector3d Wg_k;
+                    getVelocityVector(pt, mu3, sigma3, Wg_k, s_trefftzCoreRadius, true, s_bMultiThread);
+                    Wg_k *= 0.5;
+                    StripForce += (Wg_k * u) * (g * wt);
+                    Wg_m += Wg_k * wt; // strip-averaged downwash for the span distributions
+                }
+                StripForce *= p3.trailingVortex().norm();
+            }
             StripForce *= m_pPolar3d->density() / qDyn;      // N/q
             ForceBodyAxes += StripForce;      // N/q
 

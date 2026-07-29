@@ -24,6 +24,7 @@
 
 #define _MATH_DEFINES_DEFINED
 
+#include <cstdlib>
 #include <thread>
 #include <iostream>
 #include <QString>
@@ -130,8 +131,23 @@ void P3LinAnalysis::makeMatrixBlock(int iBlock)
 }
 
 
+/**
+ * FL5_WAKE_LR_FIX=1 corrects the wake left/right coupling for BOT trailing panels:
+ * the legacy code assumes node 1 = left trailing node for all shedding panels (see the
+ * comment below), but Panel3::leftTrailingNode() returns m_S[2] for BOT panels — the
+ * legacy mapping couples the wake column's left edge to the bot panel's geometric RIGHT
+ * node. Default (unset/0) keeps the legacy behavior bit-identical.
+ */
+static bool fl5WakeLRFix()
+{
+    char const *v = getenv("FL5_WAKE_LR_FIX");
+    return v && v[0]=='1';
+}
+
+
 void P3LinAnalysis::makeWakeMatrixBlock(int iBlock)
 {
+    bool bLRFix = fl5WakeLRFix();
     int N = nPanels()*3;
 
     // for each panel
@@ -212,8 +228,17 @@ void P3LinAnalysis::makeWakeMatrixBlock(int iBlock)
                     {
                         int row = 3*i3 + ib;
     //                    col0 = 3*k3;
-                        col1 = 3*k3+1;
-                        col2 = 3*k3+2;
+                        if(bLRFix)
+                        {
+                            // BOT panels: geometric left trailing node is m_S[2], right is m_S[1]
+                            col1 = 3*k3+2;
+                            col2 = 3*k3+1;
+                        }
+                        else
+                        {
+                            col1 = 3*k3+1;
+                            col2 = 3*k3+2;
+                        }
                         if(s_bDoublePrecision)
                         {
                             // add the wake's left contribution to basis function 1

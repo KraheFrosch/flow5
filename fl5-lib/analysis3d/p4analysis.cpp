@@ -28,12 +28,14 @@
 #include <QString>
 #include <QDebug>
 
+#include <cstdlib>
 #include <thread>
 #include <iostream>
 
 
 #include <p4analysis.h>
 
+#include <gaussquadrature.h>
 #include <matrix.h>
 #include <objects2d.h>
 #include <panel4.h>
@@ -1453,6 +1455,21 @@ void P4Analysis::inducedForce(int nPanels, double QInf, double alpha, double bet
 }
 
 
+/**
+ * FL5_TREFFTZ_NPT=N (default 1): N-point Gauss-Legendre sampling of the Trefftz strip
+ * downwash across the strip width (VLM branch). N=1 keeps the legacy single control-point
+ * sample bit-identical. The strip circulation is constant in the VLM, so the quadrature
+ * reduces to a Gauss-weighted average of the induced velocity across the strip.
+ */
+static int fl5TrefftzNpt()
+{
+    char const *v = getenv("FL5_TREFFTZ_NPT");
+    if(!v) return 1;
+    int n = atoi(v);
+    return (n>=1 && n<=16) ? n : 1;
+}
+
+
 /** Calculates the induced drag in the Trefftz plane
  * The Trefttz plane is half-way down the wake panels to avoid end-effects
  */
@@ -1463,6 +1480,9 @@ void P4Analysis::trefftzDrag(int nPanels, double QInf, double alpha, double beta
     double GammaStrip(0);
     Vector3d C, Wg;
     Vector3d vortex, stripforce, ForceBodyAxes; // strip and global forces, in body axes
+
+    int nTrefftzPt = fl5TrefftzNpt();
+    GaussQuadrature gqStrip(nTrefftzPt);
 
     //   Define wind axes
     Vector3d winddir = objects::windDirection(alpha, beta);
@@ -1543,6 +1563,8 @@ void P4Analysis::trefftzDrag(int nPanels, double QInf, double alpha, double beta
                     Panel4 const &pp4 = m_Panel4.at(pp+pos);
                     if(m_pPolar3d->isVLM1() || pp4.isTrailing())
                     {
+                        if(nTrefftzPt<=1)
+                        {
                         C = p4.ctrlPt(true);
 
                         // evaluate at half the ff distance, so that we get influence of upstream and downstream parts of the vortices
@@ -1557,6 +1579,27 @@ void P4Analysis::trefftzDrag(int nPanels, double QInf, double alpha, double beta
                         // So divide by 2 to account for this.
                         Wg *= 1.0/2.0;
 //                        Wg += winddir;
+                        }
+                        else
+                        {
+                            // FL5_TREFFTZ_NPT>1: Gauss-weighted downwash average across the
+                            // strip width, sampled between the strip's trailing vortex legs.
+                            // The VLM strip circulation is constant spanwise, so averaging w
+                            // implements the strip drag integral exactly.
+                            Vector3d eSpan = p4.TB() - p4.TA();
+                            eSpan.x = 0.0;
+                            C = (p4.TA() + p4.TB())/2.0;
+                            C.x = m_pPolar3d->TrefftzDistance()/2.0;
+                            Wg.set(0,0,0);
+                            for(int k=0; k<nTrefftzPt; k++)
+                            {
+                                Vector3d Pk = C + eSpan * gqStrip.xrel(k, -0.5, 0.5);
+                                Vector3d Wk;
+                                getVelocityVector(Pk, Mu4, Sigma4, Wk, Vortex::coreRadius(), true, s_bMultiThread);
+                                Wg += Wk * gqStrip.weight(k, -0.5, 0.5);
+                            }
+                            Wg *= 1.0/2.0;
+                        }
 
                         if(pp4.isTrailing())
                         {
