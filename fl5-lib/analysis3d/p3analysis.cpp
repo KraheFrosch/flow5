@@ -66,6 +66,45 @@ static int fl5TrefftzNpt()
     return (n>=1 && n<=16) ? n : 1;
 }
 
+/**
+ * FL5_TREFFTZ_EXACT=1: charges the exact far-field induced drag of the DISCRETE trailing
+ * vortex system (Munk/Trefftz-plane 2D): per strip a constant-strength vortex sheet
+ * segment (the linear doublet drop) plus point filaments at inter-strip circulation
+ * jumps and at the tips, evaluated with analytic 2D kernels — no point-sampled
+ * quadrature error is left for an optimizer to farm (a CMA arm defeated N-point Gauss
+ * sampling by digging a deeper dip whose CDi the sampler under-charged by 24%;
+ * everloft docs/ROOT_DIP_FIX_LOG.md §3.7). The sheet's tangential self-term is parallel
+ * to the strip and drops out of the drag cross product; the normal component is the
+ * finite Cauchy principal value.
+ */
+static bool fl5TrefftzExact()
+{
+    char const *v = getenv("FL5_TREFFTZ_EXACT");
+    return v && v[0]=='1';
+}
+
+// velocity in the (y,z) Trefftz plane induced by a straight constant-strength vortex
+// sheet segment A->B, sheet strength gamma per unit length (CCW-positive convention)
+static void fl5SheetVel(double Ay, double Az, double By, double Bz, double gamma,
+                        double Py, double Pz, double &vy, double &vz)
+{
+    double ty = By-Ay, tz = Bz-Az;
+    double L = sqrt(ty*ty+tz*tz);
+    if(L<1e-12) return;
+    ty/=L; tz/=L;
+    double ny = -tz, nz = ty;
+    double xi  = (Py-Ay)*ty + (Pz-Az)*tz;
+    double eta = (Py-Ay)*ny + (Pz-Az)*nz;
+    double th1 = atan2(eta, xi);
+    double th2 = atan2(eta, xi-L);
+    double r1s = xi*xi+eta*eta;
+    double r2s = (xi-L)*(xi-L)+eta*eta;
+    if(r1s<1e-20 || r2s<1e-20) return;
+    double ut = gamma/(2.0*PI)*(th1-th2);
+    double un = gamma/(4.0*PI)*log(r1s/r2s);
+    vy += ut*ty + un*ny;
+    vz += ut*tz + un*nz;
+}
 
 P3Analysis::P3Analysis() : PanelAnalysis()
 {
@@ -841,8 +880,101 @@ void P3Analysis::trefftzDrag(int nPanel3, double QInf, double alpha, double beta
     int nTrefftzPt = fl5TrefftzNpt();
     GaussQuadrature gqStrip(nTrefftzPt);
 
+    // FL5_TREFFTZ_EXACT pre-pass: collect the discrete trailing system in the (y,z)
+    // Trefftz plane — per-strip sheet segments and merged endpoint filaments
+    // (-gL at each strip's left node, +gR at its right node: junction jumps and tips)
+    bool bExact = fl5TrefftzExact();
+    int nExactPt = std::max(nTrefftzPt, 8);
+    GaussQuadrature gqE(nExactPt);
+    std::vector<double> exYl, exZl, exYr, exZr, exGl, exGr;
+    if(bExact)
+    {
+        Vector3d l_, r_;
+        for(int i3=0; i3<nPanel3; i3++)
+        {
+            Panel3 const &p3 = m_Panel3.at(i3+pos3);
+            if(!(p3.isTrailing() && (p3.isBotPanel() || p3.isMidPanel()))) continue;
+            Panel3 const *p3W = m_WakePanel3.data() + p3.iWake();
+            midWakePoint(p3W, l_, r_);
+            double gl=0, gr=0;
+            if(p3.isMidPanel())
+            {
+                int idxM = p3.index();
+                gl = -mu3[3*idxM+1]*4.0*PI;
+                gr = -mu3[3*idxM+2]*4.0*PI;
+            }
+            else
+            {
+                int idxB = p3.index();
+                int idxU = nextTopTrailingPanelIndex(p3);
+                if(bLRFix) { gl = (-mu3[3*idxU+1] + mu3[3*idxB+2])*4.0*PI; gr = (-mu3[3*idxU+2] + mu3[3*idxB+1])*4.0*PI; }
+                else       { gl = (-mu3[3*idxU+1] + mu3[3*idxB+1])*4.0*PI; gr = (-mu3[3*idxU+2] + mu3[3*idxB+2])*4.0*PI; }
+            }
+            exYl.push_back(l_.y); exZl.push_back(l_.z);
+            exYr.push_back(r_.y); exZr.push_back(r_.z);
+            exGl.push_back(gl);   exGr.push_back(gr);
+        }
+        // v2: the DG doublet jumps between strips would form point filaments whose
+        // far-field energy is log-divergent — any finite sampler implicitly
+        // renormalizes them, which is exactly what an optimizer farms (a CMA arm drove
+        // the charged CDi BELOW the Munk lower bound CL²/πAR this way). Instead charge
+        // the exact energy of the CONTINUOUS piecewise-linear circulation: node value =
+        // average of the DG values sharing the node, tip nodes ramped to zero within
+        // the tip strip. No filaments -> finite exact energy -> charge equals the
+        // exact Glauert value of the charged loading by construction.
+        double tol = 1e-6;
+        std::vector<double> ndY, ndZ, ndSum;
+        std::vector<int> ndCount;
+        std::vector<int> ndL(exGl.size(), -1), ndR(exGl.size(), -1);
+        for(size_t k=0; k<exGl.size(); k++)
+        {
+            double py[2]{exYl[k], exYr[k]}, pz[2]{exZl[k], exZr[k]}, pg[2]{exGl[k], exGr[k]};
+            for(int e=0; e<2; e++)
+            {
+                int found=-1;
+                for(size_t f=0; f<ndY.size(); f++)
+                {
+                    if(fabs(ndY[f]-py[e])<tol && fabs(ndZ[f]-pz[e])<tol) { found=int(f); break; }
+                }
+                if(found<0)
+                {
+                    found = int(ndY.size());
+                    ndY.push_back(py[e]); ndZ.push_back(pz[e]);
+                    ndSum.push_back(0.0); ndCount.push_back(0);
+                }
+                ndSum[found] += pg[e];
+                ndCount[found]++;
+                if(e==0) ndL[k]=found; else ndR[k]=found;
+            }
+        }
+        for(size_t f=0; f<ndY.size(); f++)
+            ndSum[f] = (ndCount[f]>1) ? ndSum[f]/double(ndCount[f]) : 0.0; // tips -> 0
+        {
+            char const *dmp = getenv("FL5_TREFFTZ_DUMP");
+            if(dmp && dmp[0])
+            {
+                FILE *fp = fopen(dmp, "w");
+                if(fp)
+                {
+                    fprintf(fp, "yl,zl,yr,zr,gL_DG,gR_DG,gL_hat,gR_hat\n");
+                    for(size_t k=0; k<exGl.size(); k++)
+                        fprintf(fp, "%.6f,%.6f,%.6f,%.6f,%.8f,%.8f,%.8f,%.8f\n",
+                                exYl[k], exZl[k], exYr[k], exZr[k],
+                                exGl[k], exGr[k], ndSum[ndL[k]], ndSum[ndR[k]]);
+                    fclose(fp);
+                }
+            }
+        }
+        for(size_t k=0; k<exGl.size(); k++)
+        {
+            exGl[k] = ndSum[ndL[k]];
+            exGr[k] = ndSum[ndR[k]];
+        }
+    }
+
     // Note: parallelization fails, incompatibility with std::vectors of SpanDistribs
     int m=0;
+    size_t kEx=0;
     for(int i3=0; i3<nPanel3; i3++)
     {
         int index = i3+pos3;
@@ -893,7 +1025,39 @@ void P3Analysis::trefftzDrag(int nPanel3, double QInf, double alpha, double beta
             u.set(p3.trailingVortex());
             u.normalize();
 
-            if(nTrefftzPt<=1)
+            if(bExact)
+            {
+                // exact far-field drag of the continuous piecewise-linear circulation
+                // (both the wash and the integrand use the nodal-averaged loading);
+                // 0.5 matches the legacy semi-infinite-doubling convention downstream
+                Wg_m.set(0,0,0);
+                double Ay=left.y, Az=left.z, By=right.y, Bz=right.z;
+                double ghL = exGl[kEx], ghR = exGr[kEx];
+                double ghM = (ghL+ghR)/2.0;
+                for(int k=0; k<nExactPt; k++)
+                {
+                    double t = gqE.xrel(k, -0.5, 0.5);
+                    double wt = gqE.weight(k, -0.5, 0.5);
+                    double Py = (Ay+By)/2.0 + (By-Ay)*t;
+                    double Pz = (Az+Bz)/2.0 + (Bz-Az)*t;
+                    double g = ghM + (ghR-ghL)*t;
+                    double vy=0, vz=0;
+                    for(size_t s2=0; s2<exGl.size(); s2++)
+                    {
+                        double Lsy = exYr[s2]-exYl[s2], Lsz = exZr[s2]-exZl[s2];
+                        double Ls = sqrt(Lsy*Lsy+Lsz*Lsz);
+                        if(Ls<1e-12) continue;
+                        fl5SheetVel(exYl[s2], exZl[s2], exYr[s2], exZr[s2], (exGl[s2]-exGr[s2])/Ls, Py, Pz, vy, vz);
+                    }
+                    Vector3d Wg_k(0.0, vy, vz);
+                    Wg_k *= 0.5;
+                    StripForce += (Wg_k * u) * (g * wt);
+                    Wg_m += Wg_k * wt;
+                }
+                StripForce *= p3.trailingVortex().norm();
+                kEx++;
+            }
+            else if(nTrefftzPt<=1)
             {
 //            getVelocityVector(left,  mu3, sigma3, Wg_l, 0.0001, true, s_bMultiThread);
             getVelocityVector(mid,   mu3, sigma3, Wg_m, s_trefftzCoreRadius, true, s_bMultiThread);
