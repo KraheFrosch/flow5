@@ -47,6 +47,9 @@ class FL5LIB_EXPORT P3Analysis : public PanelAnalysis
         virtual bool isTriUniMethod() const =0;
         virtual bool isTriLinMethod() const =0;
 
+        static double s_trefftzCoreRadius;
+        static void setTrefftzCoreRadius(double r) { s_trefftzCoreRadius = r; }
+
         void makeInfluenceMatrix() override;
         virtual void makeMatrixBlock(int iBlock) = 0;
 
